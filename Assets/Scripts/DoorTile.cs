@@ -6,19 +6,26 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider2D))]
 public class DoorTile : ActivableObject
 {
-    private BoxCollider2D collider2D;
+    private BoxCollider2D __collider2D;
+
     // Start is called before the first frame update
     void Start()
     {
-        collider2D = GetComponent<BoxCollider2D>();
+        __collider2D = GetComponent<BoxCollider2D>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!!collider2D)
+        if (!!__collider2D)
         {
-            collider2D.enabled = !isTriggered;
+            __collider2D.enabled = !isTriggered;
         }
     }//! update
+
+    public override void trigger() // OPEN/CLOSE DOOR
+    {
+        isTriggered =! isTriggered;
+    }
+
 }

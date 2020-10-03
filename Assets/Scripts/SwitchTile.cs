@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ButtonTile : MonoBehaviour
+public class SwitchTile : MonoBehaviour
 {
     public GameObject activable;
     
@@ -25,7 +25,7 @@ public class ButtonTile : MonoBehaviour
     }
 
     private void OnTriggerExit2D(Collider2D other)
-    {
-        activableObject.listen(signalKey);   
+    { 
     }
+
 }
