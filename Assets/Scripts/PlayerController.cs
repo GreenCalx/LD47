@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq.Expressions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -27,29 +26,28 @@ public class PlayerController : MonoBehaviour
 
     readonly float Speed = 1f;
 
-    public Looper L = new Looper();
+    public Looper L;
 
     /// <summary>
     /// References
     /// </summary>
-    readonly public GameObject GameLoop;
+    public GameObject GameLoop;
     WorldManager WM;
 
     // Start is called before the first frame update
-    void Start()
+    public void Start()
     {
         if(GameLoop)
         {
             WM = GameLoop.GetComponent<WorldManager>();
         }
- 
-        L.PC = this;
         this.energyCounter = new EnergyCounter();
     }
 
     /// <summary>
     /// WorldManager will call this with its current tick as it is the 
     /// master of ticks, this way all player's loops are synchronized
+    /// it will be used in FixedUpdate as it is fucking with physics possibily
     /// </summary>
     /// <param name="CurrentIdx"></param>
     public void RequireTick(int CurrentIdx)
@@ -92,11 +90,9 @@ public class PlayerController : MonoBehaviour
     }
 
     // Update is called once per frame
+    // Everything related to in^puts is done here
     void Update()
     {
-        
-
-
         if (!IsLoopedControled)
         {
             //var Up    = Input.GetAxisRaw(DirectionInputs[(int)Direction.UP]);
@@ -122,11 +118,16 @@ public class PlayerController : MonoBehaviour
                 var P = GO.GetComponent<PlayerController>();
                 if (P)
                 {
+                    // Update newly created looper with current loop previous
+                    // frames
                     P.L.Events = this.L.Events.GetRange(0, this.L.CurrentIdx+1);
-                    P.L.IsRecording = true;
+                    P.L.StartRecording();
+                    // IMPORTANT : this nees to be done after StartRecording as it will take current 
+                    // position as start position and we dont want that
                     P.L.StartPosition = this.L.StartPosition;
                 }
 
+                // For now new players are randomly colored
                 var SpriteRender = GO.GetComponent<SpriteRenderer>();
                 if (SpriteRender)
                 {

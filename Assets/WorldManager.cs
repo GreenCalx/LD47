@@ -10,30 +10,48 @@ public class WorldManager : MonoBehaviour
 
     int CurrentTick = 0;
 
+    public Vector2 StartPosition; //. First player will appear at this position
+
+    /// <summary>
+    /// This function will create the prefab of player
+    /// and add it to the current world manager to be managed by it for ticks
+    /// </summary>
+    /// <param name="P"></param>
+    /// <returns></returns>
     public GameObject AddPlayer( Vector2 P)
     {
         var GO = Instantiate(PlayerPrefab, P, Quaternion.identity);
-        Players.Add(GO);
-        var PC = GO.GetComponent<PlayerController>();
-        GO.SetActive( true );
+        if (GO)
+        {
+            // prefab is deactivated on spectree as it is used only as prefab
+            // and we dont want it to work
+            GO.SetActive(true);
+            Players.Add(GO);
+        }
         return GO;
     }
     // Start is called before the first frame update
     void Start()
     {
-        AddPlayer(new Vector2());
+        var GO = AddPlayer(StartPosition);
+        var PC = GO.GetComponent<PlayerController>();
+        PC.Start();
+        PC.L.StartRecording();
     }
 
     // Update is called once per frame
     void Update()
     {
+        // For now ticks are done by hand!
         if (Input.GetKeyDown(KeyCode.M))
         {
+            // See if we arrived to the longest loop end
+            // if thats the case we reset all loops to be started again frame 0
             bool NeedReset = false;
-            if (Players.Count >= 1)
+            if (Players.Count >= 1) // No need if no players
             {
                 var P = Players[0].GetComponent<PlayerController>(); // supposed to be longest
-                if (P.L.IsRunning)
+                if (P.L.IsRunning) // Only if Running ?
                 {
                     if (CurrentTick >= P.L.Events.Count)
                     {
@@ -47,19 +65,10 @@ public class WorldManager : MonoBehaviour
             foreach ( var Player in Players )
             {
                 var go = Player.GetComponent<PlayerController>();
-                if (NeedReset)
-                {
-                    go.L.Reset();
-                }
-                else
-                {
-                    if (go)
-                    {
-                        go.RequireTick(CurrentTick);
-                    }
-                }
+                if (NeedReset) go.L.ReStart();
+                else if (go) go.RequireTick(CurrentTick);
             }
-            
+            // Only increment Curenttick if we didn't need to reset
             if( !NeedReset ) CurrentTick++;
         }
     }
