@@ -1,0 +1,77 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "test.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "level1.tmx": {
+            "scale": 0.4513,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 853.0910702415244,
+                "y": 549.5235984932419
+            }
+        },
+        "level1.tmx#test": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1
+        },
+        "level2.tmx": {
+            "scale": 0.5241,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": -280.48082427017744,
+                "y": 410.22705590536145
+            }
+        },
+        "level3.tmx": {
+            "scale": 0.5607,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": -90.9577314071696,
+                "y": 67.77242732298919
+            }
+        },
+        "sprites.tsx": {
+            "dynamicWrapping": true
+        },
+        "test.tmx": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": -18,
+                "y": 16
+            }
+        },
+        "test.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "tilesAssets/test.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "map.fixedSize": false,
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 64,
+    "map.tileWidth": 64,
+    "openFiles": [
+        "test.tmx"
+    ],
+    "project": "level_design.tiled-project",
+    "recentFiles": [
+        "test.tmx",
+        "test.tsx",
+        "tilesAssets/test.tsx",
+        "level1.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.type": 1
+}
