@@ -296,6 +296,11 @@ PrefabInstance:
       propertyPath: GameLoop
       value: 
       objectReference: {fileID: 1069861534}
+    - target: {fileID: 6013280694991801665, guid: fe40bb787fcbda24e86031d229a96cf4,
+        type: 3}
+      propertyPath: animationtime
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 6013280694991801666, guid: fe40bb787fcbda24e86031d229a96cf4,
         type: 3}
       propertyPath: m_LocalPosition.x

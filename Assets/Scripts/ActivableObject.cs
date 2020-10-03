@@ -10,6 +10,10 @@ public enum SIGNAL_KEYS
 
 public class ActivableObject : MonoBehaviour
 {
+    public GameObject[] activators;
+    public List<ActivatorObject> activatorsObject = new List<ActivatorObject>();
+    private List<ActivatorObject> currentActivatorsObject = new List<ActivatorObject>();
+
     public SIGNAL_KEYS key;
     public bool isTriggered     = false;
 
@@ -17,19 +21,33 @@ public class ActivableObject : MonoBehaviour
     void Start()
     {
         isTriggered = false;
+
+        foreach (var go in activators)
+        {
+            activatorsObject.Add(go.GetComponent<ActivatorObject>());
+        }
     }
 
     public virtual void trigger() {}
 
-    public void listen(SIGNAL_KEYS iSigKey) 
+    public void listen(SIGNAL_KEYS iSigKey, ActivatorObject activator) 
     {
+        currentActivatorsObject.Add(activator);
 
-        if ( key == SIGNAL_KEYS.NONE )
+        activatorsObject.Sort();
+        currentActivatorsObject.Sort();
+        if (activatorsObject.Equals(currentActivatorsObject))
         {
-            trigger();
-        } else if (iSigKey == key)
-        {
-            trigger();
+
+            if (key == SIGNAL_KEYS.NONE)
+            {
+                trigger();
+            }
+            else if (iSigKey == key)
+            {
+                trigger();
+            }
+
         }
         
     }

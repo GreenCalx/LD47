@@ -8,7 +8,7 @@ public class SwitchTile : ActivatorObject
     private void OnTriggerEnter2D(Collider2D other)
     {
         foreach( ActivableObject ao in activableObjects )
-            ao.listen(signalKey);   
+            ao.listen(signalKey, this);   
     }
 
     private void OnTriggerStay2D(Collider2D other)
