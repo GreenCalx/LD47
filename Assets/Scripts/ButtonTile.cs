@@ -8,10 +8,6 @@ public class ButtonTile : ActivatorObject
     //public SIGNAL_KEYS signalKey;
     //private ActivableObject activableObject;
 
-    void Start()
-    {
-    }
-
     private void OnTriggerEnter2D(Collider2D other)
     {
         foreach( ActivableObject ao in activableObjects )

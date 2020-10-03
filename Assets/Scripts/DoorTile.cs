@@ -26,6 +26,9 @@ public class DoorTile : ActivableObject
     public override void trigger() // OPEN/CLOSE DOOR
     {
         isTriggered =! isTriggered;
+        SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
+        if (!!sr)
+            sr.enabled = !isTriggered;
     }
 
 }

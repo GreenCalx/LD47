@@ -9,7 +9,7 @@ public class ActivatorObject : MonoBehaviour
     protected List<ActivableObject> activableObjects;
 
     // Start is called before the first frame update
-    void Start()
+    protected virtual void Start()
     {
         activableObjects = new List<ActivableObject>();
         foreach( GameObject go in activables )
@@ -21,6 +21,7 @@ public class ActivatorObject : MonoBehaviour
             }
         }
     }
+    
 
     // Update is called once per frame
     void Update()

@@ -5,10 +5,6 @@ using UnityEngine;
 public class SwitchTile : ActivatorObject
 {
 
-    void Start()
-    {
-    }
-
     private void OnTriggerEnter2D(Collider2D other)
     {
         foreach( ActivableObject ao in activableObjects )

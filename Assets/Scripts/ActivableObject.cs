@@ -31,6 +31,6 @@ public class ActivableObject : MonoBehaviour
         {
             trigger();
         }
-            
+        
     }
 }
