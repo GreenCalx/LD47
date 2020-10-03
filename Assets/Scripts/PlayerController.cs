@@ -55,12 +55,19 @@ public class PlayerController : MonoBehaviour
         TickRequired = true;
         L.CurrentIdx = CurrentIdx;
     }
-
-    /// <summary>
-    /// If WorldManager asked a Tick, then we update the player according to
-    /// either the current loop doirection or the player asked direction
-    /// </summary>
-    void FixedUpdate()
+    void OnCollisionEnter(Collision collision)
+    {
+        var PC = collision.gameObject.GetComponent<PlayerController>();
+        if (PC)
+        {
+            Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
+        }
+    }
+        /// <summary>
+        /// If WorldManager asked a Tick, then we update the player according to
+        /// either the current loop doirection or the player asked direction
+        /// </summary>
+        void FixedUpdate()
     {
         if (TickRequired)
         {

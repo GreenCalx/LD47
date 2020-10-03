@@ -19,8 +19,8 @@ public class ExitTile : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        string obj_name = other.name;
-        if ( obj_name == "Player" )
+        var PC = other.gameObject.GetComponent<PlayerController>();
+        if ( PC)
         {
             SceneManager.LoadScene( "LevelSelectorScene", LoadSceneMode.Single);
         }
