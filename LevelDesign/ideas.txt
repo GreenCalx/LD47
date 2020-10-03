@@ -1,0 +1,5 @@
+- tile speed x2
+- tile no break
+- tile consomable refresh action points
+- tile new loop start
+- tile consomable loose action points 
