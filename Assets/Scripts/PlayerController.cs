@@ -108,14 +108,15 @@ public class PlayerController : MonoBehaviour
                                                                   Speed * Directionf[(int)CurrentDirection].y,
                                                                   0);
                 bool has_energy_left = energyCounter.tryConsume();
-                levelUI.refresh();
+                if (!!levelUI)
+                    levelUI.refresh();
                 if (!has_energy_left)
                 {
                     L.StopRecording();
                     L.StartRunning();
                     energyCounter.refillAll();
-
-                    levelUI.refresh();
+                    if (!!levelUI)
+                        levelUI.refresh();
                 }
 
                 Tails.Add(Instantiate(TailPrefab, this.gameObject.transform.position, Quaternion.identity));
