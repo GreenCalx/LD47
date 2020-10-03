@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Security.AccessControl;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -32,12 +33,14 @@ public class PlayerController : MonoBehaviour
 
     public Looper L;
 
+    List<GameObject> Tails = new List<GameObject>();
+
     /// <summary>
     /// References
     /// </summary>
     public GameObject GameLoop;
     WorldManager WM;
-
+    public GameObject TailPrefab;
     // Start is called before the first frame update
     public void Start()
     {
@@ -99,6 +102,7 @@ public class PlayerController : MonoBehaviour
             // TODO: What about physics?? Do we rely on RigidBody?
             if (CurrentDirection != Direction.NONE)
             {
+
                 this.gameObject.transform.position += new Vector3(Speed * Directionf[(int)CurrentDirection].x,
                                                                   Speed * Directionf[(int)CurrentDirection].y,
                                                                   0);
@@ -112,11 +116,27 @@ public class PlayerController : MonoBehaviour
 
                     levelUI.refresh();
                 }
+
+                Tails.Add(Instantiate(TailPrefab, this.gameObject.transform.position, Quaternion.identity));
+                Tails[Tails.Count - 1].SetActive(true);
+                Tails[Tails.Count - 1].transform.localScale = Tails[Tails.Count - 1].transform.localScale * 0.8f;
+                var c = GetComponent<SpriteRenderer>().color;
+                Tails[Tails.Count - 1].GetComponent<Tail>().SR.color = new Color(c.r, c.g, c.b, c.a * 0.8f);
+
+                this.gameObject.transform.position += new Vector3(Speed * Directionf[(int)CurrentDirection].x,
+                                                                  Speed * Directionf[(int)CurrentDirection].y,
+                                                                  0);                
             }
             // Reset position once we updated the player
             // This way we expect the position to be None if the player is not
             // touching any button during a tick
             CurrentDirection = PlayerController.Direction.NONE;
+
+            foreach(var Tail in Tails)
+            {
+                if(Tail)
+                Tail.GetComponent<Tail>().Tick();
+            }
         }
         TickRequired = false;
     }
