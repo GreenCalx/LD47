@@ -24,7 +24,7 @@ public class PlayerController : MonoBehaviour
     public bool IsLoopedControled = false;
     bool HasAlreadyBeenBreakedFrom = false;
     public EnergyCounter energyCounter;
-    public GameObject levelUI_GOref;
+    private GameObject levelUI_GOref;
     private GameObject levelUI_GO;
     public LevelUI levelUI;
 
@@ -58,6 +58,7 @@ public class PlayerController : MonoBehaviour
         levelUI_GO = Instantiate(levelUI_GOref);
         levelUI = levelUI_GO.GetComponent<LevelUI>();
         levelUI.playerRef = this.gameObject;
+        levelUI.refresh();
     }
 
     /// <summary>
@@ -177,6 +178,10 @@ public class PlayerController : MonoBehaviour
                     // IMPORTANT : this nees to be done after StartRecording as it will take current 
                     // position as start position and we dont want that
                     P.L.StartPosition = this.L.StartPosition;
+
+                    // update new player controller energy counter
+                    EnergyCounter new_ec = energyCounter.getNestedCounter();
+                    P.energyCounter = new_ec;
                 }
 
                 // For now new players are randomly colored
