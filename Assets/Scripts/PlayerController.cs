@@ -55,12 +55,12 @@ public class PlayerController : MonoBehaviour
         TickRequired = true;
         L.CurrentIdx = CurrentIdx;
     }
-    void OnCollisionEnter(Collision collision)
+    void OnCollisionEnter2D(Collision2D collision)
     {
         var PC = collision.gameObject.GetComponent<PlayerController>();
         if (PC)
         {
-            Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
+            Physics2D.IgnoreCollision(collision.collider, GetComponent<Collider2D>());
         }
     }
         /// <summary>

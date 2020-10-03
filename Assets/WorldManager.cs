@@ -26,6 +26,12 @@ public class WorldManager : MonoBehaviour
             // prefab is deactivated on spectree as it is used only as prefab
             // and we dont want it to work
             GO.SetActive(true);
+
+            foreach(var Player in Players)
+            {
+                Physics2D.IgnoreCollision(Player.GetComponent<Collider2D>(), GO.GetComponent<Collider2D>());
+            }
+
             Players.Add(GO);
         }
         return GO;
