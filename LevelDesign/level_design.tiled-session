@@ -12,8 +12,8 @@
             "scale": 0.4513,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 853.0910702415244,
-                "y": 549.5235984932419
+                "x": 1169.9534677598049,
+                "y": 553.9552404165745
             }
         },
         "level1.tmx#test": {
@@ -24,16 +24,56 @@
             "scale": 0.5241,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": -280.48082427017744,
-                "y": 410.22705590536145
+                "x": -76.32131272657898,
+                "y": 408.3190230871971
             }
         },
         "level3.tmx": {
-            "scale": 0.5607,
+            "scale": 0.4852,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": -90.9577314071696,
-                "y": 67.77242732298919
+                "x": 136.0263808738664,
+                "y": 111.29431162407252
+            }
+        },
+        "level4.tmx": {
+            "scale": 0.3925,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": -351.592356687898,
+                "y": 35.668789808917154
+            }
+        },
+        "level5.json": {
+            "scale": 0.4193359375,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 0,
+                "y": 0
+            }
+        },
+        "level5.tmx": {
+            "scale": 0.5142,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 203.22831583041614,
+                "y": -13.613380007779142
+            }
+        },
+        "level6.tmx": {
+            "scale": 0.5216,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": -96.81748466257682,
+                "y": -111.19631901840489
+            }
+        },
+        "level7.tmx": {
+            "scale": 0.6026,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": -412.3796880185862,
+                "y": 79.65482907401258
             }
         },
         "sprites.tsx": {
@@ -52,6 +92,14 @@
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
+        "tests.tmx": {
+            "scale": 0.6026,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": -169.2665117822769,
+                "y": -288.7487553932957
+            }
+        },
         "tilesAssets/test.tsx": {
             "dynamicWrapping": true,
             "scaleInDock": 1,
@@ -59,6 +107,7 @@
         }
     },
     "map.fixedSize": false,
+    "map.lastUsedExportFilter": "JSON map files (*.json)",
     "map.lastUsedFormat": "tmx",
     "map.tileHeight": 64,
     "map.tileWidth": 64,
@@ -67,10 +116,16 @@
     ],
     "project": "level_design.tiled-project",
     "recentFiles": [
+        "level4.tmx",
+        "level3.tmx",
+        "level5.tmx",
+        "level2.tmx",
+        "level1.tmx",
+        "level6.tmx",
+        "level5.json",
         "test.tmx",
         "test.tsx",
-        "tilesAssets/test.tsx",
-        "level1.tmx"
+        "tilesAssets/test.tsx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.type": 1
