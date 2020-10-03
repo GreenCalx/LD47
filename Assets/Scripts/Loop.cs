@@ -92,6 +92,7 @@ namespace Assets.Scripts
                         if (CurrentTime >= Events[CurrentEvent].DirectionTime)
                         {
                             CurrentEvent += 1;
+                            CurrentTime = 0;
                             if (CurrentEvent > Events.Count-1)
                             {
                                 CurrentEvent = 0;
