@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [System.Serializable]
@@ -18,7 +19,7 @@ public class ActivableObject : MonoBehaviour
     public bool isTriggered     = false;
 
     // Start is called before the first frame update
-    void Start()
+    public void Start()
     {
         isTriggered = false;
 
@@ -36,7 +37,8 @@ public class ActivableObject : MonoBehaviour
 
         activatorsObject.Sort();
         currentActivatorsObject.Sort();
-        if (activatorsObject.Equals(currentActivatorsObject))
+        var Result = activatorsObject.Except(currentActivatorsObject);
+        if (!Result.Any())
         {
 
             if (key == SIGNAL_KEYS.NONE)

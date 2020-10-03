@@ -12,6 +12,7 @@ public class DoorTile : ActivableObject
     void Start()
     {
         __collider2D = GetComponent<BoxCollider2D>();
+        base.Start();
     }
 
     // Update is called once per frame
