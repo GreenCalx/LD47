@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 public class LevelUI : MonoBehaviour
 {
-
     [Range(0, 1f)] [SerializeField] public float energy_disabled_alpha = 0.5f;
     [Range(0, 1f)] [SerializeField] public float energy_enabled_alpha = 1f;
     public GameObject playerRef;
@@ -35,7 +34,7 @@ public class LevelUI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        refresh();
+        //refresh();
     }
 
     public void refresh()
@@ -49,6 +48,7 @@ public class LevelUI : MonoBehaviour
                 updateEnergyPanels(ec.energy);
             }
         }
+        else { Debug.Log("UIEnergy : Player ref is missing"); }
     }
 
     public void updateEnergyPanels( int iPlayerEnergy)
@@ -60,7 +60,7 @@ public class LevelUI : MonoBehaviour
             if (!!im)
             {
                 var new_color = im.color;
-                new_color.a = ( i >= iPlayerEnergy ) ? energy_enabled_alpha : energy_disabled_alpha;
+                new_color = ( i >= iPlayerEnergy ) ? UnityEngine.Color.red : UnityEngine.Color.white;
                 im.color = new_color;
             }
         }

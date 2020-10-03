@@ -7,6 +7,7 @@ public class WorldManager : MonoBehaviour
 {
     List<GameObject> Players = new List<GameObject>();
     public GameObject PlayerPrefab;
+    public GameObject levelUI_GOref;
 
 
     int CurrentTick = 0;
@@ -45,6 +46,10 @@ public class WorldManager : MonoBehaviour
         var GO = AddPlayer(StartPosition);
         var PC = GO.GetComponent<PlayerController>();
         PC.Start();
+        if (!!levelUI_GOref)
+            PC.initUI(levelUI_GOref);
+        else
+            Debug.Log("WorldManager : NO UI FOUND.");
         PC.L.StartRecording();
     }
 
