@@ -10,6 +10,8 @@ public class WorldManager : MonoBehaviour
 
 
     int CurrentTick = 0;
+    public float TickRate = 2f; // 2 seconds
+    float CurrentTime = 0;
 
     public Vector2 StartPosition; //. First player will appear at this position
 
@@ -49,9 +51,11 @@ public class WorldManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        CurrentTime += Time.deltaTime;
         // For now ticks are done by hand!
-        if (Input.GetKeyDown(KeyCode.M))
+        if (Input.GetKeyDown(KeyCode.M) || CurrentTime > TickRate)
         {
+            CurrentTime = 0;
             // See if we arrived to the longest loop end
             // if thats the case we reset all loops to be started again frame 0
             bool NeedReset = false;
