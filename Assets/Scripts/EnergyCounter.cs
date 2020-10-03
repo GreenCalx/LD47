@@ -11,12 +11,12 @@ public class EnergyCounter
     public int energy;
 
     // Start is called before the first frame update
-    EnergyCounter()
+    public EnergyCounter()
     {
         refillAll();
     }
 
-    EnergyCounter( int iMaxEnergy, int iMaxReplenish)
+    public EnergyCounter( int iMaxEnergy, int iMaxReplenish)
     {
         MAX_ENERGY      = iMaxEnergy;
         MAX_REPLENISH   = iMaxReplenish;
