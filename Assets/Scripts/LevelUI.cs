@@ -6,6 +6,8 @@ using UnityEngine.UI;
 public class LevelUI : MonoBehaviour
 {
 
+    [Range(0, 1f)] [SerializeField] public float energy_disabled_alpha = 0.5f;
+    [Range(0, 1f)] [SerializeField] public float energy_enabled_alpha = 1f;
     public GameObject playerRef;
     public GameObject[] energy_panels;
     public GameObject   replenish_label;
@@ -15,6 +17,7 @@ public class LevelUI : MonoBehaviour
 
     private Text ui_replenish_lbl;
 
+    private const string ENERGY_PANEL_PREFIX = "ENERGY";
 
     // Start is called before the first frame update
     void Start()
@@ -39,22 +42,27 @@ public class LevelUI : MonoBehaviour
     {
         if (!!hasPlayerRef)
         {
-            // TODO : get counter from player
             EnergyCounter ec = playerController.energyCounter;
             if (ec != null)
             {
                 ui_replenish_lbl.text   = "" + ec.replenish;
                 updateEnergyPanels(ec.energy);
-                
             }
         }
     }
 
     public void updateEnergyPanels( int iPlayerEnergy)
     {
+        UIEnergyPanel[] energy_panels = GetComponentsInChildren<UIEnergyPanel>();
         for (int i=0; i < energy_panels.Length; i++)
         {
-            
+            Image im = energy_panels[i].gameObject.GetComponent<Image>();
+            if (!!im)
+            {
+                var new_color = im.color;
+                new_color.a = ( i >= iPlayerEnergy ) ? energy_enabled_alpha : energy_disabled_alpha;
+                im.color = new_color;
+            }
         }
     }
 }

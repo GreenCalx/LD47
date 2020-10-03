@@ -2,21 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ButtonTile : MonoBehaviour
+public class ButtonTile : ActivatorObject
 {
-    public GameObject activable;
-    
-    public SIGNAL_KEYS signalKey;
-    private ActivableObject activableObject;
+    //public GameObject activable;
+    //public SIGNAL_KEYS signalKey;
+    //private ActivableObject activableObject;
 
     void Start()
     {
-        activableObject = activable.GetComponent<ActivableObject>();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        activableObject.listen(signalKey);
+        foreach( ActivableObject ao in activableObjects )
+            ao.listen(signalKey);  
     }
 
     private void OnTriggerStay2D(Collider2D other)
@@ -26,6 +25,7 @@ public class ButtonTile : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        activableObject.listen(signalKey);   
+        foreach( ActivableObject ao in activableObjects )
+            ao.listen(signalKey);   
     }
 }

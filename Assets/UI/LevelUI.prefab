@@ -205,7 +205,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc0e07a8007d1524fa781438955208c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ENERGY_LEVEL: 0
+  ENERGY_LEVEL: 1
 --- !u!1 &7677855202246996948
 GameObject:
   m_ObjectHideFlags: 0
@@ -217,6 +217,7 @@ GameObject:
   - component: {fileID: 7677855202246996949}
   - component: {fileID: 7677855202246996951}
   - component: {fileID: 7677855202246996950}
+  - component: {fileID: 7069215069897060577}
   m_Layer: 5
   m_Name: ENERGY5
   m_TagString: Untagged
@@ -280,6 +281,19 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &7069215069897060577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7677855202246996948}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc0e07a8007d1524fa781438955208c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ENERGY_LEVEL: 5
 --- !u!1 &7677855202327067222
 GameObject:
   m_ObjectHideFlags: 0
@@ -291,6 +305,7 @@ GameObject:
   - component: {fileID: 7677855202327067223}
   - component: {fileID: 7677855202327067241}
   - component: {fileID: 7677855202327067240}
+  - component: {fileID: 8807097666934757854}
   m_Layer: 5
   m_Name: ENERGY3
   m_TagString: Untagged
@@ -354,6 +369,19 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &8807097666934757854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7677855202327067222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc0e07a8007d1524fa781438955208c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ENERGY_LEVEL: 3
 --- !u!1 &7677855202684426865
 GameObject:
   m_ObjectHideFlags: 0
@@ -365,6 +393,7 @@ GameObject:
   - component: {fileID: 7677855202684426866}
   - component: {fileID: 7677855202684426868}
   - component: {fileID: 7677855202684426867}
+  - component: {fileID: 6021875486561882626}
   m_Layer: 5
   m_Name: ENERGY4
   m_TagString: Untagged
@@ -428,6 +457,19 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &6021875486561882626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7677855202684426865}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc0e07a8007d1524fa781438955208c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ENERGY_LEVEL: 4
 --- !u!1 &7677855202957420476
 GameObject:
   m_ObjectHideFlags: 0
@@ -593,6 +635,7 @@ GameObject:
   - component: {fileID: 7677855203478727644}
   - component: {fileID: 7677855203478727646}
   - component: {fileID: 7677855203478727645}
+  - component: {fileID: 3075457871258768076}
   m_Layer: 5
   m_Name: ENERGY2
   m_TagString: Untagged
@@ -656,6 +699,19 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3075457871258768076
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7677855203478727643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc0e07a8007d1524fa781438955208c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ENERGY_LEVEL: 2
 --- !u!1 &7677855203704025668
 GameObject:
   m_ObjectHideFlags: 0
