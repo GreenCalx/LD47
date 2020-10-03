@@ -170,34 +170,13 @@ public class PlayerController : MonoBehaviour
         {
             if (!IsLoopedControled)
             {
-
-                // break from the loop
-                HasAlreadyBeenBreakedFrom = true;
-                // create a new player at current position
-                var GO = WM.AddPlayer(this.gameObject.transform.position);
-                var P = GO.GetComponent<PlayerController>();
-                if (P)
-                {
-                    // Update newly created looper with current loop previous
-                    // frames
-                    P.L.Events = this.L.Events.GetRange(0, this.L.CurrentIdx+1);
-                    P.L.StartRecording();
-                    // IMPORTANT : this nees to be done after StartRecording as it will take current 
-                    // position as start position and we dont want that
-                    P.L.StartPosition = this.L.StartPosition;
-
-                    // update new player controller energy counter
-                    EnergyCounter new_ec = energyCounter.getNestedCounter();
-                    P.energyCounter = new_ec;
-                }
-
+            
                 //var Up    = Input.GetAxisRaw(DirectionInputs[(int)Direction.UP]);
                 //var Right = Input.GetAxisRaw(DirectionInputs[(int)Direction.RIGHT]);
                 var Up = Input.GetButtonDown(DirectionInputs[(int)Direction.UP]);
                 var Down = Input.GetButtonDown(DirectionInputs[(int)Direction.DOWN]);
                 var Right = Input.GetButtonDown(DirectionInputs[(int)Direction.RIGHT]);
                 var Left = Input.GetButtonDown(DirectionInputs[(int)Direction.LEFT]);
-
 
                 if (Up) CurrentDirection = Direction.UP;
                 if (Down) CurrentDirection = Direction.DOWN;

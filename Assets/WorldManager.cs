@@ -35,15 +35,7 @@ public class WorldManager : MonoBehaviour
             {
                 Physics2D.IgnoreCollision(Player.GetComponent<Collider2D>(), GO.GetComponent<Collider2D>());
             }
-
             Players.Add(GO);
-
-            var PC = GO.GetComponent<PlayerController>();
-            if (!!levelUI_GOref)
-                PC.initUI(levelUI_GOref);
-            else
-                Debug.Log("WorldManager : NO UI FOUND.");
-
         }
         return GO;
     }
@@ -52,6 +44,10 @@ public class WorldManager : MonoBehaviour
     {
         var GO = AddPlayer(StartPosition);
         var PC = GO.GetComponent<PlayerController>();
+        if (!!levelUI_GOref)
+            PC.initUI(levelUI_GOref);
+        else
+            Debug.Log("WorldManager : NO UI FOUND.");
         PC.Start();
         PC.L.StartRecording();
     }

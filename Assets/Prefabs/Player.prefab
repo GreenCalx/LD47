@@ -245,9 +245,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   CurrentDirection: 4
   IsLoopedControled: 0
+  levelUI: {fileID: 0}
   L: {fileID: 2963608312177263724}
   GameLoop: {fileID: 0}
   TailPrefab: {fileID: 851262058}
+  animationtime: 0.5
+  maxLocalScale: 200
 --- !u!61 &1593470860993976547
 BoxCollider2D:
   m_ObjectHideFlags: 0
