@@ -197,6 +197,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -6128108969864301200, guid: 1052cc782ac433546b20275fed6e25ed,
+        type: 3}
+      propertyPath: signalKey
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -6128108969864301200, guid: 1052cc782ac433546b20275fed6e25ed,
+        type: 3}
+      propertyPath: activable
+      value: 
+      objectReference: {fileID: 1390892157}
     - target: {fileID: 4558887905771045256, guid: 1052cc782ac433546b20275fed6e25ed,
         type: 3}
       propertyPath: m_Name
@@ -259,6 +269,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1052cc782ac433546b20275fed6e25ed, type: 3}
+--- !u!1 &1390892157 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3291880432823398901, guid: 422913cc1cf8f5a4299cd449fd31e88d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1886951596}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1423689668
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -532,6 +548,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: DoorTile
+      objectReference: {fileID: 0}
+    - target: {fileID: 9162789474972756765, guid: 422913cc1cf8f5a4299cd449fd31e88d,
+        type: 3}
+      propertyPath: key
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 422913cc1cf8f5a4299cd449fd31e88d, type: 3}
