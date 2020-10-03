@@ -3,8 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 
-namespace Assets.Scripts
-{
     public class Loop : MonoBehaviour
     {
         public PlayerController Player;
@@ -68,7 +66,11 @@ namespace Assets.Scripts
                 if (StopRecord) IsRecording = false;
             } else
             {
-                if (Record) IsRecording = true;
+                if (Record)
+                { 
+                   IsRecording = true;
+                    StartPosition = Player.transform.position;
+                }
             }
 
 
@@ -119,4 +121,3 @@ namespace Assets.Scripts
 
         }
     }
-}
