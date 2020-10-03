@@ -8,67 +8,32 @@ using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviour
 {
-    public class Looper
-    {
-        public PlayerController PC;
-        
-        public Vector2 StartPosition;
-        public List<PlayerController.Direction> Events = new List<PlayerController.Direction>();
-        public bool IsPaused = false;
-        public bool IsRunning = false;
-        public bool IsRecording = true;
-
-        public int CurrentIdx;
-
-        public PlayerController.Direction Tick()
-        {
-            if (CurrentIdx >= Events.Count) return PlayerController.Direction.NONE;
-            else return Events[CurrentIdx];            
-        }
-
-        public void Reset()
-        {
-            PC.gameObject.transform.position = new Vector3(StartPosition.x, StartPosition.y, 0);
-        }
-
-        public void Start()
-        {
-            Reset();
-        }
-
-        public void Stop()
-        {
-            Reset();
-        }
-        public void StartRecord()
-        {
-            StartPosition = PC.gameObject.transform.position;
-            IsRecording = true;
-            IsPaused = false;
-            IsRunning = false;
-        }
-
-        public void EndRecord()
-        {
-            IsRecording = false;
-        }
-    }
-    public Looper L = new Looper();
-
+    /// <summary>
+    /// Directions related variables
+    /// </summary>
     public enum Direction { UP, DOWN, RIGHT, LEFT, NONE };
     //readonly string[]  DirectionInputs = { "Vertical",          "Vertical",          "Horizontal",        "Horizontal"               };
     readonly string[] DirectionInputs = { "Up", "Down", "Right", "Left" };
     readonly Vector2[] Directionf = { new Vector2(0, 1), new Vector2(0, -1), new Vector2(1, 0), new Vector2(-1, 0) };
+    
+    /// <summary>
+    /// State variables
+    /// </summary>
     public Direction CurrentDirection = Direction.NONE;
-
     bool TickRequired = false;
     public bool IsLoopedControled = false;
     bool HasAlreadyBeenBreakedFrom = false;
 
-    float Speed = 1f;
+    readonly float Speed = 1f;
 
-    public GameObject GameLoop;
+    public Looper L = new Looper();
+
+    /// <summary>
+    /// References
+    /// </summary>
+    readonly public GameObject GameLoop;
     WorldManager WM;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -80,30 +45,45 @@ public class PlayerController : MonoBehaviour
         L.PC = this;
     }
 
+    /// <summary>
+    /// WorldManager will call this with its current tick as it is the 
+    /// master of ticks, this way all player's loops are synchronized
+    /// </summary>
+    /// <param name="CurrentIdx"></param>
     public void RequireTick(int CurrentIdx)
     {
         TickRequired = true;
         L.CurrentIdx = CurrentIdx;
     }
 
+    /// <summary>
+    /// If WorldManager asked a Tick, then we update the player according to
+    /// either the current loop doirection or the player asked direction
+    /// </summary>
     void FixedUpdate()
     {
         if (TickRequired)
         {
-            if (IsLoopedControled && L.IsRunning)
+            // We update the direction from the loop if it is loop controlled
+            if (L.IsRunning && IsLoopedControled )
             {
                 CurrentDirection = L.Tick();
             }
 
-            if (CurrentDirection != Direction.NONE)
-                this.gameObject.transform.position += new Vector3(Speed * Directionf[(int)CurrentDirection].x,
-                                                                  Speed * Directionf[(int)CurrentDirection].y,
-                                                                  0);
             if (L.IsRecording)
             {
                 L.Events.Add(CurrentDirection);
             }
 
+            // Update position of the player
+            // TODO: What about physics?? Do we rely on RigidBody?
+            if (CurrentDirection != Direction.NONE)
+                this.gameObject.transform.position += new Vector3(Speed * Directionf[(int)CurrentDirection].x,
+                                                                  Speed * Directionf[(int)CurrentDirection].y,
+                                                                  0);
+            // Reset position once we updated the player
+            // This way we expect the position to be None if the player is not
+            // touching any button during a tick
             CurrentDirection = PlayerController.Direction.NONE;
         }
         TickRequired = false;
@@ -112,44 +92,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        var Start = Input.GetKeyDown(KeyCode.A);
-        var Stop = Input.GetKeyDown(KeyCode.Z);
-        var Pause = Input.GetKeyDown(KeyCode.E);
-        var Restart = Input.GetKeyDown(KeyCode.R);
-        var Record = Input.GetKeyDown(KeyCode.T);
-        var StopRecord = Input.GetKeyDown(KeyCode.Y);
-
-        if (L.IsRunning)
-        {
-
-            if (Stop)
-            {
-                IsLoopedControled = false;
-                L.IsRunning = false;
-            }
-            if (Pause) L.IsPaused = true;
-        }
-        else
-        {
-            if (Start)
-            {
-                L.IsRunning = true;
-                IsLoopedControled = true;
-            }
-        }
-
-        if (L.IsRecording)
-        {
-            if (StopRecord) L.IsRecording = false;
-        }
-        else
-        {
-            if (Record)
-            {
-                L.IsRecording = true;
-                L.StartPosition = this.gameObject.transform.position;
-            }
-        }
+        
 
 
         if (!IsLoopedControled)
