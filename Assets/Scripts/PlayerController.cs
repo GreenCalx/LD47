@@ -23,6 +23,10 @@ public class PlayerController : MonoBehaviour
     public bool IsLoopedControled = false;
     bool HasAlreadyBeenBreakedFrom = false;
     public EnergyCounter energyCounter;
+    public GameObject levelUI_GOref;
+    private GameObject levelUI_GO;
+    public LevelUI levelUI;
+
 
     readonly float Speed = 1f;
 
@@ -41,7 +45,16 @@ public class PlayerController : MonoBehaviour
         {
             WM = GameLoop.GetComponent<WorldManager>();
         }
-        this.energyCounter = new EnergyCounter();
+        this.energyCounter = new EnergyCounter( 5, 5);
+
+    }
+
+    public void initUI( GameObject iUIGORef )
+    {
+        levelUI_GOref = iUIGORef;
+        levelUI_GO = Instantiate(levelUI_GOref);
+        levelUI = levelUI_GO.GetComponent<LevelUI>();
+        levelUI.playerRef = this.gameObject;
     }
 
     /// <summary>
@@ -85,9 +98,21 @@ public class PlayerController : MonoBehaviour
             // Update position of the player
             // TODO: What about physics?? Do we rely on RigidBody?
             if (CurrentDirection != Direction.NONE)
+            {
                 this.gameObject.transform.position += new Vector3(Speed * Directionf[(int)CurrentDirection].x,
                                                                   Speed * Directionf[(int)CurrentDirection].y,
                                                                   0);
+                bool has_energy_left = energyCounter.tryConsume();
+                levelUI.refresh();
+                if (!has_energy_left)
+                {
+                    L.StopRecording();
+                    L.StartRunning();
+                    energyCounter.refillAll();
+
+                    levelUI.refresh();
+                }
+            }
             // Reset position once we updated the player
             // This way we expect the position to be None if the player is not
             // touching any button during a tick
