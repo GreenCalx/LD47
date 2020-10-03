@@ -8,6 +8,7 @@ public class WorldManager : MonoBehaviour
     List<GameObject> Players = new List<GameObject>();
     public GameObject PlayerPrefab;
 
+
     int CurrentTick = 0;
 
     public Vector2 StartPosition; //. First player will appear at this position
