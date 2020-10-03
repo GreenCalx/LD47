@@ -3,7 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 
-    public class Loop : MonoBehaviour
+#if false
+public class Loop : MonoBehaviour
     {
         public PlayerController Player;
         public Vector2 StartPosition;
@@ -39,8 +40,6 @@ using TMPro;
 
         void Update()
         {
-            
-
             var Start = Input.GetKeyDown(KeyCode.A);
             var Stop = Input.GetKeyDown(KeyCode.Z);
             var Pause = Input.GetKeyDown(KeyCode.E);
@@ -57,7 +56,7 @@ using TMPro;
                 if (Start)
                 {
                     IsRunning = true;
-                    Player.SetPosition(StartPosition);
+                    //Player.SetPosition(StartPosition);
                 }
             }
             
@@ -79,7 +78,7 @@ using TMPro;
                 if (Restart)
                 {
                     CurrentEvent = 0;
-                    Player.SetPosition(StartPosition);
+                    //Player.SetPosition(StartPosition);
                 }
 
                 if (IsRunning)
@@ -99,7 +98,7 @@ using TMPro;
                             {
                                 CurrentEvent = 0;
                                 CurrentTime = 0;
-                                Player.SetPosition(StartPosition);
+                                //Player.SetPosition(StartPosition);
                             }
                         }
                     }
@@ -121,3 +120,5 @@ using TMPro;
 
         }
     }
+
+#endif
