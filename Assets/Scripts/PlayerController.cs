@@ -142,28 +142,35 @@ public class PlayerController : MonoBehaviour
         TickRequired = false;
     }
 
+
+    public float animationtime = 0.5f;
+    public float maxLocalScale = 200;
+    float currentAnimationTime = 0;
+    void testAnimation()
+    {
+        currentAnimationTime += Time.deltaTime;
+
+        if (currentAnimationTime < animationtime)
+        {
+            var s = Mathf.Max(100f, 100f + Mathf.Sin( (animationtime - currentAnimationTime) * 20) * (maxLocalScale - 100f));
+            this.gameObject.transform.localScale = new Vector3(s, s, 1);
+        } else
+        {
+            this.gameObject.transform.localScale = new Vector3(100, 100, 1);
+        }
+    }
+
     // Update is called once per frame
     // Everything related to in^puts is done here
     void Update()
     {
-        if (!IsLoopedControled)
-        {
-            //var Up    = Input.GetAxisRaw(DirectionInputs[(int)Direction.UP]);
-            //var Right = Input.GetAxisRaw(DirectionInputs[(int)Direction.RIGHT]);
-            var Up = Input.GetButtonDown(DirectionInputs[(int)Direction.UP]);
-            var Down = Input.GetButtonDown(DirectionInputs[(int)Direction.DOWN]);
-            var Right = Input.GetButtonDown(DirectionInputs[(int)Direction.RIGHT]);
-            var Left = Input.GetButtonDown(DirectionInputs[(int)Direction.LEFT]);
-
-            if (Up) CurrentDirection = Direction.UP;
-            if (Down) CurrentDirection = Direction.DOWN;
-            if (Left) CurrentDirection = Direction.LEFT;
-            if (Right) CurrentDirection = Direction.RIGHT;
-        }
+        if (currentAnimationTime < animationtime)
+            testAnimation();
         else
         {
-            if (Input.GetKeyDown(KeyCode.B) && !HasAlreadyBeenBreakedFrom)
+            if (!IsLoopedControled)
             {
+
                 // break from the loop
                 HasAlreadyBeenBreakedFrom = true;
                 // create a new player at current position
@@ -184,11 +191,45 @@ public class PlayerController : MonoBehaviour
                     P.energyCounter = new_ec;
                 }
 
-                // For now new players are randomly colored
-                var SpriteRender = GO.GetComponent<SpriteRenderer>();
-                if (SpriteRender)
+                //var Up    = Input.GetAxisRaw(DirectionInputs[(int)Direction.UP]);
+                //var Right = Input.GetAxisRaw(DirectionInputs[(int)Direction.RIGHT]);
+                var Up = Input.GetButtonDown(DirectionInputs[(int)Direction.UP]);
+                var Down = Input.GetButtonDown(DirectionInputs[(int)Direction.DOWN]);
+                var Right = Input.GetButtonDown(DirectionInputs[(int)Direction.RIGHT]);
+                var Left = Input.GetButtonDown(DirectionInputs[(int)Direction.LEFT]);
+
+
+                if (Up) CurrentDirection = Direction.UP;
+                if (Down) CurrentDirection = Direction.DOWN;
+                if (Left) CurrentDirection = Direction.LEFT;
+                if (Right) CurrentDirection = Direction.RIGHT;
+            }
+            else
+            {
+                if (Input.GetKeyDown(KeyCode.B) && !HasAlreadyBeenBreakedFrom)
                 {
-                    SpriteRender.color = UnityEngine.Random.ColorHSV();
+                    // break from the loop
+                    HasAlreadyBeenBreakedFrom = true;
+                    // create a new player at current position
+                    var GO = WM.AddPlayer(this.gameObject.transform.position);
+                    var P = GO.GetComponent<PlayerController>();
+                    if (P)
+                    {
+                        // Update newly created looper with current loop previous
+                        // frames
+                        P.L.Events = this.L.Events.GetRange(0, this.L.CurrentIdx + 1);
+                        P.L.StartRecording();
+                        // IMPORTANT : this nees to be done after StartRecording as it will take current 
+                        // position as start position and we dont want that
+                        P.L.StartPosition = this.L.StartPosition;
+                    }
+
+                    // For now new players are randomly colored
+                    var SpriteRender = GO.GetComponent<SpriteRenderer>();
+                    if (SpriteRender)
+                    {
+                        SpriteRender.color = UnityEngine.Random.ColorHSV();
+                    }
                 }
             }
         }
