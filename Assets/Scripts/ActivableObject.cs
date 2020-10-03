@@ -2,9 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
+public enum SIGNAL_KEYS
+{
+    NONE, BLUE, RED, YELLOW
+}
+
 public class ActivableObject : MonoBehaviour
 {
-    public bool isTriggered;
+    public SIGNAL_KEYS key;
+    public bool isTriggered     = false;
 
     // Start is called before the first frame update
     void Start()
@@ -12,11 +19,18 @@ public class ActivableObject : MonoBehaviour
         isTriggered = false;
     }
 
+    public virtual void trigger() {}
 
-
-    // Update is called once per frame
-    void Update()
+    public void listen(SIGNAL_KEYS iSigKey) 
     {
-        
+
+        if ( key == SIGNAL_KEYS.NONE )
+        {
+            trigger();
+        } else if (iSigKey == key)
+        {
+            trigger();
+        }
+            
     }
 }

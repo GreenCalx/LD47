@@ -7,6 +7,7 @@ using UnityEngine;
 public class DoorTile : ActivableObject
 {
     private BoxCollider2D __collider2D;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -21,4 +22,10 @@ public class DoorTile : ActivableObject
             __collider2D.enabled = !isTriggered;
         }
     }//! update
+
+    public override void trigger() // OPEN/CLOSE DOOR
+    {
+        isTriggered =! isTriggered;
+    }
+
 }
