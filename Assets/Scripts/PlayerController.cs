@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviour
     bool TickRequired = false;
     public bool IsLoopedControled = false;
     bool HasAlreadyBeenBreakedFrom = false;
+    public EnergyCounter energyCounter;
 
     readonly float Speed = 1f;
 
@@ -41,8 +42,9 @@ public class PlayerController : MonoBehaviour
         {
             WM = GameLoop.GetComponent<WorldManager>();
         }
-
+ 
         L.PC = this;
+        this.energyCounter = new EnergyCounter();
     }
 
     /// <summary>
