@@ -111,7 +111,7 @@ public class PlayerController : MonoBehaviour
                 {
                     L.StopRecording();
                     L.StartRunning();
-                    energyCounter.refillAll();
+                    energyCounter.refillAllCells();
                     if (!!levelUI)
                         levelUI.refresh();
                 }

@@ -44,8 +44,8 @@ public class LevelUI : MonoBehaviour
             EnergyCounter ec = playerController.energyCounter;
             if (ec != null)
             {
-                ui_replenish_lbl.text   = "" + ec.replenish;
-                updateEnergyPanels(ec.energy);
+                ui_replenish_lbl.text   = "" + ec.getReplenish();
+                updateEnergyPanels(ec.getEnergy());
             }
         }
         else { Debug.Log("UIEnergy : Player ref is missing"); }
