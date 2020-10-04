@@ -27,7 +27,7 @@ public class PlayerController : MonoBehaviour
     private GameObject levelUI_GOref;
     private GameObject levelUI_GO;
     public LevelUI levelUI;
-
+    [SerializeField] private LayerMask wallmask;
 
     readonly float Speed = 1f;
 
@@ -41,6 +41,8 @@ public class PlayerController : MonoBehaviour
     public GameObject GameLoop;
     WorldManager WM;
     public GameObject TailPrefab;
+
+    private Rigidbody2D rb2D;
     // Start is called before the first frame update
     public void Start()
     {
@@ -49,6 +51,7 @@ public class PlayerController : MonoBehaviour
             WM = GameLoop.GetComponent<WorldManager>();
         }
         this.energyCounter = new EnergyCounter( 5, 5);
+        rb2D = gameObject.AddComponent<Rigidbody2D>();
 
     }
 
@@ -103,10 +106,6 @@ public class PlayerController : MonoBehaviour
             // TODO: What about physics?? Do we rely on RigidBody?
             if (CurrentDirection != Direction.NONE)
             {
-
-                this.gameObject.transform.position += new Vector3(Speed * Directionf[(int)CurrentDirection].x,
-                                                                  Speed * Directionf[(int)CurrentDirection].y,
-                                                                  0);
                 bool has_energy_left = energyCounter.tryConsume();
                 if (!!levelUI)
                     levelUI.refresh();
@@ -125,9 +124,25 @@ public class PlayerController : MonoBehaviour
                 var c = GetComponent<SpriteRenderer>().color;
                 Tails[Tails.Count - 1].GetComponent<Tail>().SR.color = new Color(c.r, c.g, c.b, c.a * 0.8f);
 
-                this.gameObject.transform.position += new Vector3(Speed * Directionf[(int)CurrentDirection].x,
-                                                                  Speed * Directionf[(int)CurrentDirection].y,
-                                                                  0);                
+                //move
+                Vector3 new_position  = new Vector3( Speed * Directionf[(int)CurrentDirection].x,
+                                                Speed * Directionf[(int)CurrentDirection].y,
+                                                0 ) ;
+                Debug.DrawRay(transform.position, new_position *2);
+                RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, new_position, 1.2f, wallmask);
+
+                bool look_for_collision = false;
+                foreach (RaycastHit2D hit in hits)
+                {
+                    if (hit.collider != null)
+                    {
+                        Debug.Log("COLLISION DETECTED AHEAD : " + hit.collider.name);
+                        look_for_collision = true;
+                    }
+                }
+
+                if (!look_for_collision)
+                    this.gameObject.transform.position += new_position; 
             }
             // Reset position once we updated the player
             // This way we expect the position to be None if the player is not

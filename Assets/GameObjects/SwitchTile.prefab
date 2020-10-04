@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3090805287772371424}
   - component: {fileID: 3090805287772371427}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -93,7 +93,7 @@ GameObject:
   - component: {fileID: 3090805287773782582}
   - component: {fileID: 7688162672090117722}
   - component: {fileID: 1558477940434994109}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: SwitchTile
   m_TagString: Untagged
   m_Icon: {fileID: 0}

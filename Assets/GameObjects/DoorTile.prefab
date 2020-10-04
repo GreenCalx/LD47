@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3291880432819931682}
   - component: {fileID: 3291880432819931681}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 117329853410137202}
   - component: {fileID: 9162789474972756765}
   - component: {fileID: 1602808091670137028}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: DoorTile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -154,6 +154,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 521b6982894c0ce4da3e8588d5d4aab1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  activators: []
+  activatorsObject: []
+  key: 0
+  isTriggered: 0
 --- !u!50 &1602808091670137028
 Rigidbody2D:
   serializedVersion: 4

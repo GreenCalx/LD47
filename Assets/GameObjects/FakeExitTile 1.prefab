@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1448381040074407089}
   - component: {fileID: 1448381040074407090}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -92,7 +92,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1448381040077719399}
   - component: {fileID: 7282860679129892954}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: FakeExitTile 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}

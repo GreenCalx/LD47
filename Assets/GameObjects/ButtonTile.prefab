@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4558887905771045257}
   - component: {fileID: 9156104304307762661}
   - component: {fileID: -6128108969864301200}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: ButtonTile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -71,6 +71,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b31b2e284a489994d8559c3394be3670, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  activables: []
+  signalKey: 0
 --- !u!1 &4558887905773959774
 GameObject:
   m_ObjectHideFlags: 0
@@ -81,7 +83,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4558887905773959775}
   - component: {fileID: 4558887905773959772}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Sprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
