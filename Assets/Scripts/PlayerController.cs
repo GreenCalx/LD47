@@ -50,7 +50,8 @@ public class PlayerController : MonoBehaviour
         {
             WM = GameLoop.GetComponent<WorldManager>();
         }
-        this.energyCounter = new EnergyCounter( 5, 5);
+        if (energyCounter == null)
+            this.energyCounter = new EnergyCounter( 5, 5);
 
         GetComponent<BoxCollider2D>().enabled = (false);
 
@@ -104,33 +105,18 @@ public class PlayerController : MonoBehaviour
             // TODO: What about physics?? Do we rely on RigidBody?
             if (CurrentDirection != Direction.NONE)
             {
-                bool has_energy_left = energyCounter.tryConsume();
-                if (!!levelUI)
-                    levelUI.refresh();
-                if (!has_energy_left && !IsLoopedControled)
-                {
-                    L.StopRecording();
-                    L.StartRunning();
-                    energyCounter.refillAllCells();
-                    if (!!levelUI)
-                        levelUI.refresh();
-                }
+                Tails.Add(Instantiate(TailPrefab, this.gameObject.transform.position, Quaternion.identity));
+                Tails[Tails.Count - 1].SetActive(true);
+                Tails[Tails.Count - 1].transform.localScale = Tails[Tails.Count - 1].transform.localScale * 0.8f;
+                var c = GetComponent<SpriteRenderer>().color;
+                Tails[Tails.Count - 1].GetComponent<Tail>().SR.color = new Color(c.r, c.g, c.b, c.a * 0.8f);
+
+                // move
+                Movable movable = GetComponent<Movable>();
+                if (!!movable)
+                    movable.Move(Directionf[(int)CurrentDirection]);
                 else
-                {
-
-                    Tails.Add(Instantiate(TailPrefab, this.gameObject.transform.position, Quaternion.identity));
-                    Tails[Tails.Count - 1].SetActive(true);
-                    Tails[Tails.Count - 1].transform.localScale = Tails[Tails.Count - 1].transform.localScale * 0.8f;
-                    var c = GetComponent<SpriteRenderer>().color;
-                    Tails[Tails.Count - 1].GetComponent<Tail>().SR.color = new Color(c.r, c.g, c.b, c.a * 0.8f);
-
-                    // move
-                    Movable movable = GetComponent<Movable>();
-                    if (!!movable)
-                        movable.Move(Directionf[(int)CurrentDirection]);
-                    else
-                        Debug.Log("Missing movable, abnormal pls look into it and add movable script onto player.");
-                }
+                    Debug.Log("Missing movable, abnormal pls look into it and add movable script onto player.");
             }
 
             // Reset position once we updated the player
@@ -200,7 +186,22 @@ public class PlayerController : MonoBehaviour
                 if (Right) CurrentDirection = Direction.RIGHT;
                 if (None) CurrentDirection = Direction.NONE;
 
-                if (Up || Down || Right || Left || None) WM.NeedTick = true;
+                if (Up || Down || Right || Left || None) 
+                { 
+                    WM.NeedTick = true;
+                    
+                    bool has_energy_left = energyCounter.tryConsume();
+                    if (!!levelUI)
+                        levelUI.refresh();
+                    if (!has_energy_left)
+                    {
+                        L.StopRecording();
+                        L.StartRunning();
+                        energyCounter.refillAllCells();
+                        if (!!levelUI)
+                            levelUI.refresh();
+                    }
+                }
             }
             else
             {
@@ -213,6 +214,18 @@ public class PlayerController : MonoBehaviour
                     var P = GO.GetComponent<PlayerController>();
                     if (P)
                     {
+                        // update energy loop to get nested counter
+                        P.energyCounter = energyCounter.getNestedCounter();
+                        if (!!levelUI)
+                        {
+                            P.levelUI = levelUI;
+                            P.levelUI.updatePlayerRef(GO);
+                            P.levelUI.refresh();
+
+                            energyCounter = null;
+                            levelUI = null;
+                        }
+
                         // Update newly created looper with current loop previous
                         // frames
                         P.L.Events = this.L.Events.GetRange(0, this.L.CurrentIdx + 1);
@@ -246,7 +259,7 @@ public class PlayerController : MonoBehaviour
     public float Speed = 1f;
     public float TileSize = 1f;
 
-    public int PM = 5;
+    //public int PM = 5;
 
     public bool IsLoopedControled = false;
     bool HasAlreadyBeenBreakedFrom = false;
@@ -326,7 +339,9 @@ public class PlayerController : MonoBehaviour
                 if (P)
                 {
                     P.PlayerPrefab = PlayerPrefab;
-                    P.PM = PM - 1;
+                    // update energy loop to get nested counter
+                    P.energyCounter = energyCounter.getNestedCounter();
+                    //P.PM = PM - 1;
                 }
 
                 var SpriteRender = GO.GetComponent<SpriteRenderer>();
