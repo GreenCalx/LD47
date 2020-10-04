@@ -68,16 +68,24 @@ public class LevelUI : MonoBehaviour
     {
         UIEnergyPanel[] energy_panels = GetComponentsInChildren<UIEnergyPanel>();
         int n_panels = energy_panels.Length;
+        int remaining_energy_to_display = iPlayerEnergy;
         for (int i=0; i < n_panels; i++)
         {
             Image im = energy_panels[i].gameObject.GetComponent<Image>();
             if (!!im)
             {
                 var new_color = im.color;
-                new_color = ( iPlayerEnergy > i ) ?  UnityEngine.Color.white : UnityEngine.Color.red;
-                //new_color = ( i >= ( n_panels-iDisabledEnergy) ) ? UnityEngine.Color.black : new_color;
-                new_color = ( i <= iDisabledEnergy-1 ) ? UnityEngine.Color.black : new_color;
-                im.color = new_color;
+                if ( i <= iDisabledEnergy-1 ) // disable
+                {
+                    new_color = UnityEngine.Color.black;
+                } else if ( remaining_energy_to_display > 0 )
+                {
+                    new_color = UnityEngine.Color.white;
+                    remaining_energy_to_display--;
+                } else {
+                    new_color = UnityEngine.Color.red;
+                }
+                 im.color = new_color;
             }
         }
     }

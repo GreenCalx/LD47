@@ -35,7 +35,7 @@ public class EnergyCounter
         public int getEnergy()
         { return energy; }
         public void setAvailableEnergy( int iEnergy)
-        { energy = iEnergy; }
+        { energy = ( iEnergy > max_energy ) ? max_energy : iEnergy; }
 
         public int getRemainingDepletedEnergy()
         {
