@@ -7,6 +7,8 @@ using UnityEngine;
 public class DoorTile : ActivableObject
 {
     private BoxCollider2D __collider2D;
+    public AudioSource sound_on;
+    public AudioSource sound_off;
 
     // Start is called before the first frame update
     void Start()
@@ -30,6 +32,10 @@ public class DoorTile : ActivableObject
         SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
         if (!!sr)
             sr.enabled = !isTriggered;
+        if (isTriggered)
+            sound_on.Play();
+        else
+            sound_off.Play();
     }
 
 }
