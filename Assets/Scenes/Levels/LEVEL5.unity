@@ -288,6 +288,11 @@ PrefabInstance:
       propertyPath: StartPosition.y
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 893246269087679359, guid: c83a65c7c8e8b1248beb94dd7164f8be,
+        type: 3}
+      propertyPath: PlayerPrefab
+      value: 
+      objectReference: {fileID: 1864980078}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c83a65c7c8e8b1248beb94dd7164f8be, type: 3}
 --- !u!1001 &47644022
@@ -909,6 +914,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6013280694991801665, guid: fe40bb787fcbda24e86031d229a96cf4,
+        type: 3}
+      propertyPath: GameLoop
+      value: 
+      objectReference: {fileID: 1864980079}
     - target: {fileID: 6013280694991801666, guid: fe40bb787fcbda24e86031d229a96cf4,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -969,8 +979,25 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 6013280694991801692, guid: fe40bb787fcbda24e86031d229a96cf4,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fe40bb787fcbda24e86031d229a96cf4, type: 3}
+--- !u!1 &1864980078 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6013280694991801692, guid: fe40bb787fcbda24e86031d229a96cf4,
+    type: 3}
+  m_PrefabInstance: {fileID: 1864980077}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1864980079 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2963608312177263726, guid: fe40bb787fcbda24e86031d229a96cf4,
+    type: 3}
+  m_PrefabInstance: {fileID: 1864980077}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1927995727
 PrefabInstance:
   m_ObjectHideFlags: 0

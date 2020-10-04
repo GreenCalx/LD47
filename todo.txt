@@ -1,0 +1,3 @@
+- one less segment? looks like 6 segments right now
+- maxEnergy should decrease by one for each loop break
+- no time ticking (at least for testing)
