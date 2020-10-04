@@ -65,7 +65,7 @@
             "selectedLayer": 1,
             "viewCenter": {
                 "x": -96.81748466257682,
-                "y": -111.19631901840489
+                "y": -113.11349693251532
             }
         },
         "level7.tmx": {
@@ -81,7 +81,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 498.71108467182216,
-                "y": 372.7939718421575
+                "y": 109.0620662304184
             }
         },
         "sprites.tsx": {
@@ -124,6 +124,7 @@
     ],
     "project": "level_design.tiled-project",
     "recentFiles": [
+        "level8.tmx",
         "tests.tmx",
         "level4.tmx",
         "level3.tmx",
