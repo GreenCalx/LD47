@@ -29,27 +29,41 @@ public class ActivableObject : MonoBehaviour
         }
     }
 
-    public virtual void trigger() {}
+    public virtual void trigger(bool signalType) {}
 
-    public void listen(SIGNAL_KEYS iSigKey, ActivatorObject activator) 
+    public void listen(SIGNAL_KEYS iSigKey, ActivatorObject activator, bool signalType) 
     {
-        currentActivatorsObject.Add(activator);
-
-        activatorsObject.Sort();
-        currentActivatorsObject.Sort();
-        var Result = activatorsObject.Except(currentActivatorsObject);
-        if (!Result.Any())
+        if (signalType)
         {
+            currentActivatorsObject.Add(activator);
 
-            if (key == SIGNAL_KEYS.NONE)
+            bool allActivated = true;
+            foreach (ActivatorObject ao in activatorsObject)
             {
-                trigger();
+                if (!currentActivatorsObject.Contains(ao))
+                {
+                    allActivated = false;
+                    break;
+                }
             }
-            else if (iSigKey == key)
+            if (allActivated)
             {
-                trigger();
-            }
 
+                if (key == SIGNAL_KEYS.NONE)
+                {
+                    trigger(signalType);
+                }
+                else if (iSigKey == key)
+                {
+                    trigger(signalType);
+                }
+
+            }
+        }
+        else
+        {
+            currentActivatorsObject.Remove(activator);
+            trigger(signalType);
         }
         
     }
