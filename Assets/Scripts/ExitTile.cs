@@ -22,6 +22,7 @@ public class ExitTile : MonoBehaviour
         var PC = other.gameObject.GetComponent<PlayerController>();
         if ( PC)
         {
+            GetComponentInChildren<AudioSource>().Play();
             SceneManager.LoadScene( "LevelSelectorScene", LoadSceneMode.Single);
         }
     }

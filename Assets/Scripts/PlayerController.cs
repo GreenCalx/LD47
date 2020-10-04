@@ -191,7 +191,6 @@ public class PlayerController : MonoBehaviour
             GetComponent<BoxCollider2D>().enabled = (true);
             if (!IsLoopedControled)
             {
-            
                 //var Up    = Input.GetAxisRaw(DirectionInputs[(int)Direction.UP]);
                 //var Right = Input.GetAxisRaw(DirectionInputs[(int)Direction.RIGHT]);
                 var Up = Input.GetButtonDown(DirectionInputs[(int)Direction.UP]);
@@ -206,21 +205,31 @@ public class PlayerController : MonoBehaviour
                 if (Right) CurrentDirection = Direction.RIGHT;
                 if (None) CurrentDirection = Direction.NONE;
 
+                bool is_energy_locked   = energyCounter.isCurrentCellEnergyLocked();
+                if ( is_energy_locked )
+                {
+                    // force wait
+                    CurrentDirection = Direction.NONE;
+                }
+
+
                 if (Up || Down || Right || Left || None) 
                 { 
                     WM.NeedTick = true;
                     
-                    bool has_energy_left = energyCounter.tryConsume();
+                    bool has_energy_left    = energyCounter.tryConsume();
+
                     if (!!levelUI)
                         levelUI.refresh();
-                    if (!has_energy_left)
+
+                    if (!has_energy_left && !is_energy_locked)
                     {
                         L.StopRecording();
                         L.StartRunning();
                         energyCounter.refillAllCells();
                         if (!!levelUI)
                             levelUI.refresh();
-                    }
+                    } 
                 }
             }
             else
