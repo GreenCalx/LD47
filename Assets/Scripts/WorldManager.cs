@@ -99,6 +99,30 @@ public class WorldManager : MonoBehaviour
                 }
             }
 
+            // try consume energy for last player and update its ui
+            int n_players = Players.Count;
+            if (n_players>0)
+            {
+                PlayerController curr_pc = Players[n_players-1].GetComponent<PlayerController>();
+                EnergyCounter ec = curr_pc.energyCounter;
+                LevelUI ui = curr_pc.levelUI;
+
+                bool has_energy_left = ec.tryConsume();
+                if (!!ui)
+                    ui.refresh(); //update if new cell
+                bool is_energy_locked   = ec.has_locked_energy;
+                if (!has_energy_left && !is_energy_locked)
+                {
+                    curr_pc.L.StopRecording();
+                    curr_pc.L.StartRunning();
+                    ec.refillAllCells();
+
+                } else { curr_pc.WAIT_ORDER = is_energy_locked; }
+                if (!!ui)
+                    ui.refresh();
+            }
+
+
             // require world tick, update all loops, etc
             foreach ( var Player in Players )
             {

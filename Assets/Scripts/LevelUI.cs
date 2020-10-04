@@ -75,7 +75,8 @@ public class LevelUI : MonoBehaviour
             {
                 var new_color = im.color;
                 new_color = ( iPlayerEnergy > i ) ?  UnityEngine.Color.white : UnityEngine.Color.red;
-                new_color = ( i >= ( n_panels-iDisabledEnergy) ) ? UnityEngine.Color.black : new_color;
+                //new_color = ( i >= ( n_panels-iDisabledEnergy) ) ? UnityEngine.Color.black : new_color;
+                new_color = ( i <= iDisabledEnergy-1 ) ? UnityEngine.Color.black : new_color;
                 im.color = new_color;
             }
         }
