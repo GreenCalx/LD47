@@ -184,7 +184,8 @@ public class PlayerController : MonoBehaviour
                 {
                     CurrentDirection = Direction.NONE;
                     Debug.Log("WAIT ORDER.");
-                    WM.NeedTick = true;
+                    //WM.NeedTick = true;
+                    WAIT_ORDER = false;
                 } else {
 
                     var Up = Input.GetButtonDown(DirectionInputs[(int)Direction.UP]);

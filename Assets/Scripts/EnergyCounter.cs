@@ -25,24 +25,23 @@ public class EnergyCounter
         { energy = max_energy; }
         public bool tryConsume()
         { 
-            //if ( energy > 0 )
-            //{
-            //  energy--;
-            //  return true;
-           //}
-            return ( --energy > 0 );
+            return ( --energy >= 0 );
         }
         public int getEnergy()
-        { return energy; }
-        public void setAvailableEnergy( int iEnergy)
+        { return (energy>=0) ? energy : 0; }
+        public int getDepleted()
+        {
+            return (n_disabled_energy>=0) ? n_disabled_energy : 0;
+        }
+        public void setEnergy( int iEnergy)
         { energy = ( iEnergy > max_energy ) ? max_energy : iEnergy; }
 
-        public int getRemainingDepletedEnergy()
+        public void setDepleted(int iEnergy)
+        { n_disabled_energy = iEnergy; }
+
+        public bool tryConsumeDepletedEnergy()
         {
-            if ( (energy == 0) && (n_disabled_energy > 0))
-                return (n_disabled_energy--);
-            else
-                return 0;
+            return (--n_disabled_energy >= 0);
         } 
     }//! EnergyCell
     public List<EnergyCell> eCells;
@@ -70,6 +69,20 @@ public class EnergyCounter
         refillAllCells();
     }
 
+    public EnergyCounter(int iMaxEnergy, int iDisabledEnergy, int iMaxReplenish, int iCurrentReplenish)
+    {
+        MAX_ENERGY = iMaxEnergy;
+        MAX_REPLENISH = iMaxReplenish;
+        N_DISABLED_ENERGY = iDisabledEnergy;
+        refillAllCells();
+
+        var ToRemoveCells = iMaxReplenish - iCurrentReplenish;
+        for (int i = 0; i < ToRemoveCells; ++i)
+        {
+            eCells.RemoveAt(0);
+        }
+    }
+
     public void refillAllCells()
     {
 
@@ -87,16 +100,18 @@ public class EnergyCounter
         int delta_replenishes = MAX_REPLENISH - getReplenish();
         int n_replenishes = MAX_REPLENISH - delta_replenishes;
         // get counter with -1 energy overall
-        EnergyCounter ec =  new EnergyCounter( MAX_ENERGY-1, N_DISABLED_ENERGY+1, n_replenishes);
+        EnergyCounter ec =  new EnergyCounter( MAX_ENERGY-1, N_DISABLED_ENERGY+1, MAX_REPLENISH, n_replenishes);
         Debug.Log(" NESTED CPT CREATED WITH : " + ec.MAX_ENERGY + " energy for " + ec.MAX_REPLENISH + " cells and " + ec.N_DISABLED_ENERGY + " disabled energy.");
 
         // update curr cell in new ec to match current cell consuming
         if ( (getReplenish() > 0) && (ec.eCells.Count > 0) )
         {
             int remaining_energy = getEnergy();
+            int remaining_depleted = getDepleted();
             Debug.Log("remaining energy" + remaining_energy);
             EnergyCell cur_cell = ec.eCells[0];
-            cur_cell.setAvailableEnergy(remaining_energy);
+            cur_cell.setEnergy(remaining_energy-1);
+            cur_cell.setDepleted( (cur_cell.getEnergy() != 0 ? remaining_depleted+1 : remaining_depleted));
         }
 
         return ec;
@@ -107,9 +122,7 @@ public class EnergyCounter
         if ( eCells.Count > 0 )
         {
             EnergyCell curr_cell = eCells[0];
-            int remaining_depleted_energy = curr_cell.getRemainingDepletedEnergy();
-            Debug.Log("remaining_depleted_energy : " + remaining_depleted_energy);
-            has_locked_energy = (remaining_depleted_energy > 0);
+            has_locked_energy = curr_cell.tryConsumeDepletedEnergy();
         }
         return has_locked_energy;
     }
@@ -122,6 +135,11 @@ public class EnergyCounter
     public int getReplenish()   
     {
         return ( eCells.Count > 0 ) ? eCells.Count : 0;
+    }
+
+    public int getDepleted()
+    {
+        return (eCells.Count > 0) ? eCells[0].getDepleted() : 0;
     }
 
     public int getDisabledEnergy()
@@ -138,23 +156,16 @@ public class EnergyCounter
 
 
     public bool tryConsume()
-    {
-        
+    {      
         if ( eCells.Count > 0 )
         {
             EnergyCell curr_cell = eCells[0];
-            if ( !curr_cell.tryConsume() )
-            {       
-                has_locked_energy = isCurrentCellEnergyLocked();
-
-                if (!has_locked_energy)
-                {
-                    // cell depleted, remove from cell list
-                    // should procede to lmove elements ( API doc ) 
-                    eCells.RemoveAt(0);
-                }
-            }
-            return true;
+            if (curr_cell.tryConsume()) return true;
+            if (isCurrentCellEnergyLocked()) return true;
+            // cell depleted, remove from cell list
+            // should procede to lmove elements ( API doc ) 
+            eCells.RemoveAt(0);
+            return tryConsume();
         }
         return false; // no more energy cells
     }
