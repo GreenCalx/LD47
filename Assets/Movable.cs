@@ -12,13 +12,11 @@ public class Movable : MonoBehaviour
 
     public bool Move( Vector2 Direction )
     {
-        RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, Direction, 0.1f, wallmask);
+        RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, Direction, 1f, wallmask);
         if (hits.Length != 0) return false;
 
-        RaycastHit2D[] hitsm = Physics2D.RaycastAll(transform.position, Direction);
-        Debug.DrawRay(transform.position, new Vector3(Direction.x, Direction.y, 0), Color.white, 2000);
-        hitsm = hitsm.Where(val => (val.collider.gameObject != this.gameObject 
-                                    && Vector3.Distance(val.collider.gameObject.transform.position, this.gameObject.transform.position) < 1.5f)).ToArray();
+        RaycastHit2D[] hitsm = Physics2D.RaycastAll(transform.position, Direction, 1f, movablemask);
+        hitsm = hitsm.Where(val => (val.collider.gameObject != this.gameObject)).ToArray();
         if (hitsm.Length == 0)
         {
             this.gameObject.transform.position += new Vector3(Speed * Direction.x,
@@ -31,7 +29,6 @@ public class Movable : MonoBehaviour
 
         foreach (RaycastHit2D hit in hitsm)
         {
-            Debug.Log(hit.distance);
             if (hit.collider.gameObject != this.gameObject)
             {
                 if (hit.collider != null)
