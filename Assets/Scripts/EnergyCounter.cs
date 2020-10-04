@@ -25,23 +25,28 @@ public class EnergyCounter
         { energy = max_energy; }
         public bool tryConsume()
         { 
-            return (--energy > 0); 
+            //if ( energy > 0 )
+            //{
+            //  energy--;
+            //  return true;
+           //}
+            return ( --energy > 0 );
         }
         public int getEnergy()
         { return energy; }
         public void setAvailableEnergy( int iEnergy)
-        { energy = iEnergy; }
+        { energy = ( iEnergy > max_energy ) ? max_energy : iEnergy; }
 
         public int getRemainingDepletedEnergy()
         {
-            if (energy == 0)
-                return (--n_disabled_energy);
+            if ( (energy == 0) && (n_disabled_energy > 0))
+                return (n_disabled_energy--);
             else
                 return 0;
         } 
     }//! EnergyCell
     public List<EnergyCell> eCells;
-    private bool has_locked_energy = false;
+    public bool has_locked_energy = false;
 
     // Start is called before the first frame update
     public EnergyCounter()
@@ -85,12 +90,13 @@ public class EnergyCounter
         EnergyCounter ec =  new EnergyCounter( MAX_ENERGY-1, N_DISABLED_ENERGY+1, n_replenishes);
         Debug.Log(" NESTED CPT CREATED WITH : " + ec.MAX_ENERGY + " energy for " + ec.MAX_REPLENISH + " cells and " + ec.N_DISABLED_ENERGY + " disabled energy.");
 
-        // update last cell in new ec to match current cell consuming
-        if ( getReplenish() > 0 )
+        // update curr cell in new ec to match current cell consuming
+        if ( (getReplenish() > 0) && (ec.eCells.Count > 0) )
         {
             int remaining_energy = getEnergy();
-            EnergyCell last_cell_of_new_cpt = ec.getLastEnergyCell();
-            last_cell_of_new_cpt.setAvailableEnergy(remaining_energy);
+            Debug.Log("remaining energy" + remaining_energy);
+            EnergyCell cur_cell = ec.eCells[0];
+            cur_cell.setAvailableEnergy(remaining_energy);
         }
 
         return ec;
@@ -98,6 +104,13 @@ public class EnergyCounter
 
     public bool isCurrentCellEnergyLocked()
     {
+        if ( eCells.Count > 0 )
+        {
+            EnergyCell curr_cell = eCells[0];
+            int remaining_depleted_energy = curr_cell.getRemainingDepletedEnergy();
+            Debug.Log("remaining_depleted_energy : " + remaining_depleted_energy);
+            has_locked_energy = (remaining_depleted_energy > 0);
+        }
         return has_locked_energy;
     }
 
@@ -132,8 +145,7 @@ public class EnergyCounter
             EnergyCell curr_cell = eCells[0];
             if ( !curr_cell.tryConsume() )
             {       
-                int remaining_depleted_energy = curr_cell.getRemainingDepletedEnergy();
-                has_locked_energy = (remaining_depleted_energy > 0);
+                has_locked_energy = isCurrentCellEnergyLocked();
 
                 if (!has_locked_energy)
                 {

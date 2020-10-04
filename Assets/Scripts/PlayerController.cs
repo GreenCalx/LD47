@@ -29,8 +29,8 @@ public class PlayerController : MonoBehaviour
     private GameObject levelUI_GO;
     public LevelUI levelUI;
     [SerializeField] private LayerMask wallmask;
-
     readonly float Speed = 1f;
+    public bool WAIT_ORDER = false;
 
     public Looper L;
 
@@ -172,6 +172,7 @@ public class PlayerController : MonoBehaviour
     // Everything related to in^puts is done here
     void Update()
     {
+
         if (currentAnimationTime < animationtime)
             testAnimation();
         else
@@ -179,46 +180,31 @@ public class PlayerController : MonoBehaviour
             GetComponent<BoxCollider2D>().enabled = (true);
             if (!IsLoopedControled)
             {
-                //var Up    = Input.GetAxisRaw(DirectionInputs[(int)Direction.UP]);
-                //var Right = Input.GetAxisRaw(DirectionInputs[(int)Direction.RIGHT]);
-                var Up = Input.GetButtonDown(DirectionInputs[(int)Direction.UP]);
-                var Down = Input.GetButtonDown(DirectionInputs[(int)Direction.DOWN]);
-                var Right = Input.GetButtonDown(DirectionInputs[(int)Direction.RIGHT]);
-                var Left = Input.GetButtonDown(DirectionInputs[(int)Direction.LEFT]);
-                var None = Input.GetKeyDown(KeyCode.N);
-
-                if (Up) CurrentDirection = Direction.UP;
-                if (Down) CurrentDirection = Direction.DOWN;
-                if (Left) CurrentDirection = Direction.LEFT;
-                if (Right) CurrentDirection = Direction.RIGHT;
-                if (None) CurrentDirection = Direction.NONE;
-
-                bool is_energy_locked   = energyCounter.isCurrentCellEnergyLocked();
-                if ( is_energy_locked )
+                if ( WAIT_ORDER  )
                 {
-                    // force wait
                     CurrentDirection = Direction.NONE;
-                }
-
-
-                if (Up || Down || Right || Left || None) 
-                { 
+                    Debug.Log("WAIT ORDER.");
                     WM.NeedTick = true;
-                    
-                    bool has_energy_left    = energyCounter.tryConsume();
+                } else {
 
-                    if (!!levelUI)
-                        levelUI.refresh();
+                    var Up = Input.GetButtonDown(DirectionInputs[(int)Direction.UP]);
+                    var Down = Input.GetButtonDown(DirectionInputs[(int)Direction.DOWN]);
+                    var Right = Input.GetButtonDown(DirectionInputs[(int)Direction.RIGHT]);
+                    var Left = Input.GetButtonDown(DirectionInputs[(int)Direction.LEFT]);
+                    var None = Input.GetKeyDown(KeyCode.N);
 
-                    if (!has_energy_left && !is_energy_locked)
-                    {
-                        L.StopRecording();
-                        L.StartRunning();
-                        energyCounter.refillAllCells();
-                        if (!!levelUI)
-                            levelUI.refresh();
-                    } 
+                    if (Up) CurrentDirection = Direction.UP;
+                    if (Down) CurrentDirection = Direction.DOWN;
+                    if (Left) CurrentDirection = Direction.LEFT;
+                    if (Right) CurrentDirection = Direction.RIGHT;
+                    if (None) CurrentDirection = Direction.NONE;
+
+                    if (Up || Down || Right || Left || None) 
+                    { 
+                        WM.NeedTick = true;
+                    }
                 }
+
             }
             else
             {
@@ -238,9 +224,6 @@ public class PlayerController : MonoBehaviour
                             P.levelUI = levelUI;
                             P.levelUI.updatePlayerRef(GO);
                             P.levelUI.refresh();
-
-                            energyCounter = null;
-                            levelUI = null;
                         }
 
                         // Update newly created looper with current loop previous
@@ -258,6 +241,8 @@ public class PlayerController : MonoBehaviour
                     {
                         SpriteRender.color = UnityEngine.Random.ColorHSV();
                     }
+                } else {
+                    // not breaked, just replaying scenario
                 }
             }
         }
