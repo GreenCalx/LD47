@@ -42,7 +42,6 @@ public class PlayerController : MonoBehaviour
     WorldManager WM;
     public GameObject TailPrefab;
 
-    private Rigidbody2D rb2D;
     // Start is called before the first frame update
     public void Start()
     {
@@ -51,7 +50,6 @@ public class PlayerController : MonoBehaviour
             WM = GameLoop.GetComponent<WorldManager>();
         }
         this.energyCounter = new EnergyCounter( 5, 5);
-        rb2D = gameObject.AddComponent<Rigidbody2D>();
 
     }
 
@@ -124,11 +122,10 @@ public class PlayerController : MonoBehaviour
                 var c = GetComponent<SpriteRenderer>().color;
                 Tails[Tails.Count - 1].GetComponent<Tail>().SR.color = new Color(c.r, c.g, c.b, c.a * 0.8f);
 
-                //move
+                // move
                 Vector3 new_position  = new Vector3( Speed * Directionf[(int)CurrentDirection].x,
                                                 Speed * Directionf[(int)CurrentDirection].y,
                                                 0 ) ;
-                Debug.DrawRay(transform.position, new_position *2);
                 RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, new_position, 1.2f, wallmask);
 
                 bool look_for_collision = false;
@@ -144,6 +141,7 @@ public class PlayerController : MonoBehaviour
                 if (!look_for_collision)
                     this.gameObject.transform.position += new_position; 
             }
+
             // Reset position once we updated the player
             // This way we expect the position to be None if the player is not
             // touching any button during a tick
