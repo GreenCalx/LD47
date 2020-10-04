@@ -63,6 +63,11 @@ public class EnergyCounter
             }
         } else {
             energy--;
+            if ( energy <= 0 )
+            {
+                replenish--;
+                refillEnergy();
+            }
         }
         return true;
     }
