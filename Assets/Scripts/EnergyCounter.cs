@@ -6,22 +6,27 @@ public class EnergyCounter
 {
     // Has MAX_ENERY to spend MAX_REPLENISH times
     public int MAX_REPLENISH;
+    public int N_DISABLED_ENERGY;
     public int MAX_ENERGY;
 
     public class EnergyCell
     {
         int max_energy;
         int energy;
-        public EnergyCell( int iMaxEnergy )
+        int n_disabled_energy;
+        public EnergyCell( int iMaxEnergy, int iDisabledEnergy )
         {
             max_energy = iMaxEnergy;
+            n_disabled_energy = iDisabledEnergy;
             energy = 0;
             refill();
         }
         public void refill()
         { energy = max_energy; }
         public bool tryConsume()
-        { return (--energy > 0); }
+        { 
+            return (--energy > 0); 
+        }
         public int getEnergy()
         { return energy; }
         public void setAvailableEnergy( int iEnergy)
@@ -39,6 +44,15 @@ public class EnergyCounter
     {
         MAX_ENERGY      = iMaxEnergy;
         MAX_REPLENISH   = iMaxReplenish;
+        N_DISABLED_ENERGY = 0;
+        refillAllCells();
+    }
+
+    public EnergyCounter( int iMaxEnergy, int iDisabledEnergy, int iMaxReplenish)
+    {
+        MAX_ENERGY      = iMaxEnergy;
+        MAX_REPLENISH   = iMaxReplenish;
+        N_DISABLED_ENERGY = iDisabledEnergy;
         refillAllCells();
     }
 
@@ -48,7 +62,7 @@ public class EnergyCounter
         eCells = new List<EnergyCell>(MAX_REPLENISH);
         for ( int i = 0; i < MAX_REPLENISH; i++)
         {
-            eCells.Add( new EnergyCell(MAX_ENERGY) );
+            eCells.Add( new EnergyCell(MAX_ENERGY, N_DISABLED_ENERGY) );
         }
 
     }
@@ -57,10 +71,10 @@ public class EnergyCounter
     {
         // update replenishes according to number used in cur loop
         int delta_replenishes = MAX_REPLENISH - getReplenish();
-
+        int n_replenishes = MAX_REPLENISH - delta_replenishes;
         // get counter with -1 energy overall
-        EnergyCounter ec =  new EnergyCounter( MAX_ENERGY-1, delta_replenishes);
-        Debug.Log(" NESTED CPT CREATED WITH : " + (MAX_ENERGY-1) + " energy for " + delta_replenishes + " cells");
+        EnergyCounter ec =  new EnergyCounter( MAX_ENERGY-1, N_DISABLED_ENERGY+1, n_replenishes);
+        Debug.Log(" NESTED CPT CREATED WITH : " + ec.MAX_ENERGY + " energy for " + ec.MAX_REPLENISH + " cells and " + ec.N_DISABLED_ENERGY + " disabled energy.");
 
         // update last cell in new ec to match current cell consuming
         if ( getReplenish() > 0 )
@@ -83,6 +97,11 @@ public class EnergyCounter
         return ( eCells.Count > 0 ) ? eCells.Count : 0;
     }
 
+    public int getDisabledEnergy()
+    {
+        return N_DISABLED_ENERGY;
+    }
+
     public EnergyCell getLastEnergyCell()
     {
         int lastcell_idx = ( (eCells.Count-1) >= 0 ) ? (eCells.Count-1) : 0;
@@ -96,7 +115,7 @@ public class EnergyCounter
         {
             EnergyCell curr_cell = eCells[0];
             if ( !curr_cell.tryConsume() )
-            {
+            {                
                 // cell depleted, remove from cell list
                 // should procede to lmove elements ( API doc ) 
                 eCells.RemoveAt(0);

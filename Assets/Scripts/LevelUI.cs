@@ -37,6 +37,19 @@ public class LevelUI : MonoBehaviour
         //refresh();
     }
 
+    public void updatePlayerRef( GameObject newRef)
+    {
+        if (newRef == null)
+            return;
+        playerRef = newRef;
+        if ( playerRef != null)
+        {
+            playerController = playerRef.GetComponent<PlayerController>();
+            hasPlayerRef = (playerController != null);
+            
+        }
+    }
+
     public void refresh()
     {
         if (!!hasPlayerRef)
@@ -44,23 +57,25 @@ public class LevelUI : MonoBehaviour
             EnergyCounter ec = playerController.energyCounter;
             if (ec != null)
             {
-                ui_replenish_lbl.text   = "" + ec.getReplenish();
-                updateEnergyPanels(ec.getEnergy());
+                ui_replenish_lbl.text   = "" + (ec.getReplenish()-1); // has max cell
+                updateEnergyPanels( ec.getEnergy(), ec.getDisabledEnergy() );
             }
         }
         else { Debug.Log("UIEnergy : Player ref is missing"); }
     }
 
-    public void updateEnergyPanels( int iPlayerEnergy)
+    public void updateEnergyPanels( int iPlayerEnergy, int iDisabledEnergy)
     {
         UIEnergyPanel[] energy_panels = GetComponentsInChildren<UIEnergyPanel>();
-        for (int i=0; i < energy_panels.Length; i++)
+        int n_panels = energy_panels.Length;
+        for (int i=0; i < n_panels; i++)
         {
             Image im = energy_panels[i].gameObject.GetComponent<Image>();
             if (!!im)
             {
                 var new_color = im.color;
-                new_color = ( i >= iPlayerEnergy ) ? UnityEngine.Color.red : UnityEngine.Color.white;
+                new_color = ( iPlayerEnergy > i ) ?  UnityEngine.Color.white : UnityEngine.Color.red;
+                new_color = ( i >= ( n_panels-iDisabledEnergy) ) ? UnityEngine.Color.black : new_color;
                 im.color = new_color;
             }
         }
