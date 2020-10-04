@@ -26,15 +26,16 @@ public class DoorTile : ActivableObject
         }
     }//! update
 
-    public override void trigger() // OPEN/CLOSE DOOR
+    public override void trigger(bool signalType) // OPEN/CLOSE DOOR
     {
-        isTriggered =! isTriggered;
+        bool previousState = isTriggered;
+        isTriggered = signalType;
         SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
         if (!!sr)
             sr.enabled = !isTriggered;
         if (isTriggered)
             sound_on.Play();
-        else
+        else if (previousState)
             sound_off.Play();
     }
 

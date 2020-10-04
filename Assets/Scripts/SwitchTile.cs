@@ -10,11 +10,12 @@ public class SwitchTile : ActivatorObject
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        foreach( ActivableObject ao in activableObjects )
-            ao.listen(signalKey, this);
 
         if (!isSwitched)
         {
+            foreach( ActivableObject ao in activableObjects )
+                ao.listen(signalKey, this, true);
+
             GetComponentInChildren<AudioSource>().Play();
             isSwitched = true;
             SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();

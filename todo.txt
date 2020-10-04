@@ -1,3 +1,9 @@
 - one less segment? looks like 6 segments right now
 - maxEnergy should decrease by one for each loop break
 - no time ticking (at least for testing)
+- doors and buttons should reset with loop
+- switch should not send signal when already activated
+- mutltiple buttons for one door not working
+- somehow third loop player reset to begining after one played segment and then cant do shit
+- ground cosmetics shouldnt collide
+- weird players collisions?

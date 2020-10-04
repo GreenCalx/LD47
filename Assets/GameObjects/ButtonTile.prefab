@@ -331,6 +331,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   activables: []
   signalKey: 0
+  sprite_on: {fileID: -2193289488850848309, guid: d5e186e3e3475ed479b21df6eaa5006b,
+    type: 3}
+  sprite_off: {fileID: 1409080709337733203, guid: d5e186e3e3475ed479b21df6eaa5006b,
+    type: 3}
   sound_on: {fileID: 4972640653084110357}
   sound_off: {fileID: 6392264000765721002}
 --- !u!1 &4558887905773959774

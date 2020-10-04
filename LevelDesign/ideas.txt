@@ -1,6 +1,18 @@
+name:
+???
+
+gameplay:
 - tile conveyer belt
 - tile no break
 - tile consomable refresh action points
 - tile new loop start
 - tile consomable loose action points
 - tile quantic crate
+
+story:
+- last teleporter bring to "fake" one of the first level0 => stuck in a Loop
+- option to suicide to break the game loop
+- alternative hidden ending if all levels done without resets 
+
+background/lore:
+??????
