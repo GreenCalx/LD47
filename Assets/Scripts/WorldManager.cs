@@ -18,7 +18,7 @@ public class WorldManager : MonoBehaviour
 
     public bool NeedTick; // When player has chose a direction
     public bool WaitForInput; // Playre is controlling so we wait for hi inputs
-
+    public bool NeedReset;
     /// <summary>
     /// This function will create the prefab of player
     /// and add it to the current world manager to be managed by it for ticks
@@ -64,10 +64,11 @@ public class WorldManager : MonoBehaviour
         // Update physique here
         // it means that we can chose the order on which physics will be executed
         // Lets do it first loop to last loop
-        foreach(var Player in Players)
+        for(int i = 0; i < Players.Count; ++i)
         {
-            var PC = Player.GetComponent<PlayerController>();
+            var PC = Players[i].GetComponent<PlayerController>();
             PC.ApplyPhysics();
+            Physics2D.SyncTransforms();
         }
     }
 
@@ -84,7 +85,7 @@ public class WorldManager : MonoBehaviour
             CurrentTime = 0;
             // See if we arrived to the longest loop end
             // if thats the case we reset all loops to be started again frame 0
-            bool NeedReset = false;
+            NeedReset = false;
             if (Players.Count >= 1) // No need if no players
             {
                 var P = Players[0].GetComponent<PlayerController>(); // supposed to be longest

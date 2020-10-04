@@ -105,8 +105,6 @@ public class PlayerController : MonoBehaviour
             // TODO: What about physics?? Do we rely on RigidBody?
             if (CurrentDirection != Direction.NONE)
             {
-
-
                 Tails.Add(Instantiate(TailPrefab, this.gameObject.transform.position, Quaternion.identity));
                 Tails[Tails.Count - 1].SetActive(true);
                 Tails[Tails.Count - 1].transform.localScale = Tails[Tails.Count - 1].transform.localScale * 0.8f;
