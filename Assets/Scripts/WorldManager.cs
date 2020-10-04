@@ -64,9 +64,9 @@ public class WorldManager : MonoBehaviour
         // Update physique here
         // it means that we can chose the order on which physics will be executed
         // Lets do it first loop to last loop
-        foreach(var Player in Players)
+        for(int i = 0; i < Players.Count; ++i)
         {
-            var PC = Player.GetComponent<PlayerController>();
+            var PC = Players[i].GetComponent<PlayerController>();
             PC.ApplyPhysics();
         }
     }
