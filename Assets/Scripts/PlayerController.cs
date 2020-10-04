@@ -107,7 +107,7 @@ public class PlayerController : MonoBehaviour
                 bool has_energy_left = energyCounter.tryConsume();
                 if (!!levelUI)
                     levelUI.refresh();
-                if (!has_energy_left)
+                if (!has_energy_left && !IsLoopedControled)
                 {
                     L.StopRecording();
                     L.StartRunning();

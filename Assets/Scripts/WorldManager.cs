@@ -68,6 +68,7 @@ public class WorldManager : MonoBehaviour
         {
             var PC = Players[i].GetComponent<PlayerController>();
             PC.ApplyPhysics();
+            Physics2D.SyncTransforms();
         }
     }
 
