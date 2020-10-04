@@ -123,23 +123,7 @@ public class PlayerController : MonoBehaviour
                 Tails[Tails.Count - 1].GetComponent<Tail>().SR.color = new Color(c.r, c.g, c.b, c.a * 0.8f);
 
                 // move
-                Vector3 new_position  = new Vector3( Speed * Directionf[(int)CurrentDirection].x,
-                                                Speed * Directionf[(int)CurrentDirection].y,
-                                                0 ) ;
-                RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, new_position, 1.2f, wallmask);
-
-                bool look_for_collision = false;
-                foreach (RaycastHit2D hit in hits)
-                {
-                    if (hit.collider != null)
-                    {
-                        Debug.Log("COLLISION DETECTED AHEAD : " + hit.collider.name);
-                        look_for_collision = true;
-                    }
-                }
-
-                if (!look_for_collision)
-                    this.gameObject.transform.position += new_position; 
+                GetComponent<Movable>().Move(Directionf[(int)CurrentDirection]);
             }
 
             // Reset position once we updated the player
