@@ -107,7 +107,7 @@ public class PlayerController : MonoBehaviour
                 bool has_energy_left = energyCounter.tryConsume();
                 if (!!levelUI)
                     levelUI.refresh();
-                if (!has_energy_left)
+                if (!has_energy_left && !IsLoopedControled)
                 {
                     L.StopRecording();
                     L.StartRunning();
@@ -115,19 +115,22 @@ public class PlayerController : MonoBehaviour
                     if (!!levelUI)
                         levelUI.refresh();
                 }
-
-                Tails.Add(Instantiate(TailPrefab, this.gameObject.transform.position, Quaternion.identity));
-                Tails[Tails.Count - 1].SetActive(true);
-                Tails[Tails.Count - 1].transform.localScale = Tails[Tails.Count - 1].transform.localScale * 0.8f;
-                var c = GetComponent<SpriteRenderer>().color;
-                Tails[Tails.Count - 1].GetComponent<Tail>().SR.color = new Color(c.r, c.g, c.b, c.a * 0.8f);
-
-                // move
-                Movable movable = GetComponent<Movable>();
-                if (!!movable)
-                    movable.Move(Directionf[(int)CurrentDirection]);
                 else
-                    Debug.Log("Missing movable, abnormal pls look into it and add movable script onto player.");
+                {
+
+                    Tails.Add(Instantiate(TailPrefab, this.gameObject.transform.position, Quaternion.identity));
+                    Tails[Tails.Count - 1].SetActive(true);
+                    Tails[Tails.Count - 1].transform.localScale = Tails[Tails.Count - 1].transform.localScale * 0.8f;
+                    var c = GetComponent<SpriteRenderer>().color;
+                    Tails[Tails.Count - 1].GetComponent<Tail>().SR.color = new Color(c.r, c.g, c.b, c.a * 0.8f);
+
+                    // move
+                    Movable movable = GetComponent<Movable>();
+                    if (!!movable)
+                        movable.Move(Directionf[(int)CurrentDirection]);
+                    else
+                        Debug.Log("Missing movable, abnormal pls look into it and add movable script onto player.");
+                }
             }
 
             // Reset position once we updated the player

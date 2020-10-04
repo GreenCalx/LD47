@@ -10,6 +10,12 @@ public class Movable : MonoBehaviour
     [SerializeField] private LayerMask movablemask;
     public float Speed = 1f;
 
+    public bool ResetBetweenLoops = true;
+
+    public Vector2 StartPosition;
+
+    public WorldManager WM;
+
     public bool Move(Vector2 Direction)
     {
         Vector3 Dir3 = new Vector3(Direction.x, Direction.y, 0);
@@ -86,12 +92,15 @@ public class Movable : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        StartPosition = this.gameObject.transform.position;
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        if(WM.NeedReset && ResetBetweenLoops)
+        {
+            this.gameObject.transform.position = StartPosition;
+        }
     }
 }
