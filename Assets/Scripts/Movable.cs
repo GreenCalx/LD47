@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Security.AccessControl;
+using System.Threading;
 using UnityEngine;
 
 public class Movable : MonoBehaviour
@@ -14,7 +16,19 @@ public class Movable : MonoBehaviour
 
     public Vector2 StartPosition;
 
+    public Vector2 LastPosition;
+    public Vector2 NewPosition;
+
     public WorldManager WM;
+
+    public SpriteRenderer SR;
+
+    public float AnimationTime = 1;
+    public float CurrentTime = 1;
+    public bool EndAnimation = true;
+
+    public float SpawnTailTime = 0.1f;
+    public float CurrentSpawnTailTime = 0.1f;
 
     public bool Move(Vector2 Direction)
     {
@@ -26,9 +40,15 @@ public class Movable : MonoBehaviour
         hitsm = hitsm.Where(val => (val.collider.gameObject != this.gameObject)).ToArray();
         if (hitsm.Length == 0)
         {
+            LastPosition = this.gameObject.transform.position;
+
             this.gameObject.transform.position += new Vector3(Speed * Direction.x,
                                                 Speed * Direction.y,
                                                 0);
+
+            NewPosition = this.gameObject.transform.position;
+            EndAnimation = false;
+
             return true;
         }
 
@@ -57,26 +77,38 @@ public class Movable : MonoBehaviour
                                 //execute move on player which colide
                                 if (Mov.Move(Direction))
                                 {
+                                    LastPosition = this.gameObject.transform.position;
+
                                     this.gameObject.transform.position += new Vector3(Speed * Direction.x,
                                                             Speed * Direction.y,
                                                             0);
+                                    NewPosition = this.gameObject.transform.position;
+                                    EndAnimation = false;
+
                                     return true;
                                 }
                             }
                             else
                             {
+                                LastPosition = this.gameObject.transform.position;
                                 this.gameObject.transform.position += new Vector3(Speed * Direction.x,
                                                             Speed * Direction.y,
                                                             0);
+                                NewPosition = this.gameObject.transform.position;
+                                EndAnimation = false;
                                 return true;
                             }
                         } else
                         {
                             if (Mov.Move(Direction))
                             {
+                                LastPosition = this.gameObject.transform.position;
                                 this.gameObject.transform.position += new Vector3(Speed * Direction.x,
                                                         Speed * Direction.y,
                                                         0);
+                                NewPosition = this.gameObject.transform.position;
+                                EndAnimation = false;
+
                                 return true;
                             }
                         }
@@ -93,14 +125,44 @@ public class Movable : MonoBehaviour
     void Start()
     {
         StartPosition = this.gameObject.transform.position;
+        CurrentTime = AnimationTime;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (!EndAnimation)
+        {
+            CurrentSpawnTailTime -= Time.deltaTime;
+
+            if(CurrentSpawnTailTime <= 0)
+            {
+                // Spawn tail
+                var PC = GetComponent<PlayerController>();
+                if (PC)
+                {
+                    PC.SpawnTail();
+                }
+                CurrentSpawnTailTime = SpawnTailTime;
+            }
+
+            CurrentTime -= (Time.deltaTime/AnimationTime);
+            if (CurrentTime <= 0)
+            {
+                EndAnimation = true;
+                CurrentTime = AnimationTime;
+            }
+        }
+
         if(WM.NeedReset && ResetBetweenLoops)
         {
             this.gameObject.transform.position = StartPosition;
         }
+
+        if(SR && !EndAnimation)
+        {
+            SR.transform.position = Vector2.Lerp(LastPosition, NewPosition, 1-CurrentTime);
+        }
+
     }
 }

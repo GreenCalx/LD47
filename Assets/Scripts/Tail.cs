@@ -30,8 +30,8 @@ public class Tail : MonoBehaviour
         if(!IsTickBased)
         {
             SR.color = new Color(SR.color.r, SR.color.g, SR.color.b, SR.color.a - (Time.deltaTime * 1.5f));
-            this.gameObject.transform.localScale = this.gameObject.transform.localScale - new Vector3(transform.localScale.x * (Time.deltaTime * 1.5f),
-                                                                                                     transform.localScale.y *(Time.deltaTime * 1.5f), 0);
+            //this.gameObject.transform.localScale = this.gameObject.transform.localScale - new Vector3(transform.localScale.x * (Time.deltaTime * 1.5f),
+            //                                                                                         transform.localScale.y *(Time.deltaTime * 1.5f), 0);
         }
 
 

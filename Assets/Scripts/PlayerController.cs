@@ -86,6 +86,15 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void SpawnTail()
+    {
+        Tails.Add(Instantiate(TailPrefab, GetComponentInChildren<SpriteRenderer>().transform.position, Quaternion.identity));
+        Tails[Tails.Count - 1].SetActive(true);
+        //Tails[Tails.Count - 1].transform.localScale = Tails[Tails.Count - 1].transform.localScale * 0.8f;
+        var c = GetComponentInChildren<SpriteRenderer>().color;
+        Tails[Tails.Count - 1].GetComponent<Tail>().SR.color = new Color(c.r, c.g, c.b, c.a * 0.8f);
+    }
+
     public void ApplyPhysics()
     {
         if (TickRequired)
@@ -105,18 +114,29 @@ public class PlayerController : MonoBehaviour
             // TODO: What about physics?? Do we rely on RigidBody?
             if (CurrentDirection != Direction.NONE)
             {
-                Tails.Add(Instantiate(TailPrefab, this.gameObject.transform.position, Quaternion.identity));
-                Tails[Tails.Count - 1].SetActive(true);
-                Tails[Tails.Count - 1].transform.localScale = Tails[Tails.Count - 1].transform.localScale * 0.8f;
-                var c = GetComponent<SpriteRenderer>().color;
-                Tails[Tails.Count - 1].GetComponent<Tail>().SR.color = new Color(c.r, c.g, c.b, c.a * 0.8f);
-
-                // move
-                Movable movable = GetComponent<Movable>();
-                if (!!movable)
-                    movable.Move(Directionf[(int)CurrentDirection]);
+                bool has_energy_left = energyCounter.tryConsume();
+                if (!!levelUI)
+                    levelUI.refresh();
+                if (!has_energy_left && !IsLoopedControled)
+                {
+                    L.StopRecording();
+                    L.StartRunning();
+                    energyCounter.refillAllCells();
+                    if (!!levelUI)
+                        levelUI.refresh();
+                }
                 else
-                    Debug.Log("Missing movable, abnormal pls look into it and add movable script onto player.");
+                {
+
+                    //SpawnTail();
+
+                    // move
+                    Movable movable = GetComponent<Movable>();
+                    if (!!movable)
+                        movable.Move(Directionf[(int)CurrentDirection]);
+                    else
+                        Debug.Log("Missing movable, abnormal pls look into it and add movable script onto player.");
+                }
             }
 
             // Reset position once we updated the player
@@ -236,7 +256,7 @@ public class PlayerController : MonoBehaviour
                     }
 
                     // For now new players are randomly colored
-                    var SpriteRender = GO.GetComponent<SpriteRenderer>();
+                    var SpriteRender = GO.GetComponentInChildren<SpriteRenderer>();
                     if (SpriteRender)
                     {
                         SpriteRender.color = UnityEngine.Random.ColorHSV();
