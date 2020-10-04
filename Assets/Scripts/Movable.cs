@@ -70,34 +70,35 @@ public class Movable : MonoBehaviour
                     var Mov = hit.collider.GetComponent<Movable>();
                     if (Mov)
                     {
-                        if (PC && mePC)
+                        if (PC && mePC && !PC.L.IsRecording)
                         {
-                            if (PC.L.Events[PC.L.CurrentIdx] != mePC.L.Events[mePC.L.CurrentIdx])
-                            {
-                                //execute move on player which colide
-                                if (Mov.Move(Direction))
+                            
+                                if (PC.L.Events[PC.L.CurrentIdx] != mePC.L.Events[mePC.L.CurrentIdx])
+                                {
+                                    //execute move on player which colide
+                                    if (Mov.Move(Direction))
+                                    {
+                                        LastPosition = this.gameObject.transform.position;
+
+                                        this.gameObject.transform.position += new Vector3(Speed * Direction.x,
+                                                                Speed * Direction.y,
+                                                                0);
+                                        NewPosition = this.gameObject.transform.position;
+                                        EndAnimation = false;
+
+                                        return true;
+                                    }
+                                }
+                                else
                                 {
                                     LastPosition = this.gameObject.transform.position;
-
                                     this.gameObject.transform.position += new Vector3(Speed * Direction.x,
-                                                            Speed * Direction.y,
-                                                            0);
+                                                                Speed * Direction.y,
+                                                                0);
                                     NewPosition = this.gameObject.transform.position;
                                     EndAnimation = false;
-
                                     return true;
                                 }
-                            }
-                            else
-                            {
-                                LastPosition = this.gameObject.transform.position;
-                                this.gameObject.transform.position += new Vector3(Speed * Direction.x,
-                                                            Speed * Direction.y,
-                                                            0);
-                                NewPosition = this.gameObject.transform.position;
-                                EndAnimation = false;
-                                return true;
-                            }
                         } else
                         {
                             if (Mov.Move(Direction))
