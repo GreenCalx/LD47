@@ -15,6 +15,7 @@ public class SwitchTile : ActivatorObject
 
         if (!isSwitched)
         {
+            GetComponentInChildren<AudioSource>().Play();
             isSwitched = true;
             SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
             if (!!sr)
