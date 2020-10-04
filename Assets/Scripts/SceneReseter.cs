@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class SceneReseter : MonoBehaviour
 {
+        public string scene_to_load;
     // Start is called before the first frame update
     void Start()
     {
