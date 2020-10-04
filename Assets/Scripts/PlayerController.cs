@@ -6,6 +6,7 @@ using System.Security.AccessControl;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+[RequireComponent(typeof(Movable))]
 public class PlayerController : MonoBehaviour
 {
     /// <summary>
@@ -123,7 +124,11 @@ public class PlayerController : MonoBehaviour
                 Tails[Tails.Count - 1].GetComponent<Tail>().SR.color = new Color(c.r, c.g, c.b, c.a * 0.8f);
 
                 // move
-                GetComponent<Movable>().Move(Directionf[(int)CurrentDirection]);
+                Movable movable = GetComponent<Movable>();
+                if (!!movable)
+                    movable.Move(Directionf[(int)CurrentDirection]);
+                else
+                    Debug.Log("Missing movable, abnormal pls look into it and add movable script onto player.");
             }
 
             // Reset position once we updated the player
