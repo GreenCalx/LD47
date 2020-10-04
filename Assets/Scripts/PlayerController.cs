@@ -114,20 +114,8 @@ public class PlayerController : MonoBehaviour
             // TODO: What about physics?? Do we rely on RigidBody?
             if (CurrentDirection != Direction.NONE)
             {
-                bool has_energy_left = energyCounter.tryConsume();
-                if (!!levelUI)
-                    levelUI.refresh();
-                if (!has_energy_left && !IsLoopedControled)
-                {
-                    L.StopRecording();
-                    L.StartRunning();
-                    energyCounter.refillAllCells();
-                    if (!!levelUI)
-                        levelUI.refresh();
-                }
-                else
-                {
-
+                
+                
                     //SpawnTail();
 
                     // move
@@ -136,7 +124,7 @@ public class PlayerController : MonoBehaviour
                         movable.Move(Directionf[(int)CurrentDirection]);
                     else
                         Debug.Log("Missing movable, abnormal pls look into it and add movable script onto player.");
-                }
+               
             }
 
             // Reset position once we updated the player
