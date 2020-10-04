@@ -31,8 +31,17 @@ public class EnergyCounter
         { return energy; }
         public void setAvailableEnergy( int iEnergy)
         { energy = iEnergy; }
+
+        public int getRemainingDepletedEnergy()
+        {
+            if (energy == 0)
+                return (--n_disabled_energy);
+            else
+                return 0;
+        } 
     }//! EnergyCell
     public List<EnergyCell> eCells;
+    private bool has_locked_energy = false;
 
     // Start is called before the first frame update
     public EnergyCounter()
@@ -87,12 +96,17 @@ public class EnergyCounter
         return ec;
     }
 
+    public bool isCurrentCellEnergyLocked()
+    {
+        return has_locked_energy;
+    }
+
     public int getEnergy()
     {
         return  ( eCells.Count > 0 ) ? eCells[0].getEnergy() : 0;
     }
 
-    public int getReplenish()
+    public int getReplenish()   
     {
         return ( eCells.Count > 0 ) ? eCells.Count : 0;
     }
@@ -108,6 +122,8 @@ public class EnergyCounter
         return eCells[lastcell_idx];
     }
 
+
+
     public bool tryConsume()
     {
         
@@ -115,13 +131,19 @@ public class EnergyCounter
         {
             EnergyCell curr_cell = eCells[0];
             if ( !curr_cell.tryConsume() )
-            {                
-                // cell depleted, remove from cell list
-                // should procede to lmove elements ( API doc ) 
-                eCells.RemoveAt(0);
-                if ( eCells.Count == 0 )
+            {       
+                int remaining_depleted_energy = curr_cell.getRemainingDepletedEnergy();
+                has_locked_energy = (remaining_depleted_energy > 0);
+
+                if (!has_locked_energy)
                 {
-                    return false; // no more energy cells
+                    // cell depleted, remove from cell list
+                    // should procede to lmove elements ( API doc ) 
+                    eCells.RemoveAt(0);
+                    if ( eCells.Count == 0 )
+                    {
+                        return false; // no more energy cells
+                    }
                 }
             }
             return true;
