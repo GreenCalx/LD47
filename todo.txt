@@ -7,3 +7,4 @@
 - somehow third loop player reset to begining after one played segment and then cant do shit
 - ground cosmetics shouldnt collide
 - weird players collisions?
+- update levels design according to engine and my design mistakes
