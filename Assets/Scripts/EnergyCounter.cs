@@ -152,10 +152,6 @@ public class EnergyCounter
                     // cell depleted, remove from cell list
                     // should procede to lmove elements ( API doc ) 
                     eCells.RemoveAt(0);
-                    if ( eCells.Count == 0 )
-                    {
-                        return false; // no more energy cells
-                    }
                 }
             }
             return true;
