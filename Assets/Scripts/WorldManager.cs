@@ -11,10 +11,13 @@ public class WorldManager : MonoBehaviour
 
 
     int CurrentTick = 0;
-    public float TickRate = 2f; // 2 seconds
+    public float TickRate = 1f; // 2 seconds
     float CurrentTime = 0;
 
     public Vector2 StartPosition; //. First player will appear at this position
+
+    public bool NeedTick; // When player has chose a direction
+    public bool WaitForInput; // Playre is controlling so we wait for hi inputs
 
     /// <summary>
     /// This function will create the prefab of player
@@ -30,6 +33,9 @@ public class WorldManager : MonoBehaviour
             // prefab is deactivated on spectree as it is used only as prefab
             // and we dont want it to work
             GO.SetActive(true);
+
+            WaitForInput = true;
+            NeedTick = false;
 
             foreach(var Player in Players)
             {
@@ -52,13 +58,29 @@ public class WorldManager : MonoBehaviour
         PC.L.StartRecording();
     }
 
+    // FixedUpdate
+    void FixedUpdate()
+    {
+        // Update physique here
+        // it means that we can chose the order on which physics will be executed
+        // Lets do it first loop to last loop
+        foreach(var Player in Players)
+        {
+            var PC = Player.GetComponent<PlayerController>();
+            PC.ApplyPhysics();
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
-        CurrentTime += Time.deltaTime;
+        if (!WaitForInput) {
+            CurrentTime += Time.deltaTime;
+        }
         // For now ticks are done by hand!
-        if (Input.GetKeyDown(KeyCode.M) || CurrentTime > TickRate)
+        if (Input.GetKeyDown(KeyCode.M) || (!WaitForInput && (CurrentTime > TickRate)) || (WaitForInput && NeedTick))
         {
+            NeedTick = false;
             CurrentTime = 0;
             // See if we arrived to the longest loop end
             // if thats the case we reset all loops to be started again frame 0

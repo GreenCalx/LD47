@@ -40,7 +40,7 @@ public class PlayerController : MonoBehaviour
     /// References
     /// </summary>
     public GameObject GameLoop;
-    WorldManager WM;
+    public WorldManager WM;
     public GameObject TailPrefab;
 
     // Start is called before the first frame update
@@ -51,6 +51,8 @@ public class PlayerController : MonoBehaviour
             WM = GameLoop.GetComponent<WorldManager>();
         }
         this.energyCounter = new EnergyCounter( 5, 5);
+
+        GetComponent<BoxCollider2D>().enabled = (false);
 
     }
 
@@ -82,16 +84,13 @@ public class PlayerController : MonoBehaviour
             Physics2D.IgnoreCollision(collision.collider, GetComponent<Collider2D>());
         }
     }
-        /// <summary>
-        /// If WorldManager asked a Tick, then we update the player according to
-        /// either the current loop doirection or the player asked direction
-        /// </summary>
-        void FixedUpdate()
+
+    public void ApplyPhysics()
     {
         if (TickRequired)
         {
             // We update the direction from the loop if it is loop controlled
-            if (L.IsRunning && IsLoopedControled )
+            if (L.IsRunning && IsLoopedControled)
             {
                 CurrentDirection = L.Tick();
             }
@@ -136,13 +135,22 @@ public class PlayerController : MonoBehaviour
             // touching any button during a tick
             CurrentDirection = PlayerController.Direction.NONE;
 
-            foreach(var Tail in Tails)
+            foreach (var Tail in Tails)
             {
-                if(Tail)
-                Tail.GetComponent<Tail>().Tick();
+                if (Tail)
+                    Tail.GetComponent<Tail>().Tick();
             }
         }
         TickRequired = false;
+    }
+
+    /// <summary>
+    /// If WorldManager asked a Tick, then we update the player according to
+    /// either the current loop doirection or the player asked direction
+    /// </summary>
+    void FixedUpdate()
+    {
+       // ApplyPhysic()
     }
 
 
@@ -171,6 +179,7 @@ public class PlayerController : MonoBehaviour
             testAnimation();
         else
         {
+            GetComponent<BoxCollider2D>().enabled = (true);
             if (!IsLoopedControled)
             {
             
@@ -180,11 +189,15 @@ public class PlayerController : MonoBehaviour
                 var Down = Input.GetButtonDown(DirectionInputs[(int)Direction.DOWN]);
                 var Right = Input.GetButtonDown(DirectionInputs[(int)Direction.RIGHT]);
                 var Left = Input.GetButtonDown(DirectionInputs[(int)Direction.LEFT]);
+                var None = Input.GetKeyDown(KeyCode.N);
 
                 if (Up) CurrentDirection = Direction.UP;
                 if (Down) CurrentDirection = Direction.DOWN;
                 if (Left) CurrentDirection = Direction.LEFT;
                 if (Right) CurrentDirection = Direction.RIGHT;
+                if (None) CurrentDirection = Direction.NONE;
+
+                if (Up || Down || Right || Left || None) WM.NeedTick = true;
             }
             else
             {

@@ -54,6 +54,7 @@ public class Looper : MonoBehaviour
         IsRunning = true;
 
         PC.IsLoopedControled = true;
+        PC.WM.WaitForInput = false;
     }
     /// <summary>
     /// Only call reset for now
