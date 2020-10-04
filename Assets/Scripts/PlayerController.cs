@@ -229,7 +229,10 @@ public class PlayerController : MonoBehaviour
 
                         // Update newly created looper with current loop previous
                         // frames
-                        P.L.Events = this.L.Events.GetRange(0, this.L.CurrentIdx + 1);
+                        if (this.L.CurrentIdx != 0)
+                        {
+                            P.L.Events = this.L.Events.GetRange(0, this.L.CurrentIdx + 1);
+                        }
                         P.L.StartRecording();
                         // IMPORTANT : this nees to be done after StartRecording as it will take current 
                         // position as start position and we dont want that
