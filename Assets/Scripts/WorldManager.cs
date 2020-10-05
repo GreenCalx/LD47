@@ -107,12 +107,25 @@ public class WorldManager : MonoBehaviour
 
         if (IsRewinding)
         {
+            MasterMixerControl control = null;
+            var mixer = GameObject.Find("AudioMixerControl");
+            if( mixer)
+            {
+                control = mixer.GetComponent<MasterMixerControl>();
+                if (control)
+                {
+                    control.SetPhasedMode();
+                }
+            }
+
             NeedTick = false;
             WaitForInput = false;
             NeedReset = false;
 
             if (RewindGO.Count == 0)
             {
+                if (control) control.SetNormalMode();
+
                 NeedReset = true;
                 IsRewinding = false;
                 CurrentTick = 0;
