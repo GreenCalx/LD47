@@ -250,7 +250,8 @@ public class PlayerController : MonoBehaviour
                     var SpriteRender = GO.GetComponentInChildren<SpriteRenderer>();
                     if (SpriteRender)
                     {
-                        SpriteRender.color = UnityEngine.Random.ColorHSV();
+                        var c = this.gameObject.GetComponentInChildren<SpriteRenderer>().color * 0.7f;
+                        SpriteRender.color = new Color(c.r,c.g,c.b,1);
                     }
                 } else {
                     // not breaked, just replaying scenario
