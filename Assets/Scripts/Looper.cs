@@ -112,13 +112,14 @@ public class Looper : MonoBehaviour
     /// </summary>
     public void Update()
     {
-        var Start = Input.GetKeyDown(KeyCode.A);
-        var Stop = Input.GetKeyDown(KeyCode.Z);
-        var Pause = Input.GetKeyDown(KeyCode.E);
+        // var Start = Input.GetKeyDown(KeyCode.A);
+        // var Stop = Input.GetKeyDown(KeyCode.Z);
+        // var Pause = Input.GetKeyDown(KeyCode.E);
         var Restart = Input.GetKeyDown(KeyCode.R);
         var Record = Input.GetKeyDown(KeyCode.T);
-        var StopRecord = Input.GetKeyDown(KeyCode.Y);
+        // var StopRecord = Input.GetKeyDown(KeyCode.Y);
 
+        /*
         if (IsRunning)
         {
             if (Stop) this.StopRunning();
@@ -131,6 +132,9 @@ public class Looper : MonoBehaviour
             if (StopRecord) this.StopRecording();
         else
             if (Record) this.StartRecording();
+        */
+
+        if (IsRecording && Record) this.StartRecording();
     }
 }
 
