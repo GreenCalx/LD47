@@ -688,6 +688,11 @@ PrefabInstance:
       propertyPath: m_GravityScale
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5427947463286776092, guid: fe40bb787fcbda24e86031d229a96cf4,
+        type: 3}
+      propertyPath: WM
+      value: 
+      objectReference: {fileID: 1795725078}
     - target: {fileID: 6013280694991801665, guid: fe40bb787fcbda24e86031d229a96cf4,
         type: 3}
       propertyPath: GameLoop
@@ -845,6 +850,18 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1795725076}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1795725078 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 893246269087679359, guid: c83a65c7c8e8b1248beb94dd7164f8be,
+    type: 3}
+  m_PrefabInstance: {fileID: 1795725076}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1795725077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 414abb2bb3d6fa84e8c071e7be3a1876, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1809603076 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3090805287773782583, guid: c77eaf74b4a518c49af3af9ef4f418d2,

@@ -266,6 +266,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5427947463286776092, guid: fe40bb787fcbda24e86031d229a96cf4,
+        type: 3}
+      propertyPath: WM
+      value: 
+      objectReference: {fileID: 1488421297}
     - target: {fileID: 6013280694991801665, guid: fe40bb787fcbda24e86031d229a96cf4,
         type: 3}
       propertyPath: GameLoop

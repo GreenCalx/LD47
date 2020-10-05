@@ -638,6 +638,18 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1129586332}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1129586334 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 893246269087679359, guid: c83a65c7c8e8b1248beb94dd7164f8be,
+    type: 3}
+  m_PrefabInstance: {fileID: 1129586332}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1129586333}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 414abb2bb3d6fa84e8c071e7be3a1876, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1344070853
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -994,6 +1006,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5427947463286776092, guid: fe40bb787fcbda24e86031d229a96cf4,
+        type: 3}
+      propertyPath: WM
+      value: 
+      objectReference: {fileID: 1129586334}
     - target: {fileID: 6013280694991801665, guid: fe40bb787fcbda24e86031d229a96cf4,
         type: 3}
       propertyPath: GameLoop
