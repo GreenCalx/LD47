@@ -101,15 +101,15 @@ AudioMixerController:
   m_UpdateMode: 0
   m_ExposedParameters:
   - guid: ea3f2d2c71d7a1e498b415dcefaa48c5
-    name: MyExposedParam 4
+    name: EffectsVolume
   - guid: 224636de47903c7458febbe8f7393473
-    name: MyExposedParam 2
+    name: MasterVolume
   - guid: ae3a6350c22b5fa4593456aa01a23638
-    name: MyExposedParam
+    name: ChorusDryMix
   - guid: a5762570208187b4b9b983739e84bf84
-    name: MyExposedParam 1
+    name: LowpassCutoff
   - guid: d751fb2a6d0d1e348bbb47a951525a28
-    name: MyExposedParam 3
+    name: MusicVolume
   m_AudioMixerGroupViews:
   - guids:
     - deaf3dc39e9b9bd46a1efb7f5e16c72c
