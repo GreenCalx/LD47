@@ -19,7 +19,7 @@ public class Movable : MonoBehaviour
     public Vector2 LastPosition;
     public Vector2 NewPosition;
 
-    public bool IsMoving = false;
+    public bool IsSpawningTails = false;
 
     public WorldManager WM;
 
@@ -137,17 +137,19 @@ public class Movable : MonoBehaviour
     {
         if (!EndAnimation)
         {
-            CurrentSpawnTailTime -= Time.deltaTime;
-
-            if (CurrentSpawnTailTime <= 0)
+            if (IsSpawningTails)
             {
-                // Spawn tail
-                var PC = GetComponent<PlayerController>();
-                if (PC)
+                CurrentSpawnTailTime -= Time.deltaTime;
+                if (CurrentSpawnTailTime <= 0)
                 {
-                    PC.SpawnTail();
+                    // Spawn tail
+                    var PC = GetComponent<PlayerController>();
+                    if (PC)
+                    {
+                        PC.SpawnTail();
+                    }
+                    CurrentSpawnTailTime = SpawnTailTime;
                 }
-                CurrentSpawnTailTime = SpawnTailTime;
             }
 
             CurrentTime -= (Time.deltaTime / AnimationTime);

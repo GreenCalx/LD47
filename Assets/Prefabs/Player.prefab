@@ -44,6 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13f5a2fb2a68e6348b4d2cd7aa70b134, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Duration: 0.5
   SR: {fileID: 851262059}
   IsTickBased: 0
 --- !u!212 &851262059
@@ -355,14 +356,15 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 2304
   Speed: 1
-  ResetBetweenLoops: 0
+  ResetBetweenLoops: 1
   StartPosition: {x: 0, y: 0}
   LastPosition: {x: 0, y: 0}
   NewPosition: {x: 0, y: 0}
+  IsSpawningTails: 1
   WM: {fileID: 0}
   SR: {fileID: 1296851526}
-  AnimationTime: 0.5
+  AnimationTime: 0.3
   CurrentTime: 1
   EndAnimation: 1
-  SpawnTailTime: 0.1
-  CurrentSpawnTailTime: 0.1
+  SpawnTailTime: 0.05
+  CurrentSpawnTailTime: 0.05

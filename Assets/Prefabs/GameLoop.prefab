@@ -43,12 +43,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 414abb2bb3d6fa84e8c071e7be3a1876, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerPrefab: {fileID: 6013280694991801692, guid: fe40bb787fcbda24e86031d229a96cf4,
-    type: 3}
+  PlayerPrefab: {fileID: 0}
   levelUI_GOref: {fileID: 3311141456035915878, guid: 4a51d58bd4e703a4cb7d399e756f4722,
     type: 3}
-  TickRate: 60
+  CurrentTick: 0
+  TickRate: 0.1
   StartPosition: {x: 0, y: 0}
   NeedTick: 0
   WaitForInput: 0
   NeedReset: 0
+  IsRewinding: 0

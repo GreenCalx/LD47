@@ -436,11 +436,6 @@ PrefabInstance:
       propertyPath: PlayerPrefab
       value: 
       objectReference: {fileID: 6013280696226487280}
-    - target: {fileID: 893246269087679359, guid: c83a65c7c8e8b1248beb94dd7164f8be,
-        type: 3}
-      propertyPath: TickRate
-      value: 0.5
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c83a65c7c8e8b1248beb94dd7164f8be, type: 3}
 --- !u!1001 &2963608311425601103
@@ -455,11 +450,6 @@ PrefabInstance:
       propertyPath: WM
       value: 
       objectReference: {fileID: 1069861535}
-    - target: {fileID: 5427947463286776092, guid: fe40bb787fcbda24e86031d229a96cf4,
-        type: 3}
-      propertyPath: ResetBetweenLoops
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 6013280694991801665, guid: fe40bb787fcbda24e86031d229a96cf4,
         type: 3}
       propertyPath: GameLoop

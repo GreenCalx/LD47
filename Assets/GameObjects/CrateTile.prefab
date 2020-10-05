@@ -297,10 +297,10 @@ MonoBehaviour:
   StartPosition: {x: 0, y: 0}
   LastPosition: {x: 0, y: 0}
   NewPosition: {x: 0, y: 0}
-  IsMoving: 0
+  IsSpawningTails: 0
   WM: {fileID: 0}
   SR: {fileID: 996667971}
-  AnimationTime: 0.5
+  AnimationTime: 0.3
   CurrentTime: 1
   EndAnimation: 1
   SpawnTailTime: 0.1
