@@ -36,43 +36,43 @@ public class Movable : MonoBehaviour
         RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position + (0.6f * Dir3), Dir3, 0.5f, wallmask);
         if (hits.Length != 0) return false;
 
-        RaycastHit2D[] hitsm = Physics2D.RaycastAll(transform.position + (0.6f * Dir3), Dir3, 0.5f, movablemask);
-        hitsm = hitsm.Where(val => (val.collider.gameObject != this.gameObject)).ToArray();
-        if (hitsm.Length == 0)
+        if (!WM.IsRewinding)
         {
-            LastPosition = this.gameObject.transform.position;
-
-            this.gameObject.transform.position += new Vector3(Speed * Direction.x,
-                                                Speed * Direction.y,
-                                                0);
-
-            NewPosition = this.gameObject.transform.position;
-            EndAnimation = false;
-
-            return true;
-        }
-
-        if (hitsm.Length > 1) Debug.Log("weird shit going on: founding too many collisions");
-
-        foreach (RaycastHit2D hit in hitsm)
-        {
-            if (hit.collider.gameObject != this.gameObject)
+            RaycastHit2D[] hitsm = Physics2D.RaycastAll(transform.position + (0.6f * Dir3), Dir3, 0.5f, movablemask);
+            hitsm = hitsm.Where(val => (val.collider.gameObject != this.gameObject)).ToArray();
+            if (hitsm.Length == 0)
             {
-                if (hit.collider != null)
-                {
-                    // Detect if we are colliding with a player
-                    // If the player asked for the same direction than us last event
-                    // We dont execute the move and simply move this object because physic
-                    // is executed in a certain order
-                    var PC = hit.collider.GetComponent<PlayerController>();
-                    var mePC = GetComponent<PlayerController>();
+                LastPosition = this.gameObject.transform.position;
 
-                    var Mov = hit.collider.GetComponent<Movable>();
-                    if (Mov)
+                this.gameObject.transform.position += new Vector3(Speed * Direction.x,
+                                                    Speed * Direction.y,
+                                                    0);
+
+                NewPosition = this.gameObject.transform.position;
+                EndAnimation = false;
+
+                return true;
+            }
+
+            foreach (RaycastHit2D hit in hitsm)
+            {
+                if (hit.collider.gameObject != this.gameObject)
+                {
+                    if (hit.collider != null)
                     {
-                        if (PC && mePC && !PC.L.IsRecording)
+                        // Detect if we are colliding with a player
+                        // If the player asked for the same direction than us last event
+                        // We dont execute the move and simply move this object because physic
+                        // is executed in a certain order
+                        var PC = hit.collider.GetComponent<PlayerController>();
+                        var mePC = GetComponent<PlayerController>();
+
+                        var Mov = hit.collider.GetComponent<Movable>();
+                        if (Mov)
                         {
-                            
+                            if (PC && mePC && !PC.L.IsRecording)
+                            {
+
                                 if (PC.L.Events[PC.L.CurrentIdx] != mePC.L.Events[mePC.L.CurrentIdx])
                                 {
                                     //execute move on player which colide
@@ -99,25 +99,39 @@ public class Movable : MonoBehaviour
                                     EndAnimation = false;
                                     return true;
                                 }
-                        } else
-                        {
-                            if (Mov.Move(Direction))
+                            }
+                            else
                             {
-                                LastPosition = this.gameObject.transform.position;
-                                this.gameObject.transform.position += new Vector3(Speed * Direction.x,
-                                                        Speed * Direction.y,
-                                                        0);
-                                NewPosition = this.gameObject.transform.position;
-                                EndAnimation = false;
+                                if (Mov.Move(Direction))
+                                {
+                                    LastPosition = this.gameObject.transform.position;
+                                    this.gameObject.transform.position += new Vector3(Speed * Direction.x,
+                                                            Speed * Direction.y,
+                                                            0);
+                                    NewPosition = this.gameObject.transform.position;
+                                    EndAnimation = false;
 
-                                return true;
+                                    return true;
+                                }
                             }
                         }
                     }
+
+
                 }
-
-
             }
+        } else
+        {
+            LastPosition = this.gameObject.transform.position;
+
+            this.gameObject.transform.position += new Vector3(Speed * Direction.x,
+                                                Speed * Direction.y,
+                                                0);
+
+            NewPosition = this.gameObject.transform.position;
+            EndAnimation = false;
+
+            return true;
         }
         return false;
     }

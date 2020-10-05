@@ -95,7 +95,7 @@ public class PlayerController : MonoBehaviour
         Tails[Tails.Count - 1].GetComponent<Tail>().SR.color = new Color(c.r, c.g, c.b, c.a * 0.8f);
     }
 
-    public void ApplyPhysics()
+    public void ApplyPhysics(bool Reverse)
     {
         if (TickRequired)
         {
@@ -105,10 +105,18 @@ public class PlayerController : MonoBehaviour
                 CurrentDirection = L.Tick();
             }
 
-            if (L.IsRecording)
+            if (!Reverse && L.IsRecording)
             {
                 L.Events.Add(CurrentDirection);
             }
+
+            if(Reverse && CurrentDirection != Direction.NONE)
+            {
+                if (CurrentDirection == Direction.UP) CurrentDirection = Direction.DOWN;
+                else if (CurrentDirection == Direction.DOWN) CurrentDirection = Direction.UP;
+                else if (CurrentDirection == Direction.RIGHT) CurrentDirection = Direction.LEFT;
+                else if (CurrentDirection == Direction.LEFT) CurrentDirection = Direction.RIGHT;
+            } 
 
             // Update position of the player
             // TODO: What about physics?? Do we rely on RigidBody?
