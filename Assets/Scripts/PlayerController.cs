@@ -191,20 +191,19 @@ public class PlayerController : MonoBehaviour
                     //WM.NeedTick = true;
                     WAIT_ORDER = false;
                 } else {
-
                     var Up = Input.GetButtonDown(DirectionInputs[(int)Direction.UP]);
                     var Down = Input.GetButtonDown(DirectionInputs[(int)Direction.DOWN]);
                     var Right = Input.GetButtonDown(DirectionInputs[(int)Direction.RIGHT]);
                     var Left = Input.GetButtonDown(DirectionInputs[(int)Direction.LEFT]);
-                    var None = Input.GetKeyDown(KeyCode.N);
+                    //var None = Input.GetKeyDown(KeyCode.N);
 
                     if (Up) CurrentDirection = Direction.UP;
                     if (Down) CurrentDirection = Direction.DOWN;
                     if (Left) CurrentDirection = Direction.LEFT;
                     if (Right) CurrentDirection = Direction.RIGHT;
-                    if (None) CurrentDirection = Direction.NONE;
+                    //if (None) CurrentDirection = Direction.NONE;
 
-                    if (Up || Down || Right || Left || None) 
+                    if (Up || Down || Right || Left) 
                     { 
                         WM.NeedTick = true;
                     }
@@ -213,7 +212,7 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                if (Input.GetKeyDown(KeyCode.B) && !HasAlreadyBeenBreakedFrom)
+                if (Input.GetButtonDown("Break") && !HasAlreadyBeenBreakedFrom)
                 {
                     // break from the loop
                     HasAlreadyBeenBreakedFrom = true;
@@ -237,7 +236,7 @@ public class PlayerController : MonoBehaviour
                         {
                             P.L.Events = this.L.Events.GetRange(0, this.L.CurrentIdx + 1);
 
-                            // copy into world recording for rewind
+                            // TODO : copy into world recording for rewind
 
                         }
                         P.L.StartRecording();
@@ -259,124 +258,4 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-
-#if false
-    class Looper
-    {
-        public StartPosition;
-        List<PlayerController.Direction> Events;
-    }
-    public Looper L;
-    
-
-    
-    public float Speed = 1f;
-    public float TileSize = 1f;
-
-    //public int PM = 5;
-
-    public bool IsLoopedControled = false;
-    bool HasAlreadyBeenBreakedFrom = false;
-
-    bool InputUsed = true;
-
-    public GameObject PlayerPrefab; // needed to create new players when breaking from the loop
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    void FixedUpdate()
-    {
-        if(CurrentDirection != Direction.NONE)
-            this.gameObject.transform.position += new Vector3(Speed * Directionf[(int)CurrentDirection].x, 
-                                                              Speed * Directionf[(int)CurrentDirection].y, 
-                                                              0);
-        InputUsed = true;
-
-        if(L)
-        {
-            L.Events.Add(CurrentDirection);
-        }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (!IsLoopedControled)
-        {
-            //var Up    = Input.GetAxisRaw(DirectionInputs[(int)Direction.UP]);
-            //var Right = Input.GetAxisRaw(DirectionInputs[(int)Direction.RIGHT]);
-            var Up    = Input.GetButtonDown(DirectionInputs[(int)Direction.UP]  );
-            var Down  = Input.GetButtonDown(DirectionInputs[(int)Direction.DOWN]);
-            var Right = Input.GetButtonDown(DirectionInputs[(int)Direction.RIGHT]);
-            var Left  = Input.GetButtonDown(DirectionInputs[(int)Direction.LEFT]);
-
-            // TODO: Make it so that the player cannot press all inputs and doing shit
-            // for now just need to be carefull to press only one button per frame
-            if (InputUsed)
-            {
-                CurrentDirection = Direction.NONE;
-
-                if (Up) CurrentDirection = Direction.UP;
-                if (Down) CurrentDirection = Direction.DOWN;
-                if (Left) CurrentDirection = Direction.LEFT;
-                if (Right) CurrentDirection = Direction.RIGHT;
-
-                if (Up || Down || Left || Right) InputUsed = false;
-            }
-            /*if (Mathf.Abs(Right) >= Mathf.Abs(Up))
-            {
-                if (Right > 0)
-                    CurrentDirection = Direction.RIGHT;
-                if (Right < 0)
-                    CurrentDirection = Direction.LEFT;
-            }
-            else
-            {
-                if (Up > 0)
-                    CurrentDirection = Direction.UP;
-                if (Up < 0)
-                    CurrentDirection = Direction.DOWN;
-            }*/
-        } else
-        {
-            if(Input.GetKeyDown(KeyCode.B) && !HasAlreadyBeenBreakedFrom)
-            {
-                // break from the loop
-                HasAlreadyBeenBreakedFrom = true;
-                // create a new player at current position
-                var GO = Instantiate(PlayerPrefab, this.gameObject.transform.position, Quaternion.identity);
-                var P = GO.GetComponent<PlayerController>();
-                if (P)
-                {
-                    P.PlayerPrefab = PlayerPrefab;
-                    // update energy loop to get nested counter
-                    P.energyCounter = energyCounter.getNestedCounter();
-                    //P.PM = PM - 1;
-                }
-
-                var SpriteRender = GO.GetComponent<SpriteRenderer>();
-                if(SpriteRender)
-                {
-                    SpriteRender.color = UnityEngine.Random.ColorHSV();
-                }
-
-                var Looper = GO.GetComponent<Loop>();
-                if(Looper)
-                {
-                    Looper.IsRecording = true;
-                    Looper.StartPosition = GO.transform.position;
-                }
-            }
-        }
-    }
-
-    public void SetPosition( Vector2 Position )
-    {
-        this.gameObject.transform.position = new Vector3(Position.x, Position.y, 0);
-    }
-#endif
-    }
+}

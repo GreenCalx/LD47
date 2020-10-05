@@ -171,7 +171,7 @@ public class WorldManager : MonoBehaviour
         }
 
         // For now ticks are done by hand!
-        if (Input.GetKeyDown(KeyCode.M)
+        if (Input.GetButtonDown("Tick")
             //|| (!WaitForInput && (CurrentTime > TickRate)) 
             || (WaitForInput && NeedTick))
         {
