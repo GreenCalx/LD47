@@ -5,12 +5,16 @@ using UnityEngine;
 
 public class WorldManager : MonoBehaviour
 {
+    // for rewind just record everything
+    public List<List<GameObject>> RewindGO = new List<List<GameObject>>();
+    public List<List<PlayerController.Direction>> RewindDirection = new List<List<PlayerController.Direction>>();
+
     List<GameObject> Players = new List<GameObject>();
     public GameObject PlayerPrefab;
     public GameObject levelUI_GOref;
 
 
-    int CurrentTick = 0;
+    public int CurrentTick = 0;
     public float TickRate = 1f; // 2 seconds
     float CurrentTime = 0;
 
@@ -60,17 +64,36 @@ public class WorldManager : MonoBehaviour
         PC.L.StartRecording();
     }
 
+    public void AddRewindMove(GameObject go, PlayerController.Direction D)
+    {
+        // currenttick was unfiortunately already advanced when called here
+        // therefore remove 1
+        var Tick = CurrentTick - 1;
+        while (RewindGO.Count - 1 < Tick)
+        {
+            RewindGO.Add(new List<GameObject>());
+            RewindDirection.Add(new List<PlayerController.Direction>());
+        }
+
+        Debug.Log(RewindGO.Count);
+        RewindGO[Tick].Add(go);
+        RewindDirection[Tick].Add(D);
+    }
+
     // FixedUpdate
     void FixedUpdate()
     {
-        // Update physique here
-        // it means that we can chose the order on which physics will be executed
-        // Lets do it first loop to last loop
-        for (int i = 0; i < Players.Count; ++i)
+         if(!IsRewinding)
         {
-            var PC = Players[i].GetComponent<PlayerController>();
-            PC.ApplyPhysics(IsRewinding);
-            Physics2D.SyncTransforms();
+            // Update physique here
+            // it means that we can chose the order on which physics will be executed
+            // Lets do it first loop to last loop
+            for (int i = 0; i < Players.Count; ++i)
+            {
+                var PC = Players[i].GetComponent<PlayerController>();
+                PC.ApplyPhysics(IsRewinding);
+                Physics2D.SyncTransforms();
+            }
         }
     }
 
@@ -86,38 +109,69 @@ public class WorldManager : MonoBehaviour
         {
             NeedTick = false;
             WaitForInput = false;
+            NeedReset = false;
 
-            if (CurrentTick < 0)
+            if (RewindGO.Count == 0)
             {
                 NeedReset = true;
                 IsRewinding = false;
                 CurrentTick = 0;
-                
+
                 foreach (var Player in Players)
                 {
                     var go = Player.GetComponent<PlayerController>();
-                    if (go) go.L.StartRunning();
+
+
+                    if (go) {
+
+                        var m= go.GetComponent<Movable>();
+                        m.CurrentTime = 0.5f;
+                        m.AnimationTime = 0.5f;
+                        go.L.StartRunning();
+                    }
+
                 }
             }
             else
             {
                 if (CurrentTime > TickRate)
                 {
-                    --CurrentTick;
                     CurrentTime = 0;
 
-                    foreach (var Player in Players)
+                    var go_list = RewindGO[RewindGO.Count - 1];
+                    var d_list = RewindDirection[RewindDirection.Count - 1];
+
+                    go_list.Reverse();
+                    d_list.Reverse();
+
+                    for (int i = 0; i < go_list.Count; ++i)
                     {
-                        var go = Player.GetComponent<PlayerController>();
-                        if (go && CurrentTick >= 0) go.RequireTick(CurrentTick);
+                        var go = go_list[i];
+                        var d = d_list[i];
+                        var m = go.GetComponent<Movable>();
+
+                        if (d == PlayerController.Direction.UP) d = PlayerController.Direction.DOWN;
+                        else if (d == PlayerController.Direction.DOWN) d = PlayerController.Direction.UP;
+                        else if (d == PlayerController.Direction.RIGHT) d = PlayerController.Direction.LEFT;
+                        else if (d == PlayerController.Direction.LEFT) d = PlayerController.Direction.RIGHT;
+
+                        if (m)
+                        {
+                            m.AnimationTime = TickRate;
+                            m.CurrentTime = TickRate;
+                            m.Move(d);
+                        }
                     }
+
+                    RewindDirection.RemoveAt(RewindDirection.Count - 1);
+                    RewindGO.RemoveAt(RewindGO.Count - 1);
                 }
                 return;
             }
         }
 
         // For now ticks are done by hand!
-        if (Input.GetKeyDown(KeyCode.M) 
+        if (Input.GetKeyDown(KeyCode.M)
             //|| (!WaitForInput && (CurrentTime > TickRate)) 
             || (WaitForInput && NeedTick))
         {
@@ -182,7 +236,6 @@ public class WorldManager : MonoBehaviour
                     go.L.IsRunning = true;
                     go.IsLoopedControled = true;
                     IsRewinding = true;
-
                 }
                 else if (go) go.RequireTick(CurrentTick);
             }

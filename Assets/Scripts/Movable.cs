@@ -19,6 +19,8 @@ public class Movable : MonoBehaviour
     public Vector2 LastPosition;
     public Vector2 NewPosition;
 
+    public bool IsMoving = false;
+
     public WorldManager WM;
 
     public SpriteRenderer SR;
@@ -30,8 +32,10 @@ public class Movable : MonoBehaviour
     public float SpawnTailTime = 0.1f;
     public float CurrentSpawnTailTime = 0.1f;
 
-    public bool Move(Vector2 Direction)
+    public bool Move(PlayerController.Direction D)
     {
+        var Direction = PlayerController.Directionf[(int)D];
+
         Vector3 Dir3 = new Vector3(Direction.x, Direction.y, 0);
         RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position + (0.6f * Dir3), Dir3, 0.5f, wallmask);
         if (hits.Length != 0) return false;
@@ -42,15 +46,8 @@ public class Movable : MonoBehaviour
             hitsm = hitsm.Where(val => (val.collider.gameObject != this.gameObject)).ToArray();
             if (hitsm.Length == 0)
             {
-                LastPosition = this.gameObject.transform.position;
-
-                this.gameObject.transform.position += new Vector3(Speed * Direction.x,
-                                                    Speed * Direction.y,
-                                                    0);
-
-                NewPosition = this.gameObject.transform.position;
-                EndAnimation = false;
-
+                UpdatePosition(Direction, D);
+                if(ResetBetweenLoops) WM.AddRewindMove(this.gameObject, D);
                 return true;
             }
 
@@ -76,41 +73,26 @@ public class Movable : MonoBehaviour
                                 if (PC.L.Events[PC.L.CurrentIdx] != mePC.L.Events[mePC.L.CurrentIdx])
                                 {
                                     //execute move on player which colide
-                                    if (Mov.Move(Direction))
+                                    if (Mov.Move(D))
                                     {
-                                        LastPosition = this.gameObject.transform.position;
-
-                                        this.gameObject.transform.position += new Vector3(Speed * Direction.x,
-                                                                Speed * Direction.y,
-                                                                0);
-                                        NewPosition = this.gameObject.transform.position;
-                                        EndAnimation = false;
-
+                                        UpdatePosition(Direction, D);
+                                        if(ResetBetweenLoops) WM.AddRewindMove(this.gameObject, D);
                                         return true;
                                     }
                                 }
                                 else
                                 {
-                                    LastPosition = this.gameObject.transform.position;
-                                    this.gameObject.transform.position += new Vector3(Speed * Direction.x,
-                                                                Speed * Direction.y,
-                                                                0);
-                                    NewPosition = this.gameObject.transform.position;
-                                    EndAnimation = false;
+                                    UpdatePosition(Direction, D);
+                                    if(ResetBetweenLoops) WM.AddRewindMove(this.gameObject, D);
                                     return true;
                                 }
                             }
                             else
                             {
-                                if (Mov.Move(Direction))
+                                if (Mov.Move(D))
                                 {
-                                    LastPosition = this.gameObject.transform.position;
-                                    this.gameObject.transform.position += new Vector3(Speed * Direction.x,
-                                                            Speed * Direction.y,
-                                                            0);
-                                    NewPosition = this.gameObject.transform.position;
-                                    EndAnimation = false;
-
+                                    UpdatePosition(Direction, D);
+                                    if(ResetBetweenLoops) WM.AddRewindMove(this.gameObject, D);
                                     return true;
                                 }
                             }
@@ -120,26 +102,33 @@ public class Movable : MonoBehaviour
 
                 }
             }
-        } else
+        }
+        else
         {
-            LastPosition = this.gameObject.transform.position;
-
-            this.gameObject.transform.position += new Vector3(Speed * Direction.x,
-                                                Speed * Direction.y,
-                                                0);
-
-            NewPosition = this.gameObject.transform.position;
-            EndAnimation = false;
-
+            UpdatePosition(Direction, D);
             return true;
         }
         return false;
     }
 
+    void UpdatePosition(Vector2 Direction, PlayerController.Direction D)
+    {
+        LastPosition = this.gameObject.transform.position;
+
+        this.gameObject.transform.position += new Vector3(Speed * Direction.x,
+                                            Speed * Direction.y,
+                                            0);
+
+        NewPosition = this.gameObject.transform.position;
+        EndAnimation = false;
+    }
+
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         StartPosition = this.gameObject.transform.position;
+        LastPosition = StartPosition;
+        NewPosition = StartPosition;
         CurrentTime = AnimationTime;
     }
 
@@ -150,7 +139,7 @@ public class Movable : MonoBehaviour
         {
             CurrentSpawnTailTime -= Time.deltaTime;
 
-            if(CurrentSpawnTailTime <= 0)
+            if (CurrentSpawnTailTime <= 0)
             {
                 // Spawn tail
                 var PC = GetComponent<PlayerController>();
@@ -161,23 +150,27 @@ public class Movable : MonoBehaviour
                 CurrentSpawnTailTime = SpawnTailTime;
             }
 
-            CurrentTime -= (Time.deltaTime/AnimationTime);
+            CurrentTime -= (Time.deltaTime / AnimationTime);
             if (CurrentTime <= 0)
             {
                 EndAnimation = true;
                 CurrentTime = AnimationTime;
             }
+            else
+            {
+                if (SR) SR.transform.position = Vector2.Lerp(LastPosition, NewPosition, 1 - CurrentTime);
+            }
+        }
+        else
+        {
+
+            SR.transform.localPosition = Vector2.zero;
         }
 
-        if(WM.NeedReset && ResetBetweenLoops)
+        if (WM.NeedReset && ResetBetweenLoops && !WM.IsRewinding)
         {
             this.gameObject.transform.position = StartPosition;
+            SR.transform.localPosition = Vector2.zero;
         }
-
-        if(SR && !EndAnimation)
-        {
-            SR.transform.position = Vector2.Lerp(LastPosition, NewPosition, 1-CurrentTime);
-        }
-
     }
 }

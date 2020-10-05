@@ -14,8 +14,8 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     public enum Direction { UP, DOWN, RIGHT, LEFT, NONE };
     //readonly string[]  DirectionInputs = { "Vertical",          "Vertical",          "Horizontal",        "Horizontal"               };
-    readonly string[] DirectionInputs = { "Up", "Down", "Right", "Left" };
-    readonly Vector2[] Directionf = { new Vector2(0, 1), new Vector2(0, -1), new Vector2(1, 0), new Vector2(-1, 0) };
+    static public readonly string[] DirectionInputs = { "Up", "Down", "Right", "Left" };
+    static public readonly Vector2[] Directionf = { new Vector2(0, 1), new Vector2(0, -1), new Vector2(1, 0), new Vector2(-1, 0) };
     
     /// <summary>
     /// State variables
@@ -129,7 +129,7 @@ public class PlayerController : MonoBehaviour
                     // move
                     Movable movable = GetComponent<Movable>();
                     if (!!movable)
-                        movable.Move(Directionf[(int)CurrentDirection]);
+                        movable.Move(CurrentDirection);
                     else
                         Debug.Log("Missing movable, abnormal pls look into it and add movable script onto player.");
                
@@ -240,11 +240,15 @@ public class PlayerController : MonoBehaviour
                         if (this.L.CurrentIdx != 0)
                         {
                             P.L.Events = this.L.Events.GetRange(0, this.L.CurrentIdx + 1);
+
+                            // copy into world recording for rewind
+
                         }
                         P.L.StartRecording();
                         // IMPORTANT : this nees to be done after StartRecording as it will take current 
                         // position as start position and we dont want that
                         P.L.StartPosition = this.L.StartPosition;
+                        P.GetComponent<Movable>().StartPosition = P.L.StartPosition;
                     }
 
                     // For now new players are randomly colored
