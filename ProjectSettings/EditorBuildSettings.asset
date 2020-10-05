@@ -41,4 +41,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/FinalLevels/LEVEL8.unity
     guid: 24bf390b6fc0cdf4b8d0509568747c59
+  - enabled: 1
+    path: Assets/Scenes/EndGame.unity
+    guid: 37d330de226b7c449b4a67f03d319d14
   m_configObjects: {}

@@ -19,5 +19,9 @@ public class SceneReseter : MonoBehaviour
         {
             SceneManager.LoadScene( scene_to_load, LoadSceneMode.Single);
         }
+        if ( Input.GetKeyDown(KeyCode.Escape) )
+        {
+            SceneManager.LoadScene( "LevelSelectorScene", LoadSceneMode.Single);
+        }
     }
 }
