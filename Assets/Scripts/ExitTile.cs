@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 public class ExitTile : MonoBehaviour
 {
 
+    public int current_level_exit_index;
     // Start is called before the first frame update
     void Start()
     {
@@ -24,6 +25,7 @@ public class ExitTile : MonoBehaviour
         {
             GetComponentInChildren<AudioSource>().Play();
             SceneManager.LoadScene( "LevelSelectorScene", LoadSceneMode.Single);
+            LevelProgress.setProgress( current_level_exit_index, true);
         }
     }
 }
