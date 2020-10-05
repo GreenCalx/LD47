@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5294557293760146253}
   - component: {fileID: 7146403591642734110}
   m_Layer: 0
-  m_Name: pneumatic-door_off
+  m_Name: door_close
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -322,7 +322,7 @@ GameObject:
   - component: {fileID: 5096186429790177876}
   - component: {fileID: 7250998341343029021}
   m_Layer: 0
-  m_Name: pneumatic-door_on
+  m_Name: door_open
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
