@@ -7,6 +7,7 @@ using UnityEngine;
 public class Tail : MonoBehaviour
 {
     float Divider = 2f;
+    public float Duration = 0.5f;
     public SpriteRenderer SR;
     public bool IsTickBased = false;
     // Start is called before the first frame update
@@ -29,7 +30,7 @@ public class Tail : MonoBehaviour
     {
         if(!IsTickBased)
         {
-            SR.color = new Color(SR.color.r, SR.color.g, SR.color.b, SR.color.a - (Time.deltaTime * 1.5f));
+            SR.color = new Color(SR.color.r, SR.color.g, SR.color.b, SR.color.a - (Time.deltaTime / Duration));
             //this.gameObject.transform.localScale = this.gameObject.transform.localScale - new Vector3(transform.localScale.x * (Time.deltaTime * 1.5f),
             //                                                                                         transform.localScale.y *(Time.deltaTime * 1.5f), 0);
         }

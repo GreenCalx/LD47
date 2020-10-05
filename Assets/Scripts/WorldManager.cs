@@ -125,8 +125,8 @@ public class WorldManager : MonoBehaviour
                     if (go) {
 
                         var m= go.GetComponent<Movable>();
-                        m.CurrentTime = 0.5f;
-                        m.AnimationTime = 0.5f;
+                       // m.CurrentTime = 0.5f;
+                       // m.AnimationTime = 0.5f;
                         go.L.StartRunning();
                     }
 
@@ -157,8 +157,8 @@ public class WorldManager : MonoBehaviour
 
                         if (m)
                         {
-                            m.AnimationTime = TickRate;
-                            m.CurrentTime = TickRate;
+                            //m.AnimationTime = TickRate;
+                            //m.CurrentTime = TickRate;
                             m.Move(d);
                         }
                     }

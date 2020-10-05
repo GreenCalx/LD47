@@ -156,10 +156,8 @@ public class Movable : MonoBehaviour
                 EndAnimation = true;
                 CurrentTime = AnimationTime;
             }
-            else
-            {
-                if (SR) SR.transform.position = Vector2.Lerp(LastPosition, NewPosition, 1 - CurrentTime);
-            }
+
+            if(SR) SR.transform.position = Vector2.Lerp(LastPosition, NewPosition, 1 - CurrentTime);
         }
         else
         {

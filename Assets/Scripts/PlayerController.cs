@@ -122,10 +122,6 @@ public class PlayerController : MonoBehaviour
             // TODO: What about physics?? Do we rely on RigidBody?
             if (CurrentDirection != Direction.NONE)
             {
-                
-                
-                    //SpawnTail();
-
                     // move
                     Movable movable = GetComponent<Movable>();
                     if (!!movable)
