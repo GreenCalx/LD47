@@ -26,12 +26,10 @@ public class MasterMixerControl : MonoBehaviour
     public void SetPhasedMode()
     {
         MasterMixer.SetFloat("ChorusDryMix", 0);
-        MasterMixer.SetFloat("LowpassCutoff", 500);
     }
 
     public void SetNormalMode()
     {
         MasterMixer.SetFloat("ChorusDryMix", 1);
-        MasterMixer.SetFloat("LowpassCutoff", 22000);
     }
 }
