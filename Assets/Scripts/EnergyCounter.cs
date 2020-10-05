@@ -2,6 +2,40 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public class EnergyCell
+{
+    public int max_energy;
+    int energy;
+    int n_disabled_energy;
+    public EnergyCell( int iMaxEnergy, int iDisabledEnergy )
+    {
+        max_energy = iMaxEnergy;
+        n_disabled_energy = iDisabledEnergy;
+        energy = 0;
+        refill();
+    }
+    public void refill()
+    { energy = max_energy; }
+    public bool tryConsume()
+    { 
+        return ( --energy >= 0 );
+    }
+    public int getEnergy()
+    { return (energy>=0) ? energy : 0; }
+    public int getDepleted()
+    {
+        return (n_disabled_energy>=0) ? n_disabled_energy : 0;
+    }
+    public void setEnergy( int iEnergy)
+    { energy = ( iEnergy > max_energy ) ? max_energy : iEnergy; }
+    public void setDepleted(int iEnergy)
+    { n_disabled_energy = iEnergy; }
+    public bool tryConsumeDepletedEnergy()
+    {
+        return (--n_disabled_energy >= 0);
+    } 
+}//! EnergyCell
+
 public class EnergyCounter
 {
     // Has MAX_ENERY to spend MAX_REPLENISH times
@@ -9,41 +43,7 @@ public class EnergyCounter
     public int N_DISABLED_ENERGY;
     public int MAX_ENERGY;
 
-    public class EnergyCell
-    {
-        int max_energy;
-        int energy;
-        int n_disabled_energy;
-        public EnergyCell( int iMaxEnergy, int iDisabledEnergy )
-        {
-            max_energy = iMaxEnergy;
-            n_disabled_energy = iDisabledEnergy;
-            energy = 0;
-            refill();
-        }
-        public void refill()
-        { energy = max_energy; }
-        public bool tryConsume()
-        { 
-            return ( --energy >= 0 );
-        }
-        public int getEnergy()
-        { return (energy>=0) ? energy : 0; }
-        public int getDepleted()
-        {
-            return (n_disabled_energy>=0) ? n_disabled_energy : 0;
-        }
-        public void setEnergy( int iEnergy)
-        { energy = ( iEnergy > max_energy ) ? max_energy : iEnergy; }
 
-        public void setDepleted(int iEnergy)
-        { n_disabled_energy = iEnergy; }
-
-        public bool tryConsumeDepletedEnergy()
-        {
-            return (--n_disabled_energy >= 0);
-        } 
-    }//! EnergyCell
     public List<EnergyCell> eCells;
     public bool has_locked_energy = false;
 
@@ -125,6 +125,16 @@ public class EnergyCounter
             has_locked_energy = curr_cell.tryConsumeDepletedEnergy();
         }
         return has_locked_energy;
+    }
+
+    public EnergyCell getCurrentCell()
+    {
+        if ( eCells.Count > 0 )
+        {
+            EnergyCell curr_cell = eCells[0];
+            return curr_cell;
+        } 
+        return null;
     }
 
     public int getEnergy()

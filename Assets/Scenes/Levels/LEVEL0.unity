@@ -354,8 +354,14 @@ PrefabInstance:
     - target: {fileID: 893246269087679359, guid: c83a65c7c8e8b1248beb94dd7164f8be,
         type: 3}
       propertyPath: TickRate
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 893246269087679359, guid: c83a65c7c8e8b1248beb94dd7164f8be,
+        type: 3}
+      propertyPath: levelUI_GOref
+      value: 
+      objectReference: {fileID: 4370074917899848635, guid: abdb5572214155947850e7fb64510f77,
+        type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c83a65c7c8e8b1248beb94dd7164f8be, type: 3}
 --- !u!1001 &590071344
