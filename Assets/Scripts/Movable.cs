@@ -35,19 +35,19 @@ public class Movable : MonoBehaviour
     public bool Move(PlayerController.Direction D)
     {
         var Direction = PlayerController.Directionf[(int)D];
-
-        Vector3 Dir3 = new Vector3(Direction.x, Direction.y, 0);
-        RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position + (0.6f * Dir3), Dir3, 0.5f, wallmask);
-        if (hits.Length != 0) return false;
-
         if (!WM.IsRewinding)
         {
+
+            Vector3 Dir3 = new Vector3(Direction.x, Direction.y, 0);
+            RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position + (0.6f * Dir3), Dir3, 0.5f, wallmask);
+            if (hits.Length != 0) return false;
+
             RaycastHit2D[] hitsm = Physics2D.RaycastAll(transform.position + (0.6f * Dir3), Dir3, 0.5f, movablemask);
             hitsm = hitsm.Where(val => (val.collider.gameObject != this.gameObject)).ToArray();
             if (hitsm.Length == 0)
             {
                 UpdatePosition(Direction, D);
-                if(ResetBetweenLoops) WM.AddRewindMove(this.gameObject, D);
+                if (ResetBetweenLoops) WM.AddRewindMove(this.gameObject, D);
                 return true;
             }
 
@@ -76,14 +76,14 @@ public class Movable : MonoBehaviour
                                     if (Mov.Move(D))
                                     {
                                         UpdatePosition(Direction, D);
-                                        if(ResetBetweenLoops) WM.AddRewindMove(this.gameObject, D);
+                                        if (ResetBetweenLoops) WM.AddRewindMove(this.gameObject, D);
                                         return true;
                                     }
                                 }
                                 else
                                 {
                                     UpdatePosition(Direction, D);
-                                    if(ResetBetweenLoops) WM.AddRewindMove(this.gameObject, D);
+                                    if (ResetBetweenLoops) WM.AddRewindMove(this.gameObject, D);
                                     return true;
                                 }
                             }
@@ -92,7 +92,7 @@ public class Movable : MonoBehaviour
                                 if (Mov.Move(D))
                                 {
                                     UpdatePosition(Direction, D);
-                                    if(ResetBetweenLoops) WM.AddRewindMove(this.gameObject, D);
+                                    if (ResetBetweenLoops) WM.AddRewindMove(this.gameObject, D);
                                     return true;
                                 }
                             }
@@ -159,7 +159,7 @@ public class Movable : MonoBehaviour
                 CurrentTime = AnimationTime;
             }
 
-            if(SR) SR.transform.position = Vector2.Lerp(LastPosition, NewPosition, 1 - CurrentTime);
+            if (SR) SR.transform.position = Vector2.Lerp(LastPosition, NewPosition, 1 - CurrentTime);
         }
         else
         {
