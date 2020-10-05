@@ -85,13 +85,14 @@ public class WorldManager : MonoBehaviour
         if (IsRewinding)
         {
             NeedTick = false;
+            WaitForInput = false;
+
             if (CurrentTick < 0)
             {
                 NeedReset = true;
                 IsRewinding = false;
                 CurrentTick = 0;
-                WaitForInput = false;
-
+                
                 foreach (var Player in Players)
                 {
                     var go = Player.GetComponent<PlayerController>();

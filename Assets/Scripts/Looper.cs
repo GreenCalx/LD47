@@ -40,6 +40,7 @@ public class Looper : MonoBehaviour
     public void Reset()
     {
         PC.gameObject.transform.position = new Vector3(StartPosition.x, StartPosition.y, 0);
+        PC.GetComponentInChildren<SpriteRenderer>().transform.localPosition = Vector3.zero;
         IsRunning = false;
         IsPaused = false;
         IsRecording = false;
