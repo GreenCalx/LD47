@@ -391,6 +391,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 450640507192952023, guid: c77eaf74b4a518c49af3af9ef4f418d2,
+        type: 3}
+      propertyPath: m_audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 65a21d3b80d0d5c468f6a0541ff1f536, type: 3}
     - target: {fileID: 1558477940434994109, guid: c77eaf74b4a518c49af3af9ef4f418d2,
         type: 3}
       propertyPath: activables.Array.size
@@ -1069,6 +1074,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 450640507192952023, guid: c77eaf74b4a518c49af3af9ef4f418d2,
+        type: 3}
+      propertyPath: m_audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 65a21d3b80d0d5c468f6a0541ff1f536, type: 3}
     - target: {fileID: 1558477940434994109, guid: c77eaf74b4a518c49af3af9ef4f418d2,
         type: 3}
       propertyPath: activables.Array.size
@@ -1228,6 +1238,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 450640507192952023, guid: c77eaf74b4a518c49af3af9ef4f418d2,
+        type: 3}
+      propertyPath: m_audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 65a21d3b80d0d5c468f6a0541ff1f536, type: 3}
     - target: {fileID: 1558477940434994109, guid: c77eaf74b4a518c49af3af9ef4f418d2,
         type: 3}
       propertyPath: activables.Array.size
