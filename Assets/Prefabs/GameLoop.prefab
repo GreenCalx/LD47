@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerPrefab: {fileID: 0}
-  levelUI_GOref: {fileID: 4370074917899848635, guid: abdb5572214155947850e7fb64510f77,
+  levelUI_GOref: {fileID: 4572336713623461571, guid: 53f7225b65841de4fb9287a75425319e,
     type: 3}
   CurrentTick: 0
   TickRate: 0.1

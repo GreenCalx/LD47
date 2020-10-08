@@ -24,7 +24,8 @@ public class PlayerController : MonoBehaviour
     bool TickRequired = false;
     public bool IsLoopedControled = false;
     bool HasAlreadyBeenBreakedFrom = false;
-    public EnergyCounter energyCounter;
+    //public EnergyCounter energyCounter;
+    public Timeline timeline;
     private GameObject levelUI_GOref;
     private GameObject levelUI_GO;
     public LevelUI levelUI;
@@ -50,8 +51,10 @@ public class PlayerController : MonoBehaviour
         {
             WM = GameLoop.GetComponent<WorldManager>();
         }
-        if (energyCounter == null)
-            this.energyCounter = new EnergyCounter( 5, 5);
+        //if (energyCounter == null)
+        //   this.energyCounter = new EnergyCounter( 5, 5);
+        
+        this.timeline = new Timeline(0);
 
         GetComponent<BoxCollider2D>().enabled = (false);
 
@@ -222,7 +225,8 @@ public class PlayerController : MonoBehaviour
                     if (P)
                     {
                         // update energy loop to get nested counter
-                        P.energyCounter = energyCounter.getNestedCounter();
+                        //P.energyCounter = energyCounter.getNestedCounter();
+                        P.timeline = timeline.getNestedTimeline();
                         if (!!levelUI)
                         {
                             P.levelUI = levelUI;

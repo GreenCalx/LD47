@@ -211,32 +211,48 @@ public class WorldManager : MonoBehaviour
             if (n_players > 0)
             {
                 PlayerController curr_pc = Players[n_players - 1].GetComponent<PlayerController>();
-                EnergyCounter ec = curr_pc.energyCounter;
+                //EnergyCounter ec = curr_pc.energyCounter;
+                Timeline tl = curr_pc.timeline;
                 if (!NeedReset)
                 {
 
                     LevelUI ui = curr_pc.levelUI;
 
-                    bool has_energy_left = ec.tryConsume();
+                    //bool has_energy_left = ec.tryConsume();
+                    bool has_move       = tl.getAt(CurrentTick);
+                    bool timeline_over  = tl.isTimelineOver();
+                    tl.last_tick = CurrentTick;
                     if (!!ui)
                         ui.refresh(); //update if new cell
-                    bool is_energy_locked = ec.has_locked_energy;
-                    if (!has_energy_left && !is_energy_locked)
+                    if (timeline_over)
                     {
                         curr_pc.L.StopRecording();
                         WaitForInput = false;
-                        //curr_pc.L.StartRunning();
-                        ec.refillAllCells();
-                        NeedReset = true;
-
+                        NeedReset    = true;
+                        tl.reset();
+                    } else {
+                        curr_pc.WAIT_ORDER = !has_move;
                     }
-                    else { curr_pc.WAIT_ORDER = is_energy_locked; }
+
+                    //bool is_energy_locked = ec.has_locked_energy;
+                    //if (!has_energy_left && !is_energy_locked)
+                    //{
+                    //    curr_pc.L.StopRecording();
+                    //    WaitForInput = false;
+                        //curr_pc.L.StartRunning();
+                    //    ec.refillAllCells();
+                    //    NeedReset = true;
+
+                    //}
+                    //else { curr_pc.WAIT_ORDER = is_energy_locked; }
+
                     if (!!ui)
                         ui.refresh();
                 }
                 else
                 {
-                    ec.refillAllCells();
+                    //ec.refillAllCells();
+                    tl.reset();
                 }
             }
             // require world tick, update all loops, etc

@@ -10,6 +10,7 @@ public class Timeline
     // 0/F : silence
     // 1/T : play
     private BitArray    __timeLine;
+    public int last_tick;
     public  bool        timeline_finished;
 
     // Loop Level
@@ -27,8 +28,15 @@ public class Timeline
 
     public void reset( int iLoopLevel )
     {
+        last_tick = 0;
+        timeline_finished = false;
         loop_level = iLoopLevel;
         init();
+    }
+
+    public void reset()
+    {
+        reset(loop_level);
     }
 
     public void init()
@@ -50,12 +58,22 @@ public class Timeline
         return __timeLine;
     }
 
+    public bool isTimelineOver()
+    {
+        timeline_finished = ( last_tick >= N_MEASURES*MEASURE_SIZE );
+        return timeline_finished;
+    }
+
     public bool getAt( int iTimeIndex )
     {
-        if ( (i<__timeLine.Count) && (i>=0) )
-            return __timeLine[i];
+        if ( (iTimeIndex<__timeLine.Count) && (iTimeIndex>=0) )
+            return __timeLine[iTimeIndex];
         return false; // else OoB we do nothing
     }
 
+    public Timeline getNestedTimeline()
+    {
+        return new Timeline(loop_level+1);
+    }
 
 }
