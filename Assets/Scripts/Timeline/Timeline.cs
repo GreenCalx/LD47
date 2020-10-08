@@ -6,58 +6,56 @@ public class Timeline
 {
     private const int N_MEASURES    = 5;
     private const int MEASURE_SIZE  = 5;
-    private List<Measure> __measures;
-    public int current_measure_index;
-    public bool timeline_finished;
-    public Measure active_measure;
+
+    // 0/F : silence
+    // 1/T : play
+    private BitArray    __timeLine;
+    public  bool        timeline_finished;
 
     // Loop Level
     // 0 : INITIAL LOOP
     // 1 : FIRST CHILD
     // ..
-    // MEASURE_SIZE : LAST CHILD ( no move left in the timeline anyway )
+    // MEASURE_SIZE-1 : LAST CHILD with 1 move per measure
+    // MEASURE_SIZE : THEORIC LAST CHILD  with 0 moves left
     public int loop_level;
 
     public Timeline( int iLoopLevel )
     {
+        reset(iLoopLevel);
+    }
+
+    public void reset( int iLoopLevel )
+    {
         loop_level = iLoopLevel;
+        init();
     }
 
-    void init()
+    public void init()
     {
-        timeline_finished            = false;
-        current_measure_index        = 0;
-        __measures = new List<Measure>(N_MEASURES);
-        for (int i=0; i<N_MEASURES; i++ )
+        __timeLine = new BitArray( N_MEASURES * MEASURE_SIZE, true);
+        for ( int i=0; i < __timeLine.Count; i+=MEASURE_SIZE)
         {
-            Measure new_measure = new Measure();
-            new_measure.init( MEASURE_SIZE, loop_level);
-            __measures.Add( new_measure );
-        }
+            for ( int j=loop_level; j > 0; j--)
+            {
+                int k = i;                  // place cursor
+                k += (MEASURE_SIZE - j );   // apply offset
+                __timeLine[k] = false;
+            }//! for j
+        }//! for i
+    }//! init
 
-    }
-
-    public TimeUnit tryNext()
+    public BitArray getTimeline()
     {
-        TimeUnit nextTimeUnit = active_measure.tryNext();
-        if ( nextTimeUnit == null )
-        {
-            if (!tryNextMeasure())
-                return null;
-            return active_measure.tryNext();
-        }
-        return nextTimeUnit;
+        return __timeLine;
     }
 
-    private bool tryNextMeasure()
+    public bool getAt( int iTimeIndex )
     {
-        current_measure_index++;
-        if ( current_measure_index >= N_MEASURES )
-        {
-            timeline_finished = true;
-            return false;
-        }
-        active_measure = __measures[current_measure_index];
-        return true;
+        if ( (i<__timeLine.Count) && (i>=0) )
+            return __timeLine[i];
+        return false; // else OoB we do nothing
     }
+
+
 }
