@@ -61,6 +61,7 @@ public class WorldManager : MonoBehaviour
         else
             Debug.Log("WorldManager : NO UI FOUND.");
         PC.Start();
+        PC.has_active_ui = true;
         PC.L.StartRecording();
     }
 
@@ -233,25 +234,11 @@ public class WorldManager : MonoBehaviour
                     } else {
                         curr_pc.WAIT_ORDER = !has_move;
                     }
-
-                    //bool is_energy_locked = ec.has_locked_energy;
-                    //if (!has_energy_left && !is_energy_locked)
-                    //{
-                    //    curr_pc.L.StopRecording();
-                    //    WaitForInput = false;
-                        //curr_pc.L.StartRunning();
-                    //    ec.refillAllCells();
-                    //    NeedReset = true;
-
-                    //}
-                    //else { curr_pc.WAIT_ORDER = is_energy_locked; }
-
                     if (!!ui)
                         ui.refresh();
                 }
                 else
                 {
-                    //ec.refillAllCells();
                     tl.reset();
                 }
             }

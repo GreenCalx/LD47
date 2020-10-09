@@ -29,6 +29,7 @@ public class PlayerController : MonoBehaviour
     private GameObject levelUI_GOref;
     private GameObject levelUI_GO;
     public LevelUI levelUI;
+    public bool has_active_ui = false;
     [SerializeField] private LayerMask wallmask;
     readonly float Speed = 1f;
     public bool WAIT_ORDER = false;
@@ -54,7 +55,8 @@ public class PlayerController : MonoBehaviour
         //if (energyCounter == null)
         //   this.energyCounter = new EnergyCounter( 5, 5);
         
-        this.timeline = new Timeline(0);
+        if (this.timeline == null)
+            this.timeline = new Timeline(0);
 
         GetComponent<BoxCollider2D>().enabled = (false);
 
@@ -232,6 +234,8 @@ public class PlayerController : MonoBehaviour
                             P.levelUI = levelUI;
                             P.levelUI.updatePlayerRef(GO);
                             P.levelUI.refresh();
+                            P.has_active_ui     = true; // switch ui
+                            this.has_active_ui  = false;
                         }
 
                         // Update newly created looper with current loop previous
@@ -262,5 +266,7 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+        if (has_active_ui)
+            levelUI.refresh();
     }
 }

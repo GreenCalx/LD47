@@ -348,9 +348,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5040339637927600475}
-  - component: {fileID: 2788781718186738745}
   - component: {fileID: 9038454811541521764}
   - component: {fileID: 4209697074411275008}
+  - component: {fileID: 465504148100783009}
   m_Layer: 5
   m_Name: SQ17
   m_TagString: Untagged
@@ -377,18 +377,6 @@ RectTransform:
   m_AnchoredPosition: {x: 230.38, y: 29}
   m_SizeDelta: {x: 0.64, y: 0.64}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2788781718186738745
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1783193420778559066}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e6a6059fd759c54fa085430a9e28149, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!222 &9038454811541521764
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -426,6 +414,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &465504148100783009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1783193420778559066}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78e3ded122b28d846b0c9220fc7daa8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1828122431910404047
 GameObject:
   m_ObjectHideFlags: 0
@@ -1639,6 +1639,12 @@ MonoBehaviour:
     type: 3}
   disabled_time_unit: {fileID: 21300000, guid: f316b37d935f66645a865545b50d3b48, type: 3}
   time_cursor_GO: {fileID: 4172074224172068800}
+  rewind_image_GO: {fileID: 4582255398121191244}
+  ui_input_up: {fileID: 21300000, guid: 19d6e0921fe05aa48854fa4be417fce1, type: 3}
+  ui_input_left: {fileID: 21300000, guid: 5fe43c2d58efd89408f039f887e05c0e, type: 3}
+  ui_input_right: {fileID: 21300000, guid: 8473a45bf4eae7145adefe7d30db82cb, type: 3}
+  ui_input_down: {fileID: 21300000, guid: 4e81b50a7bb4a26408c1a9b0132c9de0, type: 3}
+  ui_input_none: {fileID: 21300000, guid: e2cad77613adae940b0e191f1d0ee2ba, type: 3}
 --- !u!1 &4572336715393048195
 GameObject:
   m_ObjectHideFlags: 0
