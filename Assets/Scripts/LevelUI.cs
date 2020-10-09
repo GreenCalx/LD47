@@ -33,6 +33,14 @@ public class LevelUI : MonoBehaviour
             hasPlayerRef = (playerController != null);
         }
         __time_units_squares = GetComponentsInChildren<UITimeUnit>();
+       
+        // update time cursor pos
+
+        if (!!time_cursor_GO && __time_units_squares.Length > 0)
+        {
+            Vector2 new_cursor_pos = __time_units_squares[0].transform.position;
+            time_cursor_GO.transform.position = new_cursor_pos;
+        }
     }
 
     // Update is called once per frame
@@ -94,7 +102,7 @@ public class LevelUI : MonoBehaviour
             {
                 if ( i+1 < __time_units_squares.Length )
                 {
-                    current_tick_square_transform = __time_units_squares[i].gameObject.transform;
+                    current_tick_square_transform = __time_units_squares[i+1].gameObject.transform;
                 }
                 else
                 {
@@ -104,7 +112,7 @@ public class LevelUI : MonoBehaviour
                 }
             }
         }
-        Debug.Log("current tick at ui " + iTL.last_tick);
+
         // update time cursor pos
         if (!!time_cursor_GO && !!current_tick_square_transform)
         {
