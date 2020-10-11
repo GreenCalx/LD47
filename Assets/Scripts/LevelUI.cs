@@ -6,9 +6,6 @@ using UnityEngine.UI;
 public class LevelUI : MonoBehaviour
 {
     public GameObject playerRef;
-
-    public Sprite available_time_unit;
-    public Sprite disabled_time_unit;
     public GameObject time_cursor_GO;
     public GameObject rewind_image_GO;
 
@@ -70,8 +67,6 @@ public class LevelUI : MonoBehaviour
             Timeline tl = playerController.timeline;
             if (tl != null)
             {
-                //ui_replenish_lbl.text   = "" + (ec.getReplenish()-1); // has max cell
-                //updateEnergyPanels( ec.getEnergy(), ec.getDisabledEnergy() );
                 updateTimeUnits(tl);
             }
         }
@@ -88,11 +83,13 @@ public class LevelUI : MonoBehaviour
             
             if (!square_is_active)
             {
-                __time_units_squares[i].changeSprite( disabled_time_unit );
+                //__time_units_squares[i].changeSprite( disabled_time_unit );
+                __time_units_squares[i].showDisabled();
             }
             else {
                 if ( i > iTL.last_tick )
-                    __time_units_squares[i].changeSprite( available_time_unit );
+                    __time_units_squares[i].showEnabled();
+                    //__time_units_squares[i].changeSprite( available_time_unit );
                 else if (playerController.L.Events.Count > i)
                     updateSquareInputImage( i, playerController.L.Events[i]);
             }

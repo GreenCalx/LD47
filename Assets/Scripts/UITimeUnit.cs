@@ -8,6 +8,9 @@ public class UITimeUnit : MonoBehaviour
 {
 
     private Image __img;
+    public Sprite im_enabled;
+    public Sprite im_disabled;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -18,6 +21,16 @@ public class UITimeUnit : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void showDisabled()
+    {
+        __img.sprite = im_disabled;
+    }
+
+    public void showEnabled()
+    {
+        __img.sprite = im_enabled;
     }
 
     public void changeSprite( Sprite iNewSprite )
