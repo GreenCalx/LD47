@@ -1,5 +1,4 @@
-
-Game loop:
+Core:
 - deactivate possibility to break during rewind
 - no key to launch rewind -> auto after last move
 - switch should reset with loop
@@ -13,16 +12,17 @@ UI:
 - when break keep previous inputs and display dead turns only after
 - small cells separators
 Graphics:
-- colors, fainting yellow for past self, blue for present self, mauve when merged
+- colors, fainting yellow for past selves, blue for present self, mauve when merged
 - vertical doors sprites
 Level design:
-- tutorial
+- tutorial (replace current easy levels)
+- new easy levels
 - more intermediate levels
 - polish difficult levels (dont forget need top wall on 7)
 Controls:
 - WASD to move
 - C to stand still
-- Q,E to tick forward/backward
+- Q/E to tick forward/backward
 - Gamepad
 Lore:
 - ???
