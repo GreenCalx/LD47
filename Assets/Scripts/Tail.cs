@@ -9,12 +9,8 @@ public class Tail : MonoBehaviour
     float Divider = 2f;
     public float Duration = 0.5f;
     public SpriteRenderer SR;
+
     public bool IsTickBased = false;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
     public void Tick()
     {
@@ -35,10 +31,6 @@ public class Tail : MonoBehaviour
             //                                                                                         transform.localScale.y *(Time.deltaTime * 1.5f), 0);
         }
 
-
-        if (SR.color.a <= 0.1)
-        {
-            GameObject.Destroy(this.gameObject);
-        }
+        if (SR.color.a <= 0.1) GameObject.Destroy(this.gameObject);
     }
 }

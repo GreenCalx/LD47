@@ -34,26 +34,25 @@ public class Movable : MonoBehaviour
 
     public bool Move(PlayerController.Direction D)
     {
+        bool NeedToBeMoved = false;
+
         var Direction = PlayerController.Directionf[(int)D];
-        if (!WM.IsRewinding)
+        Vector3 Dir3 = new Vector3(Direction.x, Direction.y, 0);
+        // WALL HITS
+        RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position + (0.6f * Dir3), Dir3, 0.5f, wallmask);
+        if (hits.Length != 0) return false;
+        // MOVABLE HITS
+        RaycastHit2D[] hitsm = Physics2D.RaycastAll(transform.position + (0.6f * Dir3), Dir3, 0.5f, movablemask);
+        hitsm = hitsm.Where(val => (val.collider.gameObject != this.gameObject)).ToArray(); // filter our own gameobject
+        if (hitsm.Length == 0)
         {
-
-            Vector3 Dir3 = new Vector3(Direction.x, Direction.y, 0);
-            RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position + (0.6f * Dir3), Dir3, 0.5f, wallmask);
-            if (hits.Length != 0) return false;
-
-            RaycastHit2D[] hitsm = Physics2D.RaycastAll(transform.position + (0.6f * Dir3), Dir3, 0.5f, movablemask);
-            hitsm = hitsm.Where(val => (val.collider.gameObject != this.gameObject)).ToArray();
-            if (hitsm.Length == 0)
-            {
-                UpdatePosition(Direction, D);
-                if (ResetBetweenLoops) WM.AddRewindMove(this.gameObject, D);
-                return true;
-            }
-
+            NeedToBeMoved = true;
+        }
+        else
+        {
             foreach (RaycastHit2D hit in hitsm)
             {
-                if (hit.collider.gameObject != this.gameObject)
+                if (hit.collider.gameObject != this.gameObject) // not necessary should already be filtered
                 {
                     if (hit.collider != null)
                     {
@@ -69,46 +68,29 @@ public class Movable : MonoBehaviour
                         {
                             if (PC && mePC && !PC.L.IsRecording)
                             {
-
                                 if (PC.L.Events[PC.L.CurrentIdx] != mePC.L.Events[mePC.L.CurrentIdx])
                                 {
                                     //execute move on player which colide
-                                    if (Mov.Move(D))
-                                    {
-                                        UpdatePosition(Direction, D);
-                                        if (ResetBetweenLoops) WM.AddRewindMove(this.gameObject, D);
-                                        return true;
-                                    }
+                                    NeedToBeMoved = Mov.Move(D);
                                 }
                                 else
                                 {
-                                    UpdatePosition(Direction, D);
-                                    if (ResetBetweenLoops) WM.AddRewindMove(this.gameObject, D);
-                                    return true;
+                                    NeedToBeMoved = true;
                                 }
                             }
                             else
                             {
-                                if (Mov.Move(D))
-                                {
-                                    UpdatePosition(Direction, D);
-                                    if (ResetBetweenLoops) WM.AddRewindMove(this.gameObject, D);
-                                    return true;
-                                }
+                                NeedToBeMoved = Mov.Move(D);
                             }
                         }
                     }
-
-
                 }
             }
         }
-        else
-        {
-            UpdatePosition(Direction, D);
-            return true;
-        }
-        return false;
+
+        if (NeedToBeMoved) UpdatePosition(Direction, D);
+        if (!WM.IsRewinding && ResetBetweenLoops) WM.AddRewindMove(this.gameObject, D);
+        return NeedToBeMoved;
     }
 
     void UpdatePosition(Vector2 Direction, PlayerController.Direction D)
@@ -143,6 +125,7 @@ public class Movable : MonoBehaviour
                 if (CurrentSpawnTailTime <= 0)
                 {
                     // Spawn tail
+                    // TODO : should not be in playercointreoller
                     var PC = GetComponent<PlayerController>();
                     if (PC)
                     {
@@ -163,7 +146,6 @@ public class Movable : MonoBehaviour
         }
         else
         {
-
             SR.transform.localPosition = Vector2.zero;
         }
 
