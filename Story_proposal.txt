@@ -1,0 +1,43 @@
+
+j'y ai pas mal penser aujourd'hui et j'ai pousser un peu l'idée du qbit en prenant ma douche 
+plus un doc où je couche les idées pour en rediscuter ensemble plus facilement later
+
+PLAYER:
+
+Un Qbit destiné à compléter un programme.
+Un programme tout entier exec.
+
+Dans tous les cas, est représenté par un méli-melo de data ? Un carré
+mais avec un skin animé qui evoc ça idk...
+
+LE MONDE :
+
+A l'intérieur d'un ordinateur quantique. Le joueur a pour mission de
+détruire la corruption system qu'il est supposé fix ?
+Dans tous les cas les 'biomes' de puzzle apportant des mécaniques spécifiques
+seraient différente parties d'un ordi(quantique?). Induit une non-linéarité
+dans la résolution des puzzle de chaque biomes.
+Idée à tester, brainstorm sur les possibilités..
+
+Loop in time | équivalent d'un PSU ultra avancé technologiquement genre black hole or some shit
+		=> probleme c'est que la mécanique de loop doit être conservée et n'est pas spécialement
+		   trigger par une spécificité de l'environnement mais plustot la nature du player.
+		>> de ce fait ça pourrait juste être la zone de chargement des prog
+		Ainsi on y explore les mécaniques de base avant d'y ajouter des layers
+		en fonction des autres biomes.
+Mécaniques extra : Rebase d'origin, notimebreak zones, carry specific datas ( change color ? ), color filters, patterns, sound fucceries
+Quantum objects sont dans les mécaniques de base ? genre quantum crates. idk ..
+
+STORY :
+
+Un/des programmeur(s) injectent le programme ( dont on est le dernier qbit si c'est le cas ) et on est warp à la position du joueur. Une petite intro à la AnotherWorld.
+Il faut détruire la corruption d'un systeme ou en tout cas quelque chose identifié comme une menace
+On est un programme bienveillant ? On est un virus ? A voir
+Peut aider à développer la trame narrative intermédiaire
+On pourrait imaginer que l'ordinateur dans lequel se déroule le jeu est un truc super important genre l'ordinateur dans le monde des non A.
+Le genre de truc qui peut avoir une influence sur tous els hommes vivant à l'exterieur de ce systeme.
+Possibilité de créer un dilemme moral.
+Exemple : 
+	1. Vaincre la corruption du systeme et retourner au systeme en place jusqu'à aujourd'hui > FIN 1
+	2. Epargner la corruption du systeme et créer un nouveau 'monde' pour l'homme  > FIN 2
+	3. Tru ending qui utilise la propriété quantique du systeme pour réaliser les 2 et créer deux univers // some yoloshit
