@@ -640,6 +640,11 @@ PrefabInstance:
       propertyPath: GameLoop
       value: 
       objectReference: {fileID: 533815594}
+    - target: {fileID: 6013280694991801665, guid: fe40bb787fcbda24e86031d229a96cf4,
+        type: 3}
+      propertyPath: WM
+      value: 
+      objectReference: {fileID: 533815593}
     - target: {fileID: 6013280694991801666, guid: fe40bb787fcbda24e86031d229a96cf4,
         type: 3}
       propertyPath: m_LocalPosition.x
