@@ -284,7 +284,7 @@ public class WorldManager : MonoBehaviour
 
                     bool CanMove = TL.getAt(CurrentTick);
                     bool TLOver = TL.isTimelineOver();
-                    TL.last_tick = CurrentTick;
+                    TL.setCurrentTick(CurrentTick);
                     if (!!UI)
                         UI.refresh(); //update if new cell
                     if (TLOver)

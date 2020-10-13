@@ -9,8 +9,8 @@ public class LevelUI : MonoBehaviour
     public GameObject time_cursor_GO;
     public GameObject rewind_image_GO;
 
-    //public GameObject[] time_units_squares;
-    private UITimeUnit[] __time_units_squares;
+    private UITimeUnit[]    __time_units_squares;
+    private UILooperState   __ui_looper_state;
     private PlayerController playerController = null;
     private bool hasPlayerRef = false;
 
@@ -38,12 +38,13 @@ public class LevelUI : MonoBehaviour
             Vector2 new_cursor_pos = __time_units_squares[0].transform.position;
             time_cursor_GO.transform.position = new_cursor_pos;
         }
+
+        __ui_looper_state = GetComponentInChildren<UILooperState>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        //refresh();
     }
 
     public void updatePlayerRef( GameObject newRef)
@@ -68,9 +69,22 @@ public class LevelUI : MonoBehaviour
             if (tl != null)
             {
                 updateTimeUnits(tl);
+                updateLooperState(playerController.L);
             }
         }
         else { Debug.Log("UITimeline : Player ref is missing"); }
+    }
+
+    private void updateLooperState( Looper iLooper )
+    {
+        if ( __ui_looper_state == null )
+            return;
+        if ( iLooper.IsRecording )
+            __ui_looper_state.setToRecording();
+        else if ( iLooper.IsRunning )
+            __ui_looper_state.setToReplay();
+        else
+            __ui_looper_state.setToEmpty();
     }
 
     private void updateTimeUnits(Timeline iTL)
@@ -87,7 +101,7 @@ public class LevelUI : MonoBehaviour
                 __time_units_squares[i].showDisabled();
             }
             else {
-                if ( i > iTL.last_tick )
+                if ( i > iTL.getTickForTimeUnits() )
                     __time_units_squares[i].showEnabled();
                     //__time_units_squares[i].changeSprite( available_time_unit );
                 else if (playerController.L.Events.Count > i)
@@ -95,18 +109,19 @@ public class LevelUI : MonoBehaviour
             }
 
             // get current tick time unit square
-            if (i == iTL.last_tick)
+            if ( i == iTL.getTickForCursor() )
             {
-                if ( i+1 < __time_units_squares.Length )
+                if ( i < __time_units_squares.Length )
                 {
-                    current_tick_square_transform = __time_units_squares[i+1].gameObject.transform;
+                    current_tick_square_transform = __time_units_squares[i].gameObject.transform;
                 }
-                else
-                {
+            }
+            else if ( i < iTL.getTickForCursor() && (i ==__time_units_squares.Length-1) )
+            {
+                    Debug.Log("Timeline over / Rewind is on");
                     // REWIND IS ON
                     if (!!rewind_image_GO)
                         current_tick_square_transform = rewind_image_GO.transform;
-                }
             }
         }
 

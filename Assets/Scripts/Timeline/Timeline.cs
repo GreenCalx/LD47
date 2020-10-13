@@ -10,7 +10,7 @@ public class Timeline
     // 0/F : silence
     // 1/T : play
     private BitArray    __timeLine;
-    public int last_tick;
+    private int          last_tick;
     public  bool        timeline_finished;
 
     // Loop Level
@@ -28,10 +28,25 @@ public class Timeline
 
     public void reset( int iLoopLevel )
     {
-        last_tick = 0;
+        last_tick = -1;
         timeline_finished = false;
         loop_level = iLoopLevel;
         init();
+    }
+
+    public int getTickForCursor()
+    {
+        return last_tick+1;
+    }
+
+    public int getTickForTimeUnits()
+    {
+        return last_tick;
+    }
+
+    public void setCurrentTick(int iCurrentTick)
+    {
+        last_tick = iCurrentTick;
     }
 
     public void reset()
