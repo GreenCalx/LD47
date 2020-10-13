@@ -11,6 +11,7 @@ public class LevelUI : MonoBehaviour
 
     private UITimeUnit[]    __time_units_squares;
     private UILooperState   __ui_looper_state;
+    private UIInputsPanel   __ui_inputs_panel;
     private PlayerController playerController = null;
     private bool hasPlayerRef = false;
 
@@ -40,6 +41,7 @@ public class LevelUI : MonoBehaviour
         }
 
         __ui_looper_state = GetComponentInChildren<UILooperState>();
+        __ui_inputs_panel = GetComponentInChildren<UIInputsPanel>();
     }
 
     // Update is called once per frame
@@ -70,6 +72,7 @@ public class LevelUI : MonoBehaviour
             {
                 updateTimeUnits(tl);
                 updateLooperState(playerController.L);
+                updateInfoPanel(playerController.L);
             }
         }
         else { Debug.Log("UITimeline : Player ref is missing"); }
@@ -85,6 +88,18 @@ public class LevelUI : MonoBehaviour
             __ui_looper_state.setToReplay();
         else
             __ui_looper_state.setToEmpty();
+    }
+
+    private void updateInfoPanel(Looper iLooper)
+    {
+        if (__ui_inputs_panel == null)
+            return;
+        if (iLooper.IsRecording)
+            __ui_inputs_panel.setToRecording();
+        else if (iLooper.IsRunning)
+            __ui_inputs_panel.setToReplay();
+        else
+            __ui_inputs_panel.setToEmpty();
     }
 
     private void updateTimeUnits(Timeline iTL)
