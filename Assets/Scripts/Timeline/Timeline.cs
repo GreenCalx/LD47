@@ -11,6 +11,9 @@ public class Timeline
     // 1/T : play
     private BitArray    __timeLine;
     private int          last_tick;
+    // offset is used to set timeline start to a given timeunit
+    // used to avoid unwanted disabled time when getting a nested loop
+    private int offset;
     public  bool        timeline_finished;
 
     // Loop Level
@@ -23,6 +26,13 @@ public class Timeline
 
     public Timeline( int iLoopLevel )
     {
+        offset = 0;
+        reset(iLoopLevel);
+    }
+
+    public Timeline( int iLoopLevel, int iOffset )
+    {
+        offset = iOffset;
         reset(iLoopLevel);
     }
 
@@ -59,6 +69,8 @@ public class Timeline
         __timeLine = new BitArray( N_MEASURES * MEASURE_SIZE, true);
         for ( int i=0; i < __timeLine.Count; i+=MEASURE_SIZE)
         {
+            if ( i < offset )
+                continue;
             for ( int j=loop_level; j > 0; j--)
             {
                 int k = i;                  // place cursor
@@ -88,7 +100,7 @@ public class Timeline
 
     public Timeline getNestedTimeline()
     {
-        return new Timeline(loop_level+1);
+        return new Timeline( loop_level+1, last_tick);
     }
 
 }
