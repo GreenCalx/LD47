@@ -11,7 +11,7 @@ Must do:
 	UI:
 		- highlight current turn
 		- schnibble splash screen
-		- when you break all previous inputs are still displayed (no dead black turns override)
+		x when you break all previous inputs are still displayed (no dead black turns override)
 	Graphics:
 		- find solution to highlight player from last loop from other loop
 	Audio:

@@ -8,6 +8,7 @@ public class UITimeUnit : MonoBehaviour
 {
 
     private Image __img;
+    private bool is_selected;
     public Sprite im_enabled;
     public Sprite im_disabled;
 
@@ -15,6 +16,7 @@ public class UITimeUnit : MonoBehaviour
     void Start()
     {
         __img = GetComponent<Image>();
+        is_selected = false;
     }
 
     // Update is called once per frame
@@ -36,5 +38,23 @@ public class UITimeUnit : MonoBehaviour
     public void changeSprite( Sprite iNewSprite )
     {
         __img.sprite = iNewSprite;
+    }
+
+    private void upscale(Vector3 iScaleOffset)
+    {
+        gameObject.transform.localScale += iScaleOffset;
+    }
+
+    public void setSelect( bool iIsSelected )
+    {
+        if ( iIsSelected != is_selected )
+        {
+            if (iIsSelected) {
+                upscale(new Vector3(10f,10f,0f));
+            } else {
+                upscale(new Vector3(-10f,-10f,0f));
+            }
+            is_selected = iIsSelected;
+        }
     }
 }

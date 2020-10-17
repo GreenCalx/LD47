@@ -106,6 +106,7 @@ public class LevelUI : MonoBehaviour
     {
         // update time units sprites
         Transform current_tick_square_transform = null;
+        int current_time_unit_index=0;
         for (int i=0; i<__time_units_squares.Length ;i++)
         {
             bool square_is_active = iTL.getAt(i);
@@ -129,6 +130,8 @@ public class LevelUI : MonoBehaviour
                 if ( i < __time_units_squares.Length )
                 {
                     current_tick_square_transform = __time_units_squares[i].gameObject.transform;
+                    current_time_unit_index = i;
+                    __time_units_squares[i].setSelect(true);
                 }
             }
             else if ( i < iTL.getTickForCursor() && (i ==__time_units_squares.Length-1) )
@@ -137,6 +140,8 @@ public class LevelUI : MonoBehaviour
                     // REWIND IS ON
                     if (!!rewind_image_GO)
                         current_tick_square_transform = rewind_image_GO.transform;
+            } else {
+                __time_units_squares[i].setSelect(false);
             }
         }
 
@@ -146,6 +151,12 @@ public class LevelUI : MonoBehaviour
             Vector2 new_cursor_pos = current_tick_square_transform.transform.position;
             time_cursor_GO.transform.position = new_cursor_pos;
         }
+
+        // update current tick time unit scale
+        //current_tick_square_transform.localScale += new Vector3(.1f,.1f,0f);
+        // rescale previous one if not 0
+        //if ( current_time_unit_index > 0 )
+        //    __time_units_squares[current_time_unit_index-1].gameObject.transform.localScale -= new Vector3(.1f,.1f,0f);
 
     }//! updateTimeUnits
 
