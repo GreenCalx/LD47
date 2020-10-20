@@ -14,7 +14,6 @@ public class PlayerController : MonoBehaviour
     /// Directions related variables
     /// </summary>
     public enum Direction { UP, DOWN, RIGHT, LEFT, NONE };
-    //readonly string[]  DirectionInputs = { "Vertical",          "Vertical",          "Horizontal",        "Horizontal"               };
     static public readonly string[] DirectionInputs = { "Up", "Down", "Right", "Left" };
     static public readonly Vector2[] Directionf = { new Vector2(0, 1), new Vector2(0, -1), new Vector2(1, 0), new Vector2(-1, 0) };
     

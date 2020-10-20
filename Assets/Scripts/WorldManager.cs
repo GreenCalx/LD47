@@ -129,7 +129,7 @@ public class WorldManager : MonoBehaviour
 
                     // Update newly created looper with current loop previous
                     // frames
-                    if (PlayerB.L.CurrentIdx != 0)
+                    if (PlayerA.L.CurrentIdx != 0)
                     {
                         PlayerB.L.Events = PlayerA.L.Events.GetRange(0, PlayerA.L.CurrentIdx + 1);
 
