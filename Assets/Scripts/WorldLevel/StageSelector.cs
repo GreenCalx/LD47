@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LevelSelector : MonoBehaviour
+public class StageSelector : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start()
