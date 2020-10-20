@@ -77,6 +77,8 @@ MonoBehaviour:
   isSwitched: 0
   spriteSwitched: {fileID: 2205517894363767059, guid: d5e186e3e3475ed479b21df6eaa5006b,
     type: 3}
+  spriteNotSwitched: {fileID: 934532634883167860, guid: d5e186e3e3475ed479b21df6eaa5006b,
+    type: 3}
 --- !u!82 &5896293088146763035
 AudioSource:
   m_ObjectHideFlags: 0
