@@ -46,10 +46,13 @@ MonoBehaviour:
   PlayerPrefab: {fileID: 0}
   levelUI_GOref: {fileID: 4572336713623461571, guid: 53f7225b65841de4fb9287a75425319e,
     type: 3}
-  CurrentTick: 0
+  CurrentTick: -1
   TickRate: 0.1
   StartPosition: {x: 0, y: 0}
   NeedTick: 0
   WaitForInput: 0
   NeedReset: 0
   IsRewinding: 0
+  IsGoingBackward: 1
+  FixedUpdatePassed: 0
+  MixerControl: {fileID: 0}

@@ -117,7 +117,7 @@ public class PlayerController : MonoBehaviour
     /// It will always be called from WorldManager FixedUpdate
     /// Therefore it should be treated as a FixedUpdate function
     /// </summary>
-    public void ApplyPhysics()
+    public void ApplyPhysics(bool ReverseDirection)
     {
         if (TickRequired)
         {
@@ -132,11 +132,11 @@ public class PlayerController : MonoBehaviour
                 L.Events.Add(CurrentDirection);
             }
             // Update position of the player
-            // TODO: What about physics?? Do we rely on RigidBody?
             if (CurrentDirection != Direction.NONE)
             {
                 // move
                 Movable Mover = GetComponent<Movable>();
+                if (ReverseDirection) CurrentDirection = InverseDirection(CurrentDirection);
                 if (Mover) Mover.Move(CurrentDirection);
             }
 

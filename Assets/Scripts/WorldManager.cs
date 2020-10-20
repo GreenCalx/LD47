@@ -40,7 +40,7 @@ public class WorldManager : MonoBehaviour
                 var GO = TickGameObjects[i];
                 var D = TickDirections[i];
                 var Mover = GO.GetComponent<Movable>();
-                if (Mover) Mover.Move( PlayerController.InverseDirection(D) );
+                if (Mover) Mover.Move(PlayerController.InverseDirection(D));
             }
 
             GameObjects.RemoveAt(GameObjects.Count - 1);
@@ -62,7 +62,7 @@ public class WorldManager : MonoBehaviour
     public GameObject levelUI_GOref;
 
 
-    public int CurrentTick = 0;
+    public int CurrentTick = -1;
     public float TickRate = 1f; // 2 seconds
     float AutomaticReplayRate = 0.2f;
     float AutomaticReplayCurrentTime = 0;
@@ -75,6 +75,8 @@ public class WorldManager : MonoBehaviour
     public bool NeedReset;
 
     public bool IsRewinding = false;
+    public bool IsGoingBackward = true;
+    public bool FixedUpdatePassed = false;
 
 
     public MasterMixerControl MixerControl;
@@ -191,11 +193,7 @@ public class WorldManager : MonoBehaviour
 
     public void AddRewindMove(GameObject go, PlayerController.Direction D)
     {
-        // currenttick was unfiortunately already advanced when called here
-        // therefore remove 1
-        // TODO: Record tick before qdvqncing it???
-        // mqybe we need to hqve q currentTick qnd q nextTick
-        var Tick = CurrentTick - 1;
+        var Tick = CurrentTick;
         Rewind.Record(Tick, go, D);
     }
 
@@ -207,15 +205,30 @@ public class WorldManager : MonoBehaviour
             // Update physique here
             // it means that we can chose the order on which physics will be executed
             // Lets do it first loop to last loop
-            for (int i = 0; i < Players.Count; ++i)
+            if (!IsGoingBackward)
             {
-                var PC = Players[i].GetComponent<PlayerController>();
-                PC.ApplyPhysics();
-                // IMPORTANT: sync tranforms between physics to change positions of object for
-                // next physic tick
-                Physics2D.SyncTransforms();
+                for (int i = 0; i < Players.Count; ++i)
+                {
+                    var PC = Players[i].GetComponent<PlayerController>();
+                    PC.ApplyPhysics(IsGoingBackward);
+                    // IMPORTANT: sync tranforms between physics to change positions of object for
+                    // next physic tick
+                    Physics2D.SyncTransforms();
+                }
+            } else
+            {
+                for (int i = Players.Count-1; i >= 0; --i)
+                {
+                    var PC = Players[i].GetComponent<PlayerController>();
+                    PC.ApplyPhysics(IsGoingBackward);
+                    // IMPORTANT: sync tranforms between physics to change positions of object for
+                    // next physic tick
+                    Physics2D.SyncTransforms();
+                }
+
             }
         }
+        FixedUpdatePassed = true;
     }
 
     // Update is called once per frame
@@ -241,7 +254,7 @@ public class WorldManager : MonoBehaviour
 
                 NeedReset = true;
                 IsRewinding = false;
-                CurrentTick = 0;
+                CurrentTick = -1;
 
                 foreach (var Player in Players)
                 {
@@ -270,13 +283,23 @@ public class WorldManager : MonoBehaviour
         {
             AutomaticReplayCurrentTime = 0;
         }
+        bool ForwardTick = Input.GetButtonDown("Tick") || (WaitForInput && NeedTick) || ( Input.GetButton("Tick") && AutomaticReplayCurrentTime > AutomaticReplayRate);
+        bool BackwardTick = Input.GetKeyDown(KeyCode.X) && FixedUpdatePassed && CurrentTick != -1;
 
-        bool Tick = Input.GetButtonDown("Tick") ||( Input.GetButton("Tick") && AutomaticReplayCurrentTime > AutomaticReplayRate);
+        
 
-        if (Tick
-            //|| (!WaitForInput && (CurrentTime > TickRate)) 
-            || (WaitForInput && NeedTick))
+        if (ForwardTick || BackwardTick)
         {
+
+            FixedUpdatePassed = false;
+
+            IsGoingBackward = BackwardTick;
+
+
+            if (BackwardTick)
+                CurrentTick--;
+            if (ForwardTick)
+                CurrentTick++;
 
             AutomaticReplayCurrentTime = 0;
 
@@ -285,7 +308,7 @@ public class WorldManager : MonoBehaviour
             // See if we arrived to the longest loop end
             // if thats the case we reset all loops to be started again frame 0
             NeedReset = false;
-// now this is done by the timeline
+            // now this is done by the timeline
 #if false
             if (Players.Count >= 1) // No need if no players
             {
@@ -347,14 +370,8 @@ public class WorldManager : MonoBehaviour
                         Controller.IsLoopedControled = true;
                         IsRewinding = true;
                     }
-                    else { Controller.RequireTick(CurrentTick); }
                 }
             }
-            // Only increment Curenttick if we didn't need to reset
-            // this is so weird.... 
-            // TODO: make ticks synced between fixedupdate and update
-            // as right now you could have things calling currentitck when really it is the nexttick...
-            if (!NeedReset) CurrentTick++;
         }
     }
 }
