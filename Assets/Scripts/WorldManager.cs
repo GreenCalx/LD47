@@ -64,6 +64,8 @@ public class WorldManager : MonoBehaviour
 
     public int CurrentTick = 0;
     public float TickRate = 1f; // 2 seconds
+    float AutomaticReplayRate = 0.2f;
+    float AutomaticReplayCurrentTime = 0;
     float CurrentTime = 0;
 
     public Vector2 StartPosition; //. First player will appear at this position
@@ -259,10 +261,25 @@ public class WorldManager : MonoBehaviour
         }
 
         // For now ticks are done by hand!
-        if (Input.GetButtonDown("Tick")
+
+        if (Input.GetButton("Tick"))
+        {
+            AutomaticReplayCurrentTime += Time.deltaTime;
+        }
+        else
+        {
+            AutomaticReplayCurrentTime = 0;
+        }
+
+        bool Tick = Input.GetButtonDown("Tick") ||( Input.GetButton("Tick") && AutomaticReplayCurrentTime > AutomaticReplayRate);
+
+        if (Tick
             //|| (!WaitForInput && (CurrentTime > TickRate)) 
             || (WaitForInput && NeedTick))
         {
+
+            AutomaticReplayCurrentTime = 0;
+
             NeedTick = false;
             //CurrentTime = 0;
             // See if we arrived to the longest loop end
