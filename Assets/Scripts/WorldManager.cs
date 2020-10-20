@@ -146,8 +146,17 @@ public class WorldManager : MonoBehaviour
                 var SpriteRender = GO.GetComponentInChildren<SpriteRenderer>();
                 if (SpriteRender)
                 {
-                    var c = PlayerA.gameObject.GetComponentInChildren<SpriteRenderer>().color * 0.7f;
+                    // new player and current loop will always be the bright color
+                    var c = PlayerA.gameObject.GetComponentInChildren<SpriteRenderer>().color;
                     SpriteRender.color = new Color(c.r, c.g, c.b, 1);
+
+                    // then we uodate every other player color to be darker
+                    for (int i=0; i < Players.Count-1; ++i)
+                    {
+                        Players[i].GetComponentInChildren<SpriteRenderer>().color *= 0.7f;
+                    }
+
+
                 }
 
             }
