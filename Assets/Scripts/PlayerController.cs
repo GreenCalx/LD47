@@ -207,7 +207,7 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                if (Input.GetButtonDown("Break") && !HasAlreadyBeenBreakedFrom)
+                if (Input.GetButtonDown("Break") && !HasAlreadyBeenBreakedFrom && !WM.IsRewinding)
                 {
                     // break from the loop
                     HasAlreadyBeenBreakedFrom = true;
