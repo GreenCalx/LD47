@@ -1,19 +1,19 @@
 Must do:
 	Bugs:
-		- break, manque precedentes inputs
-		- tick en trop à la fin
-		- breaking during rewind should be impossible
-		- switches should reset too and rewinding
+		x break, manque precedentes inputs
+		x tick en trop à la fin
+		x breaking during rewind should be impossible
+		x switches should reset too and rewinding
 	Features:
-		- replay backward ticks
+		/ replay backward ticks
 		- changer touches
-		- input during replay to break => record
+		x input during replay to break => record
 	UI:
 		x highlight current turn
 		- schnibble splash screen
 		x when you break all previous inputs are still displayed (no dead black turns override)
 	Graphics:
-		- find solution to highlight player from last loop from other loop
+		x find solution to highlight player from last loop from other loop
 	Audio:
 		- remove failed rewind effect
 	Level design:
@@ -22,7 +22,7 @@ Must do:
 		- make level selector a "world" level (inspiration baba is you)
 
 Nice to have:
-	- fast forward
+	x fast forward
 	- gamepad
 	- find better audio/graphics effects during replay/rewind vs recording
 	- menu (quit, audio settings, return, level selector)
