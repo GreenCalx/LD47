@@ -23,7 +23,7 @@ Must do:
 
 Nice to have:
 	x fast forward
-	- gamepad
+	x gamepad
 	- find better audio/graphics effects during replay/rewind vs recording
 	- menu (quit, audio settings, return, level selector)
 	- story/lore

@@ -27,6 +27,9 @@ public class PlayerController : MonoBehaviour
         return D;
     }
 
+    private float LastDpadAxisVertical = 0;
+    private float LastDpadAxisHorizontal = 0;
+
     /// <summary>
     /// State variables
     /// </summary>
@@ -172,7 +175,15 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     // Everything related to in^puts is done here
     void Update()
-    {
+    {   
+        var isDpadDownPressed = Input.GetAxisRaw("DPad_Vertical") == 1 && LastDpadAxisVertical != 1;
+        var isDpadUpPressed = Input.GetAxisRaw("DPad_Vertical") == -1 && LastDpadAxisVertical != -1;
+        var isDpadLeftPressed = Input.GetAxisRaw("DPad_Horizontal") == 1 && LastDpadAxisHorizontal != 1;
+        var isDpadRightPressed = Input.GetAxisRaw("DPad_Horizontal") == -1 && LastDpadAxisHorizontal != -1;
+
+
+        LastDpadAxisHorizontal = Input.GetAxisRaw("DPad_Horizontal");
+        LastDpadAxisVertical = Input.GetAxisRaw("DPad_Vertical");
 
         if (currentAnimationTime < animationtime)
             testAnimation();
@@ -189,10 +200,10 @@ public class PlayerController : MonoBehaviour
                 }
                 else
                 {
-                    var Up = Input.GetButtonDown(DirectionInputs[(int)Direction.UP]);
-                    var Down = Input.GetButtonDown(DirectionInputs[(int)Direction.DOWN]);
-                    var Right = Input.GetButtonDown(DirectionInputs[(int)Direction.RIGHT]);
-                    var Left = Input.GetButtonDown(DirectionInputs[(int)Direction.LEFT]);
+                    var Up = Input.GetButtonDown(DirectionInputs[(int)Direction.UP]) || isDpadUpPressed ;
+                    var Down = Input.GetButtonDown(DirectionInputs[(int)Direction.DOWN]) || isDpadDownPressed;
+                    var Right = Input.GetButtonDown(DirectionInputs[(int)Direction.RIGHT]) || isDpadRightPressed;
+                    var Left = Input.GetButtonDown(DirectionInputs[(int)Direction.LEFT]) || isDpadLeftPressed;
 
                     if (Up) CurrentDirection = Direction.UP;
                     if (Down) CurrentDirection = Direction.DOWN;
@@ -209,10 +220,10 @@ public class PlayerController : MonoBehaviour
             else
             {
                 bool needBreak = false;
-                var Up = Input.GetButtonDown(DirectionInputs[(int)Direction.UP]);
-                var Down = Input.GetButtonDown(DirectionInputs[(int)Direction.DOWN]);
-                var Right = Input.GetButtonDown(DirectionInputs[(int)Direction.RIGHT]);
-                var Left = Input.GetButtonDown(DirectionInputs[(int)Direction.LEFT]);
+                    var Up = Input.GetButtonDown(DirectionInputs[(int)Direction.UP]) || isDpadUpPressed ;
+                    var Down = Input.GetButtonDown(DirectionInputs[(int)Direction.DOWN]) || isDpadDownPressed;
+                    var Right = Input.GetButtonDown(DirectionInputs[(int)Direction.RIGHT]) || isDpadRightPressed;
+                    var Left = Input.GetButtonDown(DirectionInputs[(int)Direction.LEFT]) || isDpadLeftPressed;
 
                 needBreak = (Up || Down || Right || Left || Input.GetButtonDown("Break"));
 
