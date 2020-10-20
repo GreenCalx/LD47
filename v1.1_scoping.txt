@@ -9,7 +9,7 @@ Must do:
 		- changer touches
 		- input during replay to break => record
 	UI:
-		- highlight current turn
+		x highlight current turn
 		- schnibble splash screen
 		x when you break all previous inputs are still displayed (no dead black turns override)
 	Graphics:

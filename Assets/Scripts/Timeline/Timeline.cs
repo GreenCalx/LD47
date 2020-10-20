@@ -30,15 +30,21 @@ public class Timeline
         reset(iLoopLevel);
     }
 
-    public Timeline( int iLoopLevel, int iOffset )
+    public Timeline( int iLoopLevel, int iLastTick )
     {
-        offset = iOffset;
-        reset(iLoopLevel);
+        offset      = iLastTick;
+        last_tick   = iLastTick;
+        reset(iLoopLevel, iLastTick);
     }
 
     public void reset( int iLoopLevel )
     {
-        last_tick = -1;
+        reset(iLoopLevel, -1);
+    }
+
+    public void reset( int iLoopLevel, int iLastTick )
+    {
+        last_tick = iLastTick;
         timeline_finished = false;
         loop_level = iLoopLevel;
         init();
