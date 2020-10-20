@@ -87,7 +87,8 @@ public class Timeline
 
     public bool isTimelineOver()
     {
-        timeline_finished = ( last_tick >= N_MEASURES*MEASURE_SIZE );
+        // NOTE (Toffa) : We need to look at last_tick +1 because last_tick would be 24 as the first is 0 if we want to check for 25 steps
+        timeline_finished = ( last_tick+1 >= N_MEASURES*MEASURE_SIZE );
         return timeline_finished;
     }
 

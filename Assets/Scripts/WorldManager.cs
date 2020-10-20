@@ -259,6 +259,8 @@ public class WorldManager : MonoBehaviour
             // See if we arrived to the longest loop end
             // if thats the case we reset all loops to be started again frame 0
             NeedReset = false;
+// now this is done by the timeline
+#if false
             if (Players.Count >= 1) // No need if no players
             {
                 var Controller = Players[0].GetComponent<PlayerController>(); // supposed to be longest
@@ -270,7 +272,7 @@ public class WorldManager : MonoBehaviour
                     }
                 }
             }
-
+#endif
             // try consume energy for last player and update its ui
             int PlayersCount = Players.Count;
             if (PlayersCount > 0)
