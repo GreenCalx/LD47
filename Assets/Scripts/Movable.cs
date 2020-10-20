@@ -89,7 +89,7 @@ public class Movable : MonoBehaviour
         }
 
         if (NeedToBeMoved) UpdatePosition(Direction, D);
-        if (!WM.IsRewinding && ResetBetweenLoops) WM.AddRewindMove(this.gameObject, D);
+        if (!WM.IsRewinding && ResetBetweenLoops &&!WM.IsGoingBackward) WM.AddRewindMove(this.gameObject, D);
         return NeedToBeMoved;
     }
 
