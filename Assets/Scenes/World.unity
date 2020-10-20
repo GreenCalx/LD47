@@ -215,6 +215,7 @@ GameObject:
   - component: {fileID: 1059995819}
   - component: {fileID: 1059995821}
   - component: {fileID: 1059995820}
+  - component: {fileID: 1059995822}
   m_Layer: 0
   m_Name: levels
   m_TagString: Untagged
@@ -452,6 +453,19 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!114 &1059995822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1059995818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 652b0612af93dc04da14f9bd6c82ac81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  level_id: 0
 --- !u!1 &1129294601
 GameObject:
   m_ObjectHideFlags: 0
@@ -1505,7 +1519,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1381243394}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c2d66f02ec239844a975e84bb67335f, type: 3}
+  m_Script: {fileID: 11500000, guid: e4f8336f684bcd44ca17896d08994c1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1546706036
