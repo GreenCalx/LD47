@@ -64,6 +64,8 @@ public class WorldManager : MonoBehaviour
 
     public int CurrentTick = 0;
     public float TickRate = 1f; // 2 seconds
+    float AutomaticReplayRate = 0.2f;
+    float AutomaticReplayCurrentTime = 0;
     float CurrentTime = 0;
 
     public Vector2 StartPosition; //. First player will appear at this position
@@ -129,7 +131,7 @@ public class WorldManager : MonoBehaviour
 
                     // Update newly created looper with current loop previous
                     // frames
-                    if (PlayerB.L.CurrentIdx != 0)
+                    if (PlayerA.L.CurrentIdx != 0)
                     {
                         PlayerB.L.Events = PlayerA.L.Events.GetRange(0, PlayerA.L.CurrentIdx + 1);
 
@@ -146,8 +148,17 @@ public class WorldManager : MonoBehaviour
                 var SpriteRender = GO.GetComponentInChildren<SpriteRenderer>();
                 if (SpriteRender)
                 {
-                    var c = PlayerA.gameObject.GetComponentInChildren<SpriteRenderer>().color * 0.7f;
+                    // new player and current loop will always be the bright color
+                    var c = PlayerA.gameObject.GetComponentInChildren<SpriteRenderer>().color;
                     SpriteRender.color = new Color(c.r, c.g, c.b, 1);
+
+                    // then we uodate every other player color to be darker
+                    for (int i=0; i < Players.Count-1; ++i)
+                    {
+                        Players[i].GetComponentInChildren<SpriteRenderer>().color *= 0.7f;
+                    }
+
+
                 }
 
             }
@@ -250,15 +261,32 @@ public class WorldManager : MonoBehaviour
         }
 
         // For now ticks are done by hand!
-        if (Input.GetButtonDown("Tick")
+
+        if (Input.GetButton("Tick"))
+        {
+            AutomaticReplayCurrentTime += Time.deltaTime;
+        }
+        else
+        {
+            AutomaticReplayCurrentTime = 0;
+        }
+
+        bool Tick = Input.GetButtonDown("Tick") ||( Input.GetButton("Tick") && AutomaticReplayCurrentTime > AutomaticReplayRate);
+
+        if (Tick
             //|| (!WaitForInput && (CurrentTime > TickRate)) 
             || (WaitForInput && NeedTick))
         {
+
+            AutomaticReplayCurrentTime = 0;
+
             NeedTick = false;
             //CurrentTime = 0;
             // See if we arrived to the longest loop end
             // if thats the case we reset all loops to be started again frame 0
             NeedReset = false;
+// now this is done by the timeline
+#if false
             if (Players.Count >= 1) // No need if no players
             {
                 var Controller = Players[0].GetComponent<PlayerController>(); // supposed to be longest
@@ -270,7 +298,7 @@ public class WorldManager : MonoBehaviour
                     }
                 }
             }
-
+#endif
             // try consume energy for last player and update its ui
             int PlayersCount = Players.Count;
             if (PlayersCount > 0)

@@ -30,15 +30,21 @@ public class Timeline
         reset(iLoopLevel);
     }
 
-    public Timeline( int iLoopLevel, int iOffset )
+    public Timeline( int iLoopLevel, int iLastTick )
     {
-        offset = iOffset;
-        reset(iLoopLevel);
+        offset      = iLastTick;
+        last_tick   = iLastTick;
+        reset(iLoopLevel, iLastTick);
     }
 
     public void reset( int iLoopLevel )
     {
-        last_tick = -1;
+        reset(iLoopLevel, -1);
+    }
+
+    public void reset( int iLoopLevel, int iLastTick )
+    {
+        last_tick = iLastTick;
         timeline_finished = false;
         loop_level = iLoopLevel;
         init();
@@ -87,7 +93,8 @@ public class Timeline
 
     public bool isTimelineOver()
     {
-        timeline_finished = ( last_tick >= N_MEASURES*MEASURE_SIZE );
+        // NOTE (Toffa) : We need to look at last_tick +1 because last_tick would be 24 as the first is 0 if we want to check for 25 steps
+        timeline_finished = ( last_tick+1 >= N_MEASURES*MEASURE_SIZE );
         return timeline_finished;
     }
 

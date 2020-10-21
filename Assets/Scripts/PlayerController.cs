@@ -14,10 +14,9 @@ public class PlayerController : MonoBehaviour
     /// Directions related variables
     /// </summary>
     public enum Direction { UP, DOWN, RIGHT, LEFT, NONE };
-    //readonly string[]  DirectionInputs = { "Vertical",          "Vertical",          "Horizontal",        "Horizontal"               };
     static public readonly string[] DirectionInputs = { "Up", "Down", "Right", "Left" };
     static public readonly Vector2[] Directionf = { new Vector2(0, 1), new Vector2(0, -1), new Vector2(1, 0), new Vector2(-1, 0) };
-    
+
     static public Direction InverseDirection(Direction D)
     {
         if (D == PlayerController.Direction.UP) D = PlayerController.Direction.DOWN;
@@ -27,6 +26,9 @@ public class PlayerController : MonoBehaviour
 
         return D;
     }
+
+    private float LastDpadAxisVertical = 0;
+    private float LastDpadAxisHorizontal = 0;
 
     /// <summary>
     /// State variables
@@ -60,7 +62,7 @@ public class PlayerController : MonoBehaviour
     {
         if (!WM) Debug.Log("[PlayerController] No WorldManager reference in prefab");
         if (!TailPrefab) Debug.Log("[PlayerController] No TailPrefab reference in prefab");
-        
+
         // can it ever be !null at start?
         if (timeline == null) timeline = new Timeline(0);
 
@@ -70,7 +72,7 @@ public class PlayerController : MonoBehaviour
         GetComponent<BoxCollider2D>().enabled = false;
     }
 
-    public void initUI( GameObject iUIGORef )
+    public void initUI(GameObject iUIGORef)
     {
         levelUI_GOref = iUIGORef;
         levelUI_GO = Instantiate(levelUI_GOref);
@@ -133,9 +135,9 @@ public class PlayerController : MonoBehaviour
             // TODO: What about physics?? Do we rely on RigidBody?
             if (CurrentDirection != Direction.NONE)
             {
-                    // move
-                    Movable Mover = GetComponent<Movable>();
-                    if (Mover) Mover.Move(CurrentDirection);
+                // move
+                Movable Mover = GetComponent<Movable>();
+                if (Mover) Mover.Move(CurrentDirection);
             }
 
             // Reset position once we updated the player
@@ -161,9 +163,10 @@ public class PlayerController : MonoBehaviour
 
         if (currentAnimationTime < animationtime)
         {
-            var s = Mathf.Max(100f, 100f + Mathf.Sin( (animationtime - currentAnimationTime) * 20) * (maxLocalScale - 100f));
+            var s = Mathf.Max(100f, 100f + Mathf.Sin((animationtime - currentAnimationTime) * 20) * (maxLocalScale - 100f));
             this.gameObject.transform.localScale = new Vector3(s, s, 1);
-        } else
+        }
+        else
         {
             this.gameObject.transform.localScale = new Vector3(100, 100, 1);
         }
@@ -172,7 +175,15 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     // Everything related to in^puts is done here
     void Update()
-    {
+    {   
+        var isDpadDownPressed = Input.GetAxisRaw("DPad_Vertical") == 1 && LastDpadAxisVertical != 1;
+        var isDpadUpPressed = Input.GetAxisRaw("DPad_Vertical") == -1 && LastDpadAxisVertical != -1;
+        var isDpadLeftPressed = Input.GetAxisRaw("DPad_Horizontal") == 1 && LastDpadAxisHorizontal != 1;
+        var isDpadRightPressed = Input.GetAxisRaw("DPad_Horizontal") == -1 && LastDpadAxisHorizontal != -1;
+
+
+        LastDpadAxisHorizontal = Input.GetAxisRaw("DPad_Horizontal");
+        LastDpadAxisVertical = Input.GetAxisRaw("DPad_Vertical");
 
         if (currentAnimationTime < animationtime)
             testAnimation();
@@ -189,10 +200,10 @@ public class PlayerController : MonoBehaviour
                 }
                 else
                 {
-                    var Up = Input.GetButtonDown(DirectionInputs[(int)Direction.UP]);
-                    var Down = Input.GetButtonDown(DirectionInputs[(int)Direction.DOWN]);
-                    var Right = Input.GetButtonDown(DirectionInputs[(int)Direction.RIGHT]);
-                    var Left = Input.GetButtonDown(DirectionInputs[(int)Direction.LEFT]);
+                    var Up = Input.GetButtonDown(DirectionInputs[(int)Direction.UP]) || isDpadUpPressed ;
+                    var Down = Input.GetButtonDown(DirectionInputs[(int)Direction.DOWN]) || isDpadDownPressed;
+                    var Right = Input.GetButtonDown(DirectionInputs[(int)Direction.RIGHT]) || isDpadRightPressed;
+                    var Left = Input.GetButtonDown(DirectionInputs[(int)Direction.LEFT]) || isDpadLeftPressed;
 
                     if (Up) CurrentDirection = Direction.UP;
                     if (Down) CurrentDirection = Direction.DOWN;
@@ -208,12 +219,30 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                if (Input.GetButtonDown("Break") && !HasAlreadyBeenBreakedFrom)
+                bool needBreak = false;
+                    var Up = Input.GetButtonDown(DirectionInputs[(int)Direction.UP]) || isDpadUpPressed ;
+                    var Down = Input.GetButtonDown(DirectionInputs[(int)Direction.DOWN]) || isDpadDownPressed;
+                    var Right = Input.GetButtonDown(DirectionInputs[(int)Direction.RIGHT]) || isDpadRightPressed;
+                    var Left = Input.GetButtonDown(DirectionInputs[(int)Direction.LEFT]) || isDpadLeftPressed;
+
+                needBreak = (Up || Down || Right || Left || Input.GetButtonDown("Break"));
+
+
+                if (needBreak && !HasAlreadyBeenBreakedFrom && !WM.IsRewinding)
                 {
                     // break from the loop
                     HasAlreadyBeenBreakedFrom = true;
                     // create a new player at current position
                     var GO = WM.AddPlayer(this.gameObject.transform.position);
+                    Direction Dir = Direction.NONE;
+                    if (Up) Dir = Direction.UP;
+                    if (Down) Dir = Direction.DOWN;
+                    if (Left) Dir = Direction.LEFT;
+                    if (Right) Dir = Direction.RIGHT;
+
+                    GO.GetComponent<PlayerController>().CurrentDirection = Dir;
+
+                    WM.NeedTick = true;
                 }
             }
         }
