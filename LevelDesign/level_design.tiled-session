@@ -3,10 +3,11 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "level5.tmx",
+    "activeFile": "level3.tmx",
     "expandedProjectPaths": [
         "."
     ],
+    "exportAsImage.drawTileGrid": true,
     "fileStates": {
         "level0.tmx": {
             "scale": 0.5,
@@ -40,8 +41,8 @@
             "scale": 0.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": -1024,
-                "y": 513
+                "x": -714,
+                "y": 716
             }
         },
         "level4.tmx": {
@@ -49,7 +50,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 0,
-                "y": 1
+                "y": 2
             }
         },
         "level5.json": {
@@ -64,8 +65,8 @@
             "scale": 0.5142,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 5.8343057176196,
-                "y": 719.5643718397512
+                "x": 0,
+                "y": 1023.9206534422405
             }
         },
         "level6.tmx": {
@@ -135,8 +136,48 @@
             "scale": 0.75,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": -512,
-                "y": -511.3333333333333
+                "x": 289.33333333333337,
+                "y": -164
+            }
+        },
+        "tuto1.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 73.33333333333337,
+                "y": 82.66666666666669
+            }
+        },
+        "tuto2.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": -124,
+                "y": 20
+            }
+        },
+        "tuto3.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": -80,
+                "y": 116
+            }
+        },
+        "tuto4.tmx": {
+            "scale": 0.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 108,
+                "y": 874
+            }
+        },
+        "world0.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 511.99999999999994,
+                "y": 0.6666666666666288
             }
         }
     },
@@ -156,7 +197,9 @@
         "level6.tmx",
         "level7.tmx",
         "level8.tmx",
-        "tuto0.tmx"
+        "tuto0.tmx",
+        "world0.tmx",
+        "tuto1.tmx"
     ],
     "project": "level_design.tiled-project",
     "recentFiles": [
@@ -164,14 +207,14 @@
         "level0.tmx",
         "level1.tmx",
         "level2.tmx",
-        "level3.tmx",
-        "level4.tmx",
+        "tuto1.tmx",
+        "world0.tmx",
         "tuto0.tmx",
         "level8.tmx",
         "level7.tmx",
         "level6.tmx",
         "level5.tmx",
-        "level9.tmx"
+        "level4.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.type": 1
