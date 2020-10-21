@@ -112,8 +112,5 @@ public class Looper : MonoBehaviour
     /// </summary>
     public void Update()
     {
-
     }
-}
-
-
+} 

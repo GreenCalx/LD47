@@ -15,6 +15,8 @@ public class WorldManager : MonoBehaviour
     {
         public void Record(int Tick, GameObject Go, PlayerController.Direction D)
         {
+
+
             // We are using a while loop because it is possible to 'leap' a tick
             // and have to add 2 ticks instead of one
             while (GameObjects.Count - 1 < Tick)
@@ -40,11 +42,37 @@ public class WorldManager : MonoBehaviour
                 var GO = TickGameObjects[i];
                 var D = TickDirections[i];
                 var Mover = GO.GetComponent<Movable>();
-                if (Mover) Mover.Move(PlayerController.InverseDirection(D));
+                if (Mover) Mover.Move(PlayerController.InverseDirection(D), false);
             }
 
             GameObjects.RemoveAt(GameObjects.Count - 1);
             Directions.RemoveAt(Directions.Count - 1);
+        }
+
+        public void Tick(int CurrentTick)
+        {
+
+            var TickGameObjects = GameObjects[CurrentTick];
+            var TickDirections = Directions[CurrentTick];
+
+            for (int i = 0; i < TickGameObjects.Count; ++i)
+            {
+                var GO = TickGameObjects[i];
+                var D = TickDirections[i];
+                var Mover = GO.GetComponent<Movable>();
+                if (Mover) Mover.Move(PlayerController.InverseDirection(D), false);
+            }
+        }
+
+        public void DeleteRecord(int Tick)
+        {
+            // for backward implementation we need to remove the last recoirded tick
+            if (GameObjects.Count -1 >= Tick)
+            {
+                GameObjects[Tick] = new List<GameObject>();
+                Directions[Tick] = new List<PlayerController.Direction>();
+            }
+
         }
 
         public bool IsEmpty()
@@ -137,13 +165,18 @@ public class WorldManager : MonoBehaviour
                     {
                         PlayerB.L.Events = PlayerA.L.Events.GetRange(0, PlayerA.L.CurrentIdx + 1);
 
-                        // TODO : copy into world recording for rewind
+                        // copy into world recording for rewind
+                        for (int i = 0; i < PlayerB.L.Events.Count; ++i)
+                            Rewind.Record(i, GO, PlayerB.L.Events[i]); 
+
                     }
                     PlayerB.L.StartRecording();
                     // IMPORTANT : this nees to be done after StartRecording as it will take current 
                     // position as start position and we dont want that
                     PlayerB.L.StartPosition = PlayerA.L.StartPosition;
                     PlayerB.GetComponent<Movable>().StartPosition = PlayerB.L.StartPosition;
+
+                    PlayerB.BreakingTick = CurrentTick;
                 }
 
                 // For now new players are randomly colored
@@ -217,15 +250,6 @@ public class WorldManager : MonoBehaviour
                 }
             } else
             {
-                for (int i = Players.Count-1; i >= 0; --i)
-                {
-                    var PC = Players[i].GetComponent<PlayerController>();
-                    PC.ApplyPhysics(IsGoingBackward);
-                    // IMPORTANT: sync tranforms between physics to change positions of object for
-                    // next physic tick
-                    Physics2D.SyncTransforms();
-                }
-
             }
         }
         FixedUpdatePassed = true;
@@ -286,7 +310,9 @@ public class WorldManager : MonoBehaviour
         bool ForwardTick = Input.GetButtonDown("Tick") || (WaitForInput && NeedTick) || ( Input.GetButton("Tick") && AutomaticReplayCurrentTime > AutomaticReplayRate);
         bool BackwardTick = Input.GetKeyDown(KeyCode.X) && FixedUpdatePassed && CurrentTick != -1;
 
-        
+        PlayerController LastPlayer = Players[Players.Count - 1].GetComponent<PlayerController>();
+        BackwardTick = BackwardTick && (LastPlayer.IsLoopedControled || ( !LastPlayer.IsLoopedControled && LastPlayer.BreakingTick != CurrentTick));
+
 
         if (ForwardTick || BackwardTick)
         {
@@ -370,6 +396,18 @@ public class WorldManager : MonoBehaviour
                         Controller.IsLoopedControled = true;
                         IsRewinding = true;
                     }
+                    else
+                    {
+                        if (IsGoingBackward)
+                        {
+                            Rewind.Tick(CurrentTick + 1);
+                            Rewind.DeleteRecord(CurrentTick + 1);
+                        }
+                        //            Controller.RequireTick(CurrentTick + 1);
+                        else
+                            Controller.RequireTick(CurrentTick);
+                    }
+
                 }
             }
         }

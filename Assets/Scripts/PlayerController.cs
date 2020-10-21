@@ -57,6 +57,9 @@ public class PlayerController : MonoBehaviour
     public WorldManager WM;
     public GameObject TailPrefab;
 
+
+    public int BreakingTick = -1;
+
     // Start is called before the first frame update
     public void Start()
     {
@@ -129,7 +132,15 @@ public class PlayerController : MonoBehaviour
 
             if (L.IsRecording)
             {
-                L.Events.Add(CurrentDirection);
+                if (L.Events.Count-1 >= L.CurrentIdx)
+                {
+                    // remove previous recorded input
+                    L.Events[L.CurrentIdx] = CurrentDirection;
+                }
+                else
+                {
+                    L.Events.Add(CurrentDirection);
+                }
             }
             // Update position of the player
             if (CurrentDirection != Direction.NONE)

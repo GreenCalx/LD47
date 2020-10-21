@@ -32,8 +32,10 @@ public class Movable : MonoBehaviour
     public float SpawnTailTime = 0.1f;
     public float CurrentSpawnTailTime = 0.1f;
 
-    public bool Move(PlayerController.Direction D)
+    public bool Move(PlayerController.Direction D, bool ApplyPhysicsBetweenPlayers = true)
     {
+        if (D == PlayerController.Direction.NONE) return false;
+
         bool NeedToBeMoved = false;
 
         var Direction = PlayerController.Directionf[(int)D];
@@ -44,6 +46,10 @@ public class Movable : MonoBehaviour
         // MOVABLE HITS
         RaycastHit2D[] hitsm = Physics2D.RaycastAll(transform.position + (0.6f * Dir3), Dir3, 0.5f, movablemask);
         hitsm = hitsm.Where(val => (val.collider.gameObject != this.gameObject)).ToArray(); // filter our own gameobject
+
+        if (!ApplyPhysicsBetweenPlayers)
+             hitsm = hitsm.Where(val => (val.collider.gameObject.GetComponent<PlayerController>() == null)).ToArray(); // filter our own gameobject
+
         if (hitsm.Length == 0)
         {
             NeedToBeMoved = true;
