@@ -7,7 +7,7 @@ using UnityEngine;
 public class Level : MonoBehaviour
 {
 
-    public int[,] world_grid;
+    public readonly int[,] world_grid; // useless ? not used
 
     public enum WORLD_POI
     {
@@ -20,6 +20,10 @@ public class Level : MonoBehaviour
         LEVEL_CONNECTOR = 6 // Connects levels together ( path from LEVEL0 to LEVEL1 for ex )
     }    
 
+    // List of loaded stages for this level
+    [HideInInspector]
+    public List<Stage> lstages;
+
     // level_id is level's level ( level 0, level 1, etc.. ) 
     public int level_id = 0;
     private const string world_grid_file_path         = "Assets/LevelPOIGrids/";
@@ -29,11 +33,29 @@ public class Level : MonoBehaviour
 
     private Dictionary<Stage, Transform> __poi_locations;
     private WORLD_POI[,]                 __world_pois;
+    private Tuple<int , int>             __start_coord;
 
     // Start is called before the first frame update
     void Start()
     {   
         init();
+    }
+
+    private static int compareStage( Stage s1, Stage s2)
+    {
+        if ( s1 == null )
+            if ( s2 == null )
+                return 0; // S1 == S2
+            else
+                return -1; // S2 <<
+        else
+            if ( s2 == null )
+                return 1; // S1 <<
+            else
+            {
+                // delta on stage ids to cp
+                return S1.id - S2.id;
+            }
     }
 
     public void init()
@@ -60,16 +82,81 @@ public class Level : MonoBehaviour
             {
                 char poi = line[j];
                 __world_pois[i,j] = (WORLD_POI)Enum.Parse( typeof(WORLD_POI), poi.ToString()); // in the given enum range or crash ?
+                if (__world_pois[i,j] == WORLD_POI.START_STAGE)
+                    __start_coord = new Tuple<int,int>(i,j);
             }//! for j cols
         }//! for i rows
         reader.Close();
+        if ( __start_coord == null )
+        {
+            __start_coord = new Tuple<int,int>(0,0); // default start..
+            Debug.LogError(" no starting stage found for current world. default is 0,0.")
+        }
 
         // INIT internals structs with __world_pois
         // init stages
-        //Stage[] stages = GetComponentsInChildren<Stage>();
+        Stage[] stages = GetComponentsInChildren<Stage>();
+        lstages = stages.ToList();
+        lstages.Sort(compareStage);
 
+        buildStageAndConnections(lstages);
         // init level connectors
 
+    }
+
+    private void buildStageAndConnections()
+    {
+
+        List<Tuple<int,int>> paths = new List<Tuple<int,int>>{ Tuple.Create(__start_coord.Item1, __start_coord.Item2 ); };
+        int curr_stage_id   = 0;
+        int n_stages_to_set = lstages.Count;
+        while ( paths.Any() )
+        {
+            Tuple<int, int> curr_path = paths[0];
+            Stage curr_stage = lstages[curr_stage_id];
+            paths.RemoveAt(0);
+
+            // check neighbors
+            for (int i = -1; i <= 1; i++)
+            {
+                for ( int j = -1; j <= 1; j++)
+                {
+                    int row = curr_path.Item1 + i;
+                    int col = curr_path.Item2 + j;
+                    if ( (row < 0) || (col < 0) ) // OOB
+                        continue;
+                    WORLD_POI poi =  __world_pois[row, col];
+                    if ( poi == WORLD_POI.NONE ) // NOTHING HERE
+                        continue;
+                    
+                    // Stages only reachable for UP/DOWN/LEFT/RIGHT.
+                    // we cut corners out
+                    bool stage_is_reachable = (Math.Abs(row) + Math.Abs(col)) != 2;
+                    if ( poiIsStage(poi) && stage_is_reachable )
+                    {
+                        
+                    }
+                    // Connectors can connect diagonally
+                    
+
+                }//! for j cols
+            }//! for i rows
+        }
+
+    }
+
+    private bool poiIsStage( WORLD_POI iPOI )
+    {
+        return ((iPOI==WORLD_POI.LOCKED_STAGE) ||
+                (iPOI==WORLD_POI.UNLOCKED_STAGE) ||
+                (iPOI==WORLD_POI.DONE_STAGE) ||
+                (iPOI==WORLD_POI.START_STAGE) );
+    }
+
+    private bool poiIsConnector( WORLD_POI iPOI )
+    {
+        return ((iPOI==WORLD_POI.CONNECTOR) ||
+                (iPOI==WORLD_POI.LEVEL_CONNECTOR) );
     }
 
     // Update is called once per frame

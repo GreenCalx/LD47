@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LConnector : MonoBehaviour
+public class LConnector : POI
 {
     // Start is called before the first frame update
     void Start()
