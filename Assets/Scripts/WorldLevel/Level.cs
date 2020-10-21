@@ -9,7 +9,6 @@ public class Level : MonoBehaviour
 
     public int[,] world_grid;
 
-    [Flags]
     public enum WORLD_POI
     {
         NONE            = 0,
