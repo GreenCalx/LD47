@@ -15,8 +15,6 @@ public class WorldManager : MonoBehaviour
     {
         public void Record(int Tick, GameObject Go, PlayerController.Direction D)
         {
-
-
             // We are using a while loop because it is possible to 'leap' a tick
             // and have to add 2 ticks instead of one
             while (GameObjects.Count - 1 < Tick)
@@ -398,6 +396,8 @@ public class WorldManager : MonoBehaviour
                     }
                     else
                     {
+                        // NOTE (toffa): this is weird but we have to ask for the last tick direction when going backward
+                        // or we will apply the direction from the previous tick to go back to it
                         if (IsGoingBackward)
                         {
                             Rewind.Tick(CurrentTick + 1);
