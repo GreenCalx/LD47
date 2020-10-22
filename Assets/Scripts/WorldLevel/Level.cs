@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System;
 using System.IO;
 using UnityEngine;
+using System.Linq;
 
 public class Level : MonoBehaviour
 {
-
-    public readonly int[,] world_grid; // useless ? not used
+    public GameObject go_stage_selector;
+    //public readonly int[,] world_grid; // useless ? not used
 
     public enum WORLD_POI
     {
@@ -33,12 +34,30 @@ public class Level : MonoBehaviour
 
     private Dictionary<Stage, Transform> __poi_locations;
     private WORLD_POI[,]                 __world_pois;
+    private int[,]                       __world_stage_layout;
     private Tuple<int , int>             __start_coord;
+    private StageSelector                __stage_selector;
 
     // Start is called before the first frame update
     void Start()
     {   
-        init();
+
+    }
+
+    // TODO [ if u can read this and its not october then gotta be fixd ]
+    // this is a cheap fix to an issue where not all stages
+    // have started their script when this init is called.
+    // so we wait for the first update and use a bool to make it only once
+    // would need a worldmanager as well to register loaded objects and init sequence.
+    private bool init_done = false;
+    void Update()
+    {
+        if (!init_done)
+        {
+            init();
+            initPlayer();
+            init_done = true;
+        }
     }
 
     private static int compareStage( Stage s1, Stage s2)
@@ -54,8 +73,24 @@ public class Level : MonoBehaviour
             else
             {
                 // delta on stage ids to cp
-                return S1.id - S2.id;
+                return s1.id - s2.id;
             }
+    }
+
+    public void initPlayer()
+    {
+        if (!!go_stage_selector)
+        {
+            __stage_selector = go_stage_selector.GetComponent<StageSelector>();
+            if (!!__stage_selector)
+            {
+                __stage_selector.init(lstages[0]); // default at stage 0
+                Transform t_destination = __poi_locations[__stage_selector.selected_stage];
+                __stage_selector.moveTo(t_destination);    
+            }
+            
+        }
+
     }
 
     public void init()
@@ -66,18 +101,39 @@ public class Level : MonoBehaviour
         StreamReader reader = new StreamReader(path);
 
         int n_rows = 0, n_cols = 0;
+        long stage_layout_reader_pos = -1;
         while (reader.Peek() >= 0)
         {
             string line = reader.ReadLine();
-            n_cols = line.Length;
-            n_rows++;
+            if ( line.Contains("!") )
+                continue;
+            if ( line.Contains("#") )
+            {
+                if (  reader.Peek() < 0 )
+                    break; 
+                reader.ReadLine(); // line break we discard val
+                stage_layout_reader_pos = reader.BaseStream.Position; 
+                break;
+            } else {
+                n_cols = line.Length;
+                n_rows++;
+            }
+
             Debug.Log(line);
         }
         __world_pois = new WORLD_POI[n_rows,n_cols];
         reader.BaseStream.Position = 0;
+        reader.DiscardBufferedData();
         for (int i=0;i < n_rows; i++)
         {
             string line = reader.ReadLine();
+            // if comments ( should not happen )
+            while ( line.Contains("!") ) 
+                reader.ReadLine();
+            if ( line.Contains("#") )
+                break; // reached stage layout ( should not happen )
+
+            // Build POI states
             for (int j=0; j < n_cols ; j++ )
             {
                 char poi = line[j];
@@ -86,34 +142,68 @@ public class Level : MonoBehaviour
                     __start_coord = new Tuple<int,int>(i,j);
             }//! for j cols
         }//! for i rows
+
+        // Build stage layout
+        __world_stage_layout = new int[n_rows, n_cols];
+        //reader.BaseStream.Position = stage_layout_reader_pos; // blocks reader at position somehow ?
+        for (int i=0;i < n_rows; i++)
+        {
+            string line = reader.ReadLine();
+            // if comments or break ( should not happen )
+            while ( line.Contains("!") || line.Contains("#") )
+                line =  reader.ReadLine();
+
+            for (int j=0; j < n_cols ; j++ )
+            {
+                char cstage_id = line[j];
+                if ( cstage_id == '-' )
+                {
+                    __world_stage_layout[i,j] = -1;
+                    continue;
+                }
+
+                string hex_val = cstage_id.ToString();
+                int stage_id = Int32.Parse( hex_val, System.Globalization.NumberStyles.HexNumber );
+                __world_stage_layout[i,j] = stage_id;
+
+            }
+        }
+
         reader.Close();
+
+
         if ( __start_coord == null )
         {
             __start_coord = new Tuple<int,int>(0,0); // default start..
-            Debug.LogError(" no starting stage found for current world. default is 0,0.")
+            Debug.LogError(" no starting stage found for current world. default is 0,0.");
         }
 
         // INIT internals structs with __world_pois
         // init stages
         Stage[] stages = GetComponentsInChildren<Stage>();
+        if (stages.Length == 0)
+            return;
         lstages = stages.ToList();
         lstages.Sort(compareStage);
+        // Get locations
+        __poi_locations = new Dictionary<Stage, Transform>(0);
+        foreach( Stage s in lstages )
+            __poi_locations.Add( s, s.gameObject.transform );
 
-        buildStageAndConnections(lstages);
+        buildStageAndConnections( n_rows, n_cols);
         // init level connectors
 
     }
 
-    private void buildStageAndConnections()
+    private void buildStageAndConnections( int row_boundary, int col_boundary)
     {
 
-        List<Tuple<int,int>> paths = new List<Tuple<int,int>>{ Tuple.Create(__start_coord.Item1, __start_coord.Item2 ); };
+        List<Tuple<int,int>> paths = new List<Tuple<int,int>>{ Tuple.Create(__start_coord.Item1, __start_coord.Item2 ) };
         int curr_stage_id   = 0;
-        int n_stages_to_set = lstages.Count;
         while ( paths.Any() )
         {
             Tuple<int, int> curr_path = paths[0];
-            Stage curr_stage = lstages[curr_stage_id];
+            Stage curr_stage = lstages[__world_stage_layout[curr_path.Item1, curr_path.Item2]];
             paths.RemoveAt(0);
 
             // check neighbors
@@ -121,9 +211,13 @@ public class Level : MonoBehaviour
             {
                 for ( int j = -1; j <= 1; j++)
                 {
+                    if ((i == 0) && (j == 0))
+                        continue; // self
                     int row = curr_path.Item1 + i;
                     int col = curr_path.Item2 + j;
                     if ( (row < 0) || (col < 0) ) // OOB
+                        continue;
+                    if ( (row >= row_boundary) || (col >= col_boundary) ) // OOB
                         continue;
                     WORLD_POI poi =  __world_pois[row, col];
                     if ( poi == WORLD_POI.NONE ) // NOTHING HERE
@@ -131,10 +225,16 @@ public class Level : MonoBehaviour
                     
                     // Stages only reachable for UP/DOWN/LEFT/RIGHT.
                     // we cut corners out
-                    bool stage_is_reachable = (Math.Abs(row) + Math.Abs(col)) != 2;
+                    bool stage_is_reachable = (Math.Abs(i) + Math.Abs(j)) != 2;
                     if ( poiIsStage(poi) && stage_is_reachable )
                     {
-                        
+                        int stage_id = __world_stage_layout[row, col];
+                        POI.DIRECTIONS direction = POI.getDirection(j, i);
+                        Stage stage_to_connect = lstages[stage_id];
+                        if ( curr_stage.connectTo( stage_to_connect, direction) )
+                        {
+                            paths.Add(Tuple.Create(row, col));
+                        }
                     }
                     // Connectors can connect diagonally
                     
@@ -144,6 +244,8 @@ public class Level : MonoBehaviour
         }
 
     }
+
+
 
     private bool poiIsStage( WORLD_POI iPOI )
     {
@@ -160,8 +262,5 @@ public class Level : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
 }
