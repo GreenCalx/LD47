@@ -56,7 +56,7 @@ public class StageSelector : MonoBehaviour
             if (!!selected_stage)
                 selected_stage.Load();
             else
-                Debug.error("FAILED TO LOAD LEVEL SCENE. NO SELECTED STAGE.");
+                Debug.Log("FAILED TO LOAD LEVEL SCENE. NO SELECTED STAGE.");
         }
 
     }//! Update
