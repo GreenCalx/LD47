@@ -47,8 +47,17 @@ public class StageSelector : MonoBehaviour
             
             if ( neighbor!=null )
             {
-                selected_stage = (Stage)neighbor;
-                moveTo( neighbor.gameObject.transform );
+                Stage neighbor_stage = (Stage)neighbor;
+                if ( neighbor_stage.isUnlocked() )
+                {
+                    selected_stage = neighbor_stage;
+                    moveTo( neighbor.gameObject.transform );
+                } else {
+                    // play SFX or send feedback that stage is currently locked.
+                    Debug.Log("Targeted neighbor stage is locked. Complete current stage before moving on.");
+                }
+                    
+
             }
         }
         else if ( enter )

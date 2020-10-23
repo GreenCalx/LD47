@@ -56,8 +56,15 @@ public class Level : MonoBehaviour
         {
             init();
             initPlayer();
+            refreshStages();
             init_done = true;
         }
+    }
+
+    private void refreshStages()
+    {
+        foreach( Stage s in lstages )
+            s.refresh();
     }
 
     private static int compareStage( Stage s1, Stage s2)
@@ -235,6 +242,10 @@ public class Level : MonoBehaviour
                         {
                             paths.Add(Tuple.Create(row, col));
                         }
+                        
+                        // update stage completion from save file
+                        curr_stage.updateCompletion(poi);
+
                     }
                     // Connectors can connect diagonally
                     
