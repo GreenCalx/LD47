@@ -44,4 +44,34 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/EndGame.unity
     guid: 37d330de226b7c449b4a67f03d319d14
+  - enabled: 1
+    path: Assets/Scenes/World.unity
+    guid: 51d121d16b6d37840a8ee94b8cb30772
+  - enabled: 1
+    path: Assets/Scenes/WORLD/LEVEL0/LEVEL0STAGE0.unity
+    guid: a58fa68d989a1784ca4b88e5b9c946bc
+  - enabled: 1
+    path: Assets/Scenes/WORLD/LEVEL0/LEVEL0STAGE1.unity
+    guid: 43ebf7e2788e24b4f8ec8b65d936a901
+  - enabled: 1
+    path: Assets/Scenes/WORLD/LEVEL0/LEVEL0STAGE2.unity
+    guid: 3295a7fe89f3ad24e824be384e6bfbf8
+  - enabled: 1
+    path: Assets/Scenes/WORLD/LEVEL0/LEVEL0STAGE3.unity
+    guid: 156e240cc25e81b4b958993a7801ca12
+  - enabled: 1
+    path: Assets/Scenes/WORLD/LEVEL0/LEVEL0STAGE4.unity
+    guid: 3ca0242f0971e1e4ba90a04a2868352f
+  - enabled: 1
+    path: Assets/Scenes/WORLD/LEVEL0/LEVEL0STAGE5.unity
+    guid: 24275ff91b8744746806b2e09cd6f075
+  - enabled: 1
+    path: Assets/Scenes/WORLD/LEVEL0/LEVEL0STAGE6.unity
+    guid: 09e87c93ac29841418b0be5c431ba12e
+  - enabled: 1
+    path: Assets/Scenes/WORLD/LEVEL0/LEVEL0STAGE7.unity
+    guid: 97e44cbe086493345a470cc4483a9f32
+  - enabled: 1
+    path: Assets/Scenes/WORLD/LEVEL0/LEVEL0STAGE8.unity
+    guid: 994fb6f981648254f92fffc5fd9c32d2
   m_configObjects: {}

@@ -44,7 +44,7 @@ public class Level : MonoBehaviour
 
     }
 
-    // TODO [ if u can read this and its not october then gotta be fixd ]
+    // TODO [ if u can read this and its not october or november then gotta be fixd ]
     // this is a cheap fix to an issue where not all stages
     // have started their script when this init is called.
     // so we wait for the first update and use a bool to make it only once
@@ -126,7 +126,6 @@ public class Level : MonoBehaviour
                 n_rows++;
             }
 
-            Debug.Log(line);
         }
         __world_pois = new WORLD_POI[n_rows,n_cols];
         reader.BaseStream.Position = 0;
@@ -213,6 +212,10 @@ public class Level : MonoBehaviour
             Stage curr_stage = lstages[__world_stage_layout[curr_path.Item1, curr_path.Item2]];
             paths.RemoveAt(0);
 
+            // update stage completion from save file
+            WORLD_POI curr_poi =  __world_pois[curr_path.Item1, curr_path.Item2];
+            curr_stage.updateCompletion(curr_poi);
+
             // check neighbors
             for (int i = -1; i <= 1; i++)
             {
@@ -242,9 +245,6 @@ public class Level : MonoBehaviour
                         {
                             paths.Add(Tuple.Create(row, col));
                         }
-                        
-                        // update stage completion from save file
-                        curr_stage.updateCompletion(poi);
 
                     }
                     // Connectors can connect diagonally

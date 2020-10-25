@@ -1,53 +1,66 @@
+using System;
+
 public static class LevelProgress
 {
-    public static bool level0 = false;
-    public static bool level1 = false;
-    public static bool level2 = false;
-    public static bool level3 = false;
-    public static bool level4 = false;
-    public static bool level5 = false;
-    public static bool level6 = false;
-    public static bool level7 = false;
-    public static bool level8 = false;
 
-    public static void setProgress( int iLevelIndex, bool iCompletion )
+    // Number of stages per Level
+    public static readonly int[] n_stages_per_level = { 9, 10 };
+    public static bool[] arrLevel0;
+    public static bool[] arrLevel1; // CONT..
+
+    static LevelProgress()
     {
-        switch (iLevelIndex)
+        //default all to false
+        arrLevel0 = new bool[n_stages_per_level[0]];
+        arrLevel1 = new bool[n_stages_per_level[1]];
+
+        //etc..
+    }
+
+    public static void completeStage( int levelID, int stageID)
+    {
+        if ( (levelID < 0) || (stageID < 0) )
+            return;
+            
+        switch (levelID)
         {
             case 0:
-                level0 = iCompletion;
+                if ( stageID < arrLevel0.Length )
+                    arrLevel0[stageID] = true;
                 break;
             case 1:
-                level1 = iCompletion;
-                break;
-            case 2:
-                level2 = iCompletion;
-                break;
-            case 3:
-                level3 = iCompletion;
-                break;
-            case 4:
-                level4 = iCompletion;
-                break;
-            case 5:
-                level5 = iCompletion;
-                break;
-            case 6:
-                level6 = iCompletion;
-                break;
-            case 7:
-                level7 = iCompletion;
-                break;
-            case 8:
-                level8 = iCompletion;
+                if ( stageID < arrLevel1.Length )
+                    arrLevel1[stageID] = true;
                 break;
             default:
                 break;
         }
     }
 
-    public static bool finishedAllLevels()
+    public static bool getCompletion( int levelID, int stageID)
     {
-        return (level0 && level1 && level2 && level3 && level4 && level5 && level6 && level7 && level8);
+        bool completion = false;
+        if ( (levelID < 0) || (stageID < 0) )
+            return completion;
+
+        switch (levelID)
+        {
+            case 0:
+                if ( stageID < arrLevel0.Length )
+                    completion = arrLevel0[stageID];
+                break;
+            case 1:
+                if ( stageID < arrLevel1.Length )
+                    completion = arrLevel1[stageID];
+                break;
+            default:
+                break;
+        }
+        return completion;
+    }
+
+    public static bool gameIsFinished()
+    {
+        return false; // TODO
     }
 }
