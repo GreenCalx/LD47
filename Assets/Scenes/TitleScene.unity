@@ -456,7 +456,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 935358cb298990f45bc1ff094fa8d333, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scene_to_load: LevelSelectorScene
+  scene_to_load: World
 --- !u!1 &1966023520
 GameObject:
   m_ObjectHideFlags: 0
