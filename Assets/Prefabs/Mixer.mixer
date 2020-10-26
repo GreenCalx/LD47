@@ -38,36 +38,6 @@ AudioMixerGroupController:
   m_Mute: 0
   m_Solo: 0
   m_BypassEffects: 0
---- !u!244 &-1396987726241855835
-AudioMixerEffectController:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_EffectID: 30c7a27c86d17294aadf5b2bd6a8f551
-  m_EffectName: Chorus
-  m_MixLevel: 9cd85d536b72a96409772f9d64dc34c4
-  m_Parameters:
-  - m_ParameterName: Dry mix
-    m_GUID: ae3a6350c22b5fa4593456aa01a23638
-  - m_ParameterName: Wet mix tap 1
-    m_GUID: bac63f078c4fad74187647e8e5b7300c
-  - m_ParameterName: Wet mix tap 2
-    m_GUID: 0f2a3cdcd9d37c74385caa8db0078789
-  - m_ParameterName: Wet mix tap 3
-    m_GUID: 5e46a8290abb87f4084eb09c5f0a2d33
-  - m_ParameterName: Delay
-    m_GUID: 13001fcce85cf174495a1098ffe6d42a
-  - m_ParameterName: Rate
-    m_GUID: 4c540b6e2b4928a468832fffd17b1548
-  - m_ParameterName: Depth
-    m_GUID: ca7546763c4ac584a9f091039b78318e
-  - m_ParameterName: Feedback
-    m_GUID: a88d75326f425a94998465da2b337ac3
-  m_SendTarget: {fileID: 0}
-  m_EnableWetMix: 0
-  m_Bypass: 0
 --- !u!241 &24100000
 AudioMixerController:
   m_ObjectHideFlags: 0
@@ -88,8 +58,6 @@ AudioMixerController:
     name: EffectsVolume
   - guid: 224636de47903c7458febbe8f7393473
     name: MasterVolume
-  - guid: ae3a6350c22b5fa4593456aa01a23638
-    name: ChorusDryMix
   - guid: d751fb2a6d0d1e348bbb47a951525a28
     name: MusicVolume
   m_AudioMixerGroupViews:
@@ -116,7 +84,6 @@ AudioMixerGroupController:
   m_Pitch: b1eb6a8c461f29c4b8768a2a54fdbb9d
   m_Send: 00000000000000000000000000000000
   m_Effects:
-  - {fileID: -1396987726241855835}
   - {fileID: 24400004}
   m_UserColorIndex: 0
   m_Mute: 0
@@ -165,12 +132,12 @@ AudioMixerSnapshotController:
     08cb5a08b126bca48bfcb1489a1de4d3: 0
     e7c68f2833c24c1459dd3aec98aaa8da: 0
     5e46a8290abb87f4084eb09c5f0a2d33: 0.5
-    d751fb2a6d0d1e348bbb47a951525a28: 0
+    d751fb2a6d0d1e348bbb47a951525a28: -23.43374
     0ec263ea548ed584baa1161c17feed08: 0.507
     948f04fa0d9a60543a0434986a767f9a: 0.3
     a00c755b9c3946f4f8ebe7df88fedcb1: 83
     e9a1611cf0314254eaf87ef0dd0a4ad2: 0.128
-    ea3f2d2c71d7a1e498b415dcefaa48c5: 0
+    ea3f2d2c71d7a1e498b415dcefaa48c5: -8.362404
     b1eb6a8c461f29c4b8768a2a54fdbb9d: 1
     13001fcce85cf174495a1098ffe6d42a: 4
     0f2a3cdcd9d37c74385caa8db0078789: 0.501
