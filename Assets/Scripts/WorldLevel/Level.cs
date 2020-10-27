@@ -234,15 +234,12 @@ public class Level : MonoBehaviour
         // Read lmevel file and build world_pois
         string path = world_grid_file_path + world_grid_file_name_prefix
                         + level_id + world_grid_file_ext;
-        StreamReader reader = new StreamReader(path);
+        //StreamReader reader = new StreamReader(path);
         //StreamReader reader = null;
-        if ( (reader == null) || (reader.Peek() < 0) )
-        {
+        //if (Application.platform == RuntimePlatform.WebGLPlayer)
             initFromStaticDatas();
-        } else 
-        {
-            initFromFile(reader);
-        }
+        //else
+        //    initFromFile(reader);
 
 
         if ( __start_coord == null )
