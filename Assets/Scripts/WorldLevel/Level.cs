@@ -31,12 +31,16 @@ public class Level : MonoBehaviour
     private const string world_grid_file_name_prefix  = "LEVEL";
     private const string world_grid_file_ext          = ".txt";
 
+    private const string webgl_alt_path = "LevelPOIGrids/LEVEL";
+
 
     private Dictionary<Stage, Transform> __poi_locations;
     private WORLD_POI[,]                 __world_pois;
     private int[,]                       __world_stage_layout;
     private Tuple<int , int>             __start_coord;
     private StageSelector                __stage_selector;
+    private int                          __n_rows = 0;
+    private int                          __n_cols = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -100,14 +104,10 @@ public class Level : MonoBehaviour
 
     }
 
-    public void init()
+    private void initFromFile(StreamReader reader)
     {
-        // Read lmevel file and build world_pois
-        string path = world_grid_file_path + world_grid_file_name_prefix
-                        + level_id + world_grid_file_ext;
-        StreamReader reader = new StreamReader(path);
-
-        int n_rows = 0, n_cols = 0;
+        __n_rows = 0;
+        __n_cols = 0;
         long stage_layout_reader_pos = -1;
         while (reader.Peek() >= 0)
         {
@@ -122,15 +122,15 @@ public class Level : MonoBehaviour
                 stage_layout_reader_pos = reader.BaseStream.Position; 
                 break;
             } else {
-                n_cols = line.Length;
-                n_rows++;
+                __n_cols = line.Length;
+                __n_rows++;
             }
 
         }
-        __world_pois = new WORLD_POI[n_rows,n_cols];
+        __world_pois = new WORLD_POI[__n_rows,__n_cols];
         reader.BaseStream.Position = 0;
         reader.DiscardBufferedData();
-        for (int i=0;i < n_rows; i++)
+        for (int i=0;i < __n_rows; i++)
         {
             string line = reader.ReadLine();
             // if comments ( should not happen )
@@ -140,7 +140,7 @@ public class Level : MonoBehaviour
                 break; // reached stage layout ( should not happen )
 
             // Build POI states
-            for (int j=0; j < n_cols ; j++ )
+            for (int j=0; j < __n_cols ; j++ )
             {
                 char poi = line[j];
                 __world_pois[i,j] = (WORLD_POI)Enum.Parse( typeof(WORLD_POI), poi.ToString()); // in the given enum range or crash ?
@@ -150,16 +150,16 @@ public class Level : MonoBehaviour
         }//! for i rows
 
         // Build stage layout
-        __world_stage_layout = new int[n_rows, n_cols];
+        __world_stage_layout = new int[__n_rows, __n_cols];
         //reader.BaseStream.Position = stage_layout_reader_pos; // blocks reader at position somehow ?
-        for (int i=0;i < n_rows; i++)
+        for (int i=0;i < __n_rows; i++)
         {
             string line = reader.ReadLine();
             // if comments or break ( should not happen )
             while ( line.Contains("!") || line.Contains("#") )
                 line =  reader.ReadLine();
 
-            for (int j=0; j < n_cols ; j++ )
+            for (int j=0; j < __n_cols ; j++ )
             {
                 char cstage_id = line[j];
                 if ( cstage_id == '-' )
@@ -176,6 +176,73 @@ public class Level : MonoBehaviour
         }
 
         reader.Close();
+
+    }
+
+    private void initFromStaticDatas()
+    {
+        string[] level_poi = LEVEL_LAYOUTS.load_level_poi(level_id);
+        string[] level_stages = LEVEL_LAYOUTS.load_level_stages(level_id);
+        __n_rows = level_poi.Length;
+        if (__n_rows <= 0 )
+            return;
+        __n_cols = level_poi[0].Length;
+
+        __world_pois = new WORLD_POI[__n_rows,__n_cols];
+
+        for (int i=0;i < __n_rows; i++)
+        {
+            string line = level_poi[i];
+
+            // Build POI states
+            for (int j=0; j < __n_cols ; j++ )
+            {
+                char poi = line[j];
+                __world_pois[i,j] = (WORLD_POI)Enum.Parse( typeof(WORLD_POI), poi.ToString()); // in the given enum range or crash ?
+                if (__world_pois[i,j] == WORLD_POI.START_STAGE)
+                    __start_coord = new Tuple<int,int>(i,j);
+            }//! for j cols
+        }//! for i rows
+
+        // Build stage layout
+        __world_stage_layout = new int[__n_rows, __n_cols];
+        //reader.BaseStream.Position = stage_layout_reader_pos; // blocks reader at position somehow ?
+        for (int i=0;i < __n_rows; i++)
+        {
+            string line = level_stages[i];
+
+            for (int j=0; j < __n_cols ; j++ )
+            {
+                char cstage_id = line[j];
+                if ( cstage_id == '-' )
+                {
+                    __world_stage_layout[i,j] = -1;
+                    continue;
+                }
+
+                string hex_val = cstage_id.ToString();
+                int stage_id = Int32.Parse( hex_val, System.Globalization.NumberStyles.HexNumber );
+                __world_stage_layout[i,j] = stage_id;
+
+            }
+        }
+
+    }
+
+    public void init()
+    {
+        // Read lmevel file and build world_pois
+        string path = world_grid_file_path + world_grid_file_name_prefix
+                        + level_id + world_grid_file_ext;
+        StreamReader reader = new StreamReader(path);
+        //StreamReader reader = null;
+        if ( (reader == null) || (reader.Peek() < 0) )
+        {
+            initFromStaticDatas();
+        } else 
+        {
+            initFromFile(reader);
+        }
 
 
         if ( __start_coord == null )
@@ -196,7 +263,7 @@ public class Level : MonoBehaviour
         foreach( Stage s in lstages )
             __poi_locations.Add( s, s.gameObject.transform );
 
-        buildStageAndConnections( n_rows, n_cols);
+        buildStageAndConnections( __n_rows, __n_cols);
         // init level connectors
 
     }
