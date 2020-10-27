@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "level3.tmx",
+    "activeFile": "tuto3.tmx",
     "expandedProjectPaths": [
         "."
     ],
@@ -199,7 +199,10 @@
         "level8.tmx",
         "tuto0.tmx",
         "world0.tmx",
-        "tuto1.tmx"
+        "tuto1.tmx",
+        "tuto2.tmx",
+        "tuto3.tmx",
+        "tuto4.tmx"
     ],
     "project": "level_design.tiled-project",
     "recentFiles": [
@@ -207,14 +210,14 @@
         "level0.tmx",
         "level1.tmx",
         "level2.tmx",
-        "tuto1.tmx",
-        "world0.tmx",
-        "tuto0.tmx",
-        "level8.tmx",
-        "level7.tmx",
-        "level6.tmx",
+        "level3.tmx",
+        "level4.tmx",
         "level5.tmx",
-        "level4.tmx"
+        "level6.tmx",
+        "level7.tmx",
+        "level8.tmx",
+        "tuto0.tmx",
+        "world0.tmx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.type": 1
