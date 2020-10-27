@@ -9,6 +9,7 @@ public class SwitchTile : ActivatorObject
     public Sprite spriteSwitched;
     private List<GameObject> objectsOnSwitch = new List<GameObject>();
     public Sprite spriteNotSwitched;
+    public int SwitchTick = -1;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -21,19 +22,44 @@ public class SwitchTile : ActivatorObject
 
             GetComponentInChildren<AudioSource>().Play();
             isSwitched = true;
+            SwitchTick = GameObject.Find("GameLoop").GetComponent<WorldManager>().CurrentTick;
             SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
             if (!!sr)
                 sr.sprite = spriteSwitched;
         }
+
+        TryReset();
     }
 
     private void OnTriggerStay2D(Collider2D other)
     {
     }
 
+    public void TryReset()
+    {
+        int Tick = GameObject.Find("GameLoop").GetComponent<WorldManager>().CurrentTick;
+        if (Tick < SwitchTick) Reset();
+    }
+
+    public void Reset()
+    {
+        if (isSwitched)
+        {
+            foreach (ActivableObject ao in activableObjects)
+                ao.listen(signalKey, this, false);
+
+            isSwitched = false;
+
+            SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
+            if (!!sr)
+                sr.sprite = spriteNotSwitched;
+        }
+    }
+
     private void OnTriggerExit2D(Collider2D other)
     {
-        objectsOnSwitch.Remove(other.gameObject);
+        TryReset();
+       /* objectsOnSwitch.Remove(other.gameObject);
 
         // switch is reseted when going out of it
         // and nothing is on it anymore
@@ -47,7 +73,11 @@ public class SwitchTile : ActivatorObject
             SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
             if (!!sr)
                 sr.sprite = spriteNotSwitched;
-        }
+        } */
     }
 
+    void Update()
+    {
+        TryReset();
+    }
 }
