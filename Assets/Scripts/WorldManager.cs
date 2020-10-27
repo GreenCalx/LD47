@@ -11,7 +11,7 @@ public class WorldManager : MonoBehaviour
     // players
     // This is a shitty design as it is not easy to print the current timeline value while rewinding for instance
     // the problem is that is can be hard to have something work well in reverse wioth physics and shit
-    class Recorder
+    public class Recorder
     {
         public void Record(int Tick, GameObject Go, PlayerController.Direction D)
         {
@@ -81,21 +81,15 @@ public class WorldManager : MonoBehaviour
         List<List<GameObject>> GameObjects = new List<List<GameObject>>();
         List<List<PlayerController.Direction>> Directions = new List<List<PlayerController.Direction>>();
     }
-    Recorder Rewind = new Recorder();
-
-    List<GameObject> Players = new List<GameObject>();
-    public GameObject PlayerPrefab;
-    public GameObject levelUI_GOref;
 
 
+    // will be saved aka invariant
+    public Recorder Rewind = new Recorder();
+    public List<GameObject> Players = new List<GameObject>();
     public int CurrentTick = -1;
-    public float TickRate = 1f; // 2 seconds
-    float AutomaticReplayRate = 0.2f;
-    float AutomaticReplayCurrentTime = 0;
-    float CurrentTime = 0;
-
     public Vector2 StartPosition; //. First player will appear at this position
-
+    public float AutomaticReplayCurrentTime = 0;
+    public float CurrentTime = 0;
     public bool NeedTick; // When player has chose a direction
     public bool WaitForInput; // Playre is controlling so we wait for hi inputs
     public bool NeedReset;
@@ -103,6 +97,14 @@ public class WorldManager : MonoBehaviour
     public bool IsRewinding = false;
     public bool IsGoingBackward = true;
     public bool FixedUpdatePassed = false;
+
+    // will not be saved
+    public GameObject PlayerPrefab;
+    public GameObject levelUI_GOref;
+
+    public float TickRate = 1f; // 2 seconds
+    float AutomaticReplayRate = 0.2f;
+
 
 
     public MasterMixerControl MixerControl;
