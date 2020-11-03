@@ -14,7 +14,8 @@ public class PNJDialog : MonoBehaviour
     // UI to load to show dialog
     public GameObject dialogUI;
     // SFX dialog to play when talking
-    public AudioSource[] voices;
+    public AudioClip[] voices;
+    private AudioSource __audio_source; 
 
 
     private bool __is_talkable;
@@ -30,6 +31,8 @@ public class PNJDialog : MonoBehaviour
         __is_talkable       = false;
         __dialog_ongoing    = false;
         __dialog = DialogBank.load(dialog_id);
+
+        __audio_source = GetComponent<AudioSource>();
 
     }
 
@@ -87,7 +90,8 @@ public class PNJDialog : MonoBehaviour
         {
             var rand = new System.Random();
             int voice_to_play = rand.Next(0, voices.Length);
-            voices[voice_to_play].Play();
+            __audio_source.clip = voices[voice_to_play];
+            __audio_source.Play();
         }
     }
 

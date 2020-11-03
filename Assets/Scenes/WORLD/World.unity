@@ -4622,22 +4622,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 5642974757270376324, guid: 8d903503012a7d541ac0e8b48a744365,
-        type: 3}
-      propertyPath: voices.Array.size
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5642974757270376324, guid: 8d903503012a7d541ac0e8b48a744365,
-        type: 3}
-      propertyPath: dialogUI
-      value: 
-      objectReference: {fileID: 2319097700563430046, guid: 5ee8cfdcaf1f01e419fdc1df53fb7fc4,
-        type: 3}
-    - target: {fileID: 5642974757270376324, guid: 8d903503012a7d541ac0e8b48a744365,
-        type: 3}
-      propertyPath: npc_name
-      value: PSU_DUDE
-      objectReference: {fileID: 0}
     - target: {fileID: 5642974757270376325, guid: 8d903503012a7d541ac0e8b48a744365,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -4697,16 +4681,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: talkable_npc
-      objectReference: {fileID: 0}
-    - target: {fileID: 8018668884118338737, guid: 8d903503012a7d541ac0e8b48a744365,
-        type: 3}
-      propertyPath: m_Offset.y
-      value: -1.328687
-      objectReference: {fileID: 0}
-    - target: {fileID: 8018668884118338737, guid: 8d903503012a7d541ac0e8b48a744365,
-        type: 3}
-      propertyPath: m_Size.y
-      value: 0.8773713
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8d903503012a7d541ac0e8b48a744365, type: 3}
