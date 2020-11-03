@@ -3,6 +3,8 @@ using System;
 public static class LevelProgress
 {
 
+    public static readonly bool DEBUG_ACTIVATE_ALL = false;
+
     // Number of stages per Level
     public static readonly int[] n_stages_per_level = { 9, 10 };
     public static bool[] arrLevel0;
@@ -15,6 +17,12 @@ public static class LevelProgress
         arrLevel1 = new bool[n_stages_per_level[1]];
 
         //etc..
+
+        if ( DEBUG_ACTIVATE_ALL )
+        {
+            for (int i = 0; i < arrLevel0.Length; i++ )
+                arrLevel0[i] = true;
+        }
     }
 
     public static void completeStage( int levelID, int stageID)

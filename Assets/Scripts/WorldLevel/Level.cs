@@ -241,7 +241,6 @@ public class Level : MonoBehaviour
         //else
         //    initFromFile(reader);
 
-
         if ( __start_coord == null )
         {
             __start_coord = new Tuple<int,int>(0,0); // default start..
