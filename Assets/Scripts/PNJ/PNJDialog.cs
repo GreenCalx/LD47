@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class PNJDialog : MonoBehaviour
 {
-
     // ID of the dialog to load ( cf. DialogBank )
     public int dialog_id;
     // name to display in the dialog UI header
