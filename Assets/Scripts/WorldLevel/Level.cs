@@ -8,7 +8,6 @@ using System.Linq;
 public class Level : MonoBehaviour
 {
     public GameObject go_stage_selector;
-    //public readonly int[,] world_grid; // useless ? not used
 
     public enum WORLD_POI
     {
@@ -24,6 +23,9 @@ public class Level : MonoBehaviour
     // List of loaded stages for this level
     [HideInInspector]
     public List<Stage> lstages;
+    [HideInInspector]
+    public List<LConnector> lLConnectors;
+
 
     // level_id is level's level ( level 0, level 1, etc.. ) 
     public int level_id = 0;
@@ -34,9 +36,12 @@ public class Level : MonoBehaviour
     private const string webgl_alt_path = "LevelPOIGrids/LEVEL";
 
 
-    private Dictionary<Stage, Transform> __poi_locations;
+    private Dictionary<POI, Transform>   __poi_locations;
     private WORLD_POI[,]                 __world_pois;
     private int[,]                       __world_stage_layout;
+    private int[,]                       __world_lconn_layout;
+
+
     private Tuple<int , int>             __start_coord;
     private StageSelector                __stage_selector;
     private int                          __n_rows = 0;
@@ -181,15 +186,17 @@ public class Level : MonoBehaviour
 
     private void initFromStaticDatas()
     {
-        string[] level_poi = LEVEL_LAYOUTS.load_level_poi(level_id);
-        string[] level_stages = LEVEL_LAYOUTS.load_level_stages(level_id);
+        string[] level_poi      = LEVEL_LAYOUTS.load_level_poi(level_id);
+        string[] level_stages   = LEVEL_LAYOUTS.load_level_stages(level_id);
+        string[] level_lconn    = LEVEL_LAYOUTS.load_level_lconnectors(level_id);
         __n_rows = level_poi.Length;
         if (__n_rows <= 0 )
             return;
         __n_cols = level_poi[0].Length;
 
+        // TODO : Factorize those 3 loops in 1
+        // Build world POIs
         __world_pois = new WORLD_POI[__n_rows,__n_cols];
-
         for (int i=0;i < __n_rows; i++)
         {
             string line = level_poi[i];
@@ -206,7 +213,6 @@ public class Level : MonoBehaviour
 
         // Build stage layout
         __world_stage_layout = new int[__n_rows, __n_cols];
-        //reader.BaseStream.Position = stage_layout_reader_pos; // blocks reader at position somehow ?
         for (int i=0;i < __n_rows; i++)
         {
             string line = level_stages[i];
@@ -223,6 +229,28 @@ public class Level : MonoBehaviour
                 string hex_val = cstage_id.ToString();
                 int stage_id = Int32.Parse( hex_val, System.Globalization.NumberStyles.HexNumber );
                 __world_stage_layout[i,j] = stage_id;
+
+            }
+        }
+
+        // Build level connectors layout
+        __world_lconn_layout = new int[__n_rows, __n_cols];
+        for (int i=0;i < __n_rows; i++)
+        {
+            string line = level_lconn[i];
+
+            for (int j=0; j < __n_cols ; j++ )
+            {
+                char cstage_id = line[j];
+                if ( cstage_id == '-' )
+                {
+                    __world_lconn_layout[i,j] = -1;
+                    continue;
+                }
+
+                string hex_val = cstage_id.ToString();
+                int lconn_id = Int32.Parse( hex_val, System.Globalization.NumberStyles.HexNumber );
+                __world_lconn_layout[i,j] = lconn_id;
 
             }
         }
@@ -248,6 +276,8 @@ public class Level : MonoBehaviour
         }
 
         // INIT internals structs with __world_pois
+        __poi_locations = new Dictionary<POI, Transform>(0);
+
         // init stages
         Stage[] stages = GetComponentsInChildren<Stage>();
         if (stages.Length == 0)
@@ -255,12 +285,19 @@ public class Level : MonoBehaviour
         lstages = stages.ToList();
         lstages.Sort(compareStage);
         // Get locations
-        __poi_locations = new Dictionary<Stage, Transform>(0);
         foreach( Stage s in lstages )
             __poi_locations.Add( s, s.gameObject.transform );
 
-        buildStageAndConnections( __n_rows, __n_cols);
         // init level connectors
+        LConnector[] lconnectors = GetComponentsInChildren<LConnector>();
+        if (lconnectors.Length == 0)
+            return; // must have at least a 'from' lConnector if not level0 (which has a level1 connector)
+        lLConnectors = lconnectors.ToList();
+        foreach( LConnector lc in lLConnectors)
+            __poi_locations.Add( lc, lc.gameObject.transform);
+
+        // Build connections
+        buildStageAndConnections( __n_rows, __n_cols);
 
     }
 
@@ -308,9 +345,19 @@ public class Level : MonoBehaviour
                         {
                             paths.Add(Tuple.Create(row, col));
                         }
-
                     }
                     // Connectors can connect diagonally
+                    // Only one connector path with a target workds
+                    if (poiIsConnector(poi))
+                    {
+                        POI.DIRECTIONS direction = POI.getDirection(j, i);
+                        POI conn_target = findConnectorTarget( row, col, curr_path.Item1, curr_path.Item2, row_boundary, col_boundary ); 
+                        if (conn_target == null)
+                            continue;
+                        bool op_succ = curr_stage.connectTo( conn_target, direction);
+                        if (!op_succ)
+                            Debug.Log(" FAILED TO CONNECT LEVEL ");
+                    }
                     
 
                 }//! for j cols
@@ -319,7 +366,56 @@ public class Level : MonoBehaviour
 
     }
 
+    private POI findConnectorTarget( int conn_x, int conn_y, int from_x, int from_y, int row_boundary, int col_boundary)
+    {
+        POI target = null;
+        for (int i = -1; i <= 1; i++)
+        {
+            for ( int j = -1; j <= 1; j++)
+            {
+                int row = conn_x + i;
+                int col = conn_y + j;
 
+                if ( (i == 0) && ( j == 0) )
+                    continue; // identity
+                if ( (from_x == row) && ( from_y == col) )
+                    continue; // loop detected
+                if ( (row < 0) || (col < 0) ) // OOB
+                        continue;
+                if ( (row >= row_boundary) || (col >= col_boundary) ) // OOB
+                        continue;
+
+                WORLD_POI poi =  __world_pois[row, col];
+                if ( poiIsConnectorTarget(poi) )
+                {
+                    if ( poiIsStage(poi) )
+                    {
+                        int stage_id = __world_stage_layout[row,col];
+                        target = lstages[stage_id];
+                    } else // LConnector
+                    {
+                        int level_to_connect = __world_lconn_layout[row,col];
+                        foreach ( LConnector lc in lLConnectors)
+                        {
+                            if ( lc.level_target == level_to_connect)
+                            {
+                                target = lc;
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                }
+
+                if ( poiIsConnector(poi) )
+                    return findConnectorTarget( row, col, conn_x, conn_y, row_boundary, col_boundary);
+            }
+            if (target != null)
+                break;
+        }
+
+        return target;    
+    }
 
     private bool poiIsStage( WORLD_POI iPOI )
     {
@@ -331,10 +427,12 @@ public class Level : MonoBehaviour
 
     private bool poiIsConnector( WORLD_POI iPOI )
     {
-        return ((iPOI==WORLD_POI.CONNECTOR) ||
-                (iPOI==WORLD_POI.LEVEL_CONNECTOR) );
+        return (iPOI==WORLD_POI.CONNECTOR);
     }
-
-    // Update is called once per frame
+    
+    private bool poiIsConnectorTarget( WORLD_POI iPOI )
+    {
+        return ( (iPOI==WORLD_POI.LEVEL_CONNECTOR) || poiIsStage(iPOI) );
+    }
 
 }

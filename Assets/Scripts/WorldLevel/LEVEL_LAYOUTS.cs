@@ -9,7 +9,7 @@ public static class LEVEL_LAYOUTS
     {
     "056500",
     "010100",
-    "611116",
+    "011110",
     "001000",
     "004000",
     }; 
@@ -21,6 +21,14 @@ public static class LEVEL_LAYOUTS
     "--1---",
     "--0---"
     }; 
+    public static readonly string[] level0_LCONNECTORS=
+    {
+    "--1---",
+    "------",
+    "------",
+    "------",
+    "------"
+    }; 
 
     public static string[] load_level_poi(int id)
     {
@@ -29,6 +37,10 @@ public static class LEVEL_LAYOUTS
     public static string[] load_level_stages(int id)
     {
         return level0_STAGES;
+    }
+    public static string[] load_level_lconnectors(int id)
+    {
+        return level0_LCONNECTORS;
     }
 
 

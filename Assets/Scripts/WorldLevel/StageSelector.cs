@@ -6,6 +6,10 @@ public class StageSelector : MonoBehaviour
 {
     [HideInInspector]
     public Stage selected_stage;
+    [HideInInspector]
+    public POI selected_poi;
+    [HideInInspector]
+    public LConnector selected_lconn;
     
     private bool is_init = false;
 
@@ -17,7 +21,8 @@ public class StageSelector : MonoBehaviour
 
     public void init( Stage iStartingStage )
     {
-        selected_stage = iStartingStage;
+        selected_stage  = iStartingStage;
+        selected_poi    = iStartingStage;
         is_init = true;
     }
 
@@ -37,25 +42,41 @@ public class StageSelector : MonoBehaviour
         {
             POI neighbor = null;
             if (up)
-                neighbor = selected_stage.tryNeighbor(POI.DIRECTIONS.UP);
+                neighbor = selected_poi.tryNeighbor(POI.DIRECTIONS.UP);
             else if (down)
-                neighbor = selected_stage.tryNeighbor(POI.DIRECTIONS.DOWN);
+                neighbor = selected_poi.tryNeighbor(POI.DIRECTIONS.DOWN);
             else if (left)
-                neighbor = selected_stage.tryNeighbor(POI.DIRECTIONS.LEFT);
+                neighbor = selected_poi.tryNeighbor(POI.DIRECTIONS.LEFT);
             else if (right)
-                neighbor = selected_stage.tryNeighbor(POI.DIRECTIONS.RIGHT);
+                neighbor = selected_poi.tryNeighbor(POI.DIRECTIONS.RIGHT);
             
             if ( neighbor!=null )
             {
-                Stage neighbor_stage = (Stage)neighbor;
-                if ( neighbor_stage.isUnlocked() )
+                if ( neighbor is Stage )
                 {
-                    selected_stage = neighbor_stage;
-                    moveTo( neighbor.gameObject.transform );
-                } else {
-                    // play SFX or send feedback that stage is currently locked.
-                    Debug.Log("Targeted neighbor stage is locked. Complete current stage before moving on.");
+                    Stage neighbor_stage = (Stage)neighbor;
+                    if ( neighbor_stage.isUnlocked() )
+                    {
+                        selected_stage = neighbor_stage;
+                        selected_poi = neighbor;
+                        moveTo( neighbor.gameObject.transform );
+                    } else {
+                        // play SFX or send feedback that stage is currently locked.
+                        Debug.Log("Targeted neighbor stage is locked. Complete current stage before moving on.");
+                    }
+                } else if ( neighbor is LConnector )
+                {
+                    // check selected stage is done
+                    if ( selected_stage.isDone() )
+                    {
+                        selected_poi = neighbor;
+                        selected_stage = null;
+                        selected_lconn = (LConnector)neighbor;
+                        moveTo( neighbor.gameObject.transform );
+                    }
+
                 }
+
                     
 
             }
@@ -64,6 +85,8 @@ public class StageSelector : MonoBehaviour
         {
             if (!!selected_stage)
                 selected_stage.Load();
+            else if (!!selected_poi)
+                selected_lconn.Load();
             else
                 Debug.Log("FAILED TO LOAD LEVEL SCENE. NO SELECTED STAGE.");
         }

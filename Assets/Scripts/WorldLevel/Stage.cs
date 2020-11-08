@@ -93,6 +93,11 @@ public class Stage : POI
         }
     }
 
+    public bool isDone()
+    {
+        return ( __completion_status == COMPLETION.DONE);
+    }
+
     public bool isUnlocked()
     {
         return (__completion_status!=COMPLETION.LOCKED);
@@ -108,8 +113,11 @@ public class Stage : POI
     {
         foreach (Tuple<POI,POI.DIRECTIONS> neighbor in neighbors)
         {
-            Stage neighbor_stage = (Stage) neighbor.Item1;
-            neighbor_stage.tryUnlock();
+            if ( neighbor.Item1 is Stage)
+            {
+                Stage neighbor_stage = (Stage) neighbor.Item1;
+                neighbor_stage.tryUnlock();
+            }
         }
     }
 }

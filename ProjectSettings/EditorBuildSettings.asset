@@ -72,6 +72,6 @@ EditorBuildSettings:
     path: Assets/Scenes/WORLD/LEVEL0/LEVEL0STAGE8.unity
     guid: 994fb6f981648254f92fffc5fd9c32d2
   - enabled: 1
-    path: Assets/Scenes/WORLD/World.unity
+    path: Assets/Scenes/WORLD/World0.unity
     guid: 51d121d16b6d37840a8ee94b8cb30772
   m_configObjects: {}
