@@ -42,10 +42,10 @@ public class PNJDialog : MonoBehaviour
         {
             talk(); 
         }
-        if ( __dialog_ongoing && Input.GetKeyDown(KeyCode.Escape) )
+        else if ( __dialog_ongoing && Input.GetKeyDown(KeyCode.Escape) )
         {
             end_dialog();
-        }
+        } 
 
     }
 
@@ -77,15 +77,21 @@ public class PNJDialog : MonoBehaviour
             __curr_dialog_index = 0;
         }
 
-        if (__curr_dialog_index >= __dialog.Length )
-            end_dialog();
+        if (__loaded_dialog_ui == null)
+            return;
 
-        if (!!__loaded_dialog_ui)
+        if ( !__loaded_dialog_ui.message_is_displayed() )
+            __loaded_dialog_ui.force_display();
+        else
+        {
+            if (__curr_dialog_index >= __dialog.Length )
+                end_dialog();
+
             __loaded_dialog_ui.display( npc_name, __dialog[__curr_dialog_index] );
-        
-        playVoice();
+            playVoice(); 
+            __curr_dialog_index++;
+        }
 
-        __curr_dialog_index++;
     }
 
     private void playVoice()

@@ -48,6 +48,17 @@ public class UIDialog : MonoBehaviour
         }
     }
 
+    public void force_display()
+    {
+        __message.text      = __msg_to_display;
+        __curr_msg_index    = __msg_size;
+    }
+
+    public bool message_is_displayed()
+    {
+        return (__curr_msg_index >= __msg_size);
+    } 
+
     public void display( string iHeader, string iText )
     {
         if (!!__header)
