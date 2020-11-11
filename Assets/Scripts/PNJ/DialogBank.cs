@@ -11,7 +11,8 @@ public static class DialogBank
     "Time goes weird in this place",
     "My job is to welcome new data like you",
     "You need ",
-    "004000",
+    "Can you read this very very very very very very very very very very very long stream of string",
+    "Or can you read this very very very very very very very very very very very VEEEEEEEEEEEEERY very very very long stream of string"
     };
 
 

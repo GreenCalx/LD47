@@ -85,7 +85,8 @@ public class ExitTile : MonoBehaviour
             SceneManager.LoadScene( END_SCENE, LoadSceneMode.Single);
         }
         //string scene_to_load = LEVEL_NAME_PREFIX + ( current_level_exit_index + 1 ) ;
-        SceneManager.LoadScene( "World", LoadSceneMode.Single);
+        string world_to_load = "World"+__level_id;
+        SceneManager.LoadScene( world_to_load, LoadSceneMode.Single);
     }
 
     private void registerProgress()

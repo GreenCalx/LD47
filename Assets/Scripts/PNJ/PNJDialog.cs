@@ -42,6 +42,11 @@ public class PNJDialog : MonoBehaviour
         {
             talk(); 
         }
+        if ( __dialog_ongoing && Input.GetKeyDown(KeyCode.Escape) )
+        {
+            end_dialog();
+        }
+
     }
 
     private void OnTriggerEnter2D(Collider2D other)

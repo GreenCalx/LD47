@@ -5,7 +5,10 @@ using UnityEngine.SceneManagement;
 
 public class SceneReseter : MonoBehaviour
 {
-        public string scene_to_load;
+    
+    public string scene_to_load;
+    public int    current_world;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -21,7 +24,8 @@ public class SceneReseter : MonoBehaviour
         }
         if ( Input.GetKeyDown(KeyCode.Escape) )
         {
-            SceneManager.LoadScene( "World", LoadSceneMode.Single);
+            string curr_world = "World" + current_world;
+            SceneManager.LoadScene( curr_world, LoadSceneMode.Single);
         }
     }
-}
+}                                                                                                                                                                                                                                                                                                                                                                                                                                               
