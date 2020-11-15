@@ -21,6 +21,10 @@ public class Stage : POI
 
     [HideInInspector]
     public int id;
+
+    [HideInInspector]
+    public bool isStartingStage = false;
+
     private COMPLETION __completion_status;
     private SpriteRenderer __sr;
 
@@ -71,6 +75,8 @@ public class Stage : POI
 
     public void updateCompletion( Level.WORLD_POI iStagePOI )
     {
+        isStartingStage = ( iStagePOI == Level.WORLD_POI.START_STAGE );
+
         if ( iStagePOI == Level.WORLD_POI.LOCKED_STAGE )
             __completion_status = COMPLETION.LOCKED;
         else if ( (iStagePOI==Level.WORLD_POI.START_STAGE) || (iStagePOI==Level.WORLD_POI.UNLOCKED_STAGE) )

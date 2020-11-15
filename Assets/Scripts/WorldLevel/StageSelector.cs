@@ -67,7 +67,7 @@ public class StageSelector : MonoBehaviour
                 } else if ( neighbor is LConnector )
                 {
                     // check selected stage is done
-                    if ( selected_stage.isDone() )
+                    if ( selected_stage.isDone() || selected_stage.isStartingStage  )
                     {
                         selected_poi = neighbor;
                         selected_stage = null;

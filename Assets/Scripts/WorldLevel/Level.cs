@@ -109,81 +109,6 @@ public class Level : MonoBehaviour
 
     }
 
-    private void initFromFile(StreamReader reader)
-    {
-        __n_rows = 0;
-        __n_cols = 0;
-        long stage_layout_reader_pos = -1;
-        while (reader.Peek() >= 0)
-        {
-            string line = reader.ReadLine();
-            if ( line.Contains("!") )
-                continue;
-            if ( line.Contains("#") )
-            {
-                if (  reader.Peek() < 0 )
-                    break; 
-                reader.ReadLine(); // line break we discard val
-                stage_layout_reader_pos = reader.BaseStream.Position; 
-                break;
-            } else {
-                __n_cols = line.Length;
-                __n_rows++;
-            }
-
-        }
-        __world_pois = new WORLD_POI[__n_rows,__n_cols];
-        reader.BaseStream.Position = 0;
-        reader.DiscardBufferedData();
-        for (int i=0;i < __n_rows; i++)
-        {
-            string line = reader.ReadLine();
-            // if comments ( should not happen )
-            while ( line.Contains("!") ) 
-                reader.ReadLine();
-            if ( line.Contains("#") )
-                break; // reached stage layout ( should not happen )
-
-            // Build POI states
-            for (int j=0; j < __n_cols ; j++ )
-            {
-                char poi = line[j];
-                __world_pois[i,j] = (WORLD_POI)Enum.Parse( typeof(WORLD_POI), poi.ToString()); // in the given enum range or crash ?
-                if (__world_pois[i,j] == WORLD_POI.START_STAGE)
-                    __start_coord = new Tuple<int,int>(i,j);
-            }//! for j cols
-        }//! for i rows
-
-        // Build stage layout
-        __world_stage_layout = new int[__n_rows, __n_cols];
-        //reader.BaseStream.Position = stage_layout_reader_pos; // blocks reader at position somehow ?
-        for (int i=0;i < __n_rows; i++)
-        {
-            string line = reader.ReadLine();
-            // if comments or break ( should not happen )
-            while ( line.Contains("!") || line.Contains("#") )
-                line =  reader.ReadLine();
-
-            for (int j=0; j < __n_cols ; j++ )
-            {
-                char cstage_id = line[j];
-                if ( cstage_id == '-' )
-                {
-                    __world_stage_layout[i,j] = -1;
-                    continue;
-                }
-
-                string hex_val = cstage_id.ToString();
-                int stage_id = Int32.Parse( hex_val, System.Globalization.NumberStyles.HexNumber );
-                __world_stage_layout[i,j] = stage_id;
-
-            }
-        }
-
-        reader.Close();
-
-    }
-
     private void initFromStaticDatas()
     {
         string[] level_poi      = LEVEL_LAYOUTS.load_level_poi(level_id);
@@ -262,12 +187,8 @@ public class Level : MonoBehaviour
         // Read lmevel file and build world_pois
         string path = world_grid_file_path + world_grid_file_name_prefix
                         + level_id + world_grid_file_ext;
-        //StreamReader reader = new StreamReader(path);
-        //StreamReader reader = null;
-        //if (Application.platform == RuntimePlatform.WebGLPlayer)
-            initFromStaticDatas();
-        //else
-        //    initFromFile(reader);
+
+        initFromStaticDatas();
 
         if ( __start_coord == null )
         {
@@ -298,7 +219,6 @@ public class Level : MonoBehaviour
 
         // Build connections
         buildStageAndConnections( __n_rows, __n_cols);
-
     }
 
     private void buildStageAndConnections( int row_boundary, int col_boundary)
@@ -346,6 +266,31 @@ public class Level : MonoBehaviour
                             paths.Add(Tuple.Create(row, col));
                         }
                     }
+
+                    // POI is a Lconnector, same connectablility than stages
+                    if ( poiIsLevelConnector(poi) && stage_is_reachable )
+                    {
+                        int level_id = __world_lconn_layout[row, col];
+                        Debug.Log(" Connect level " + level_id);
+
+                        POI.DIRECTIONS direction = POI.getDirection(j, i);
+                        POI target = null;
+                        foreach ( LConnector lc in lLConnectors)
+                        {
+                            if ( lc.level_target == level_id)
+                            {
+                                target = lc;
+                                break;
+                            }
+                        }
+                        bool op_succ = curr_stage.connectTo( target, direction);
+                        if (!op_succ)
+                            Debug.Log(" FAILED TO CONNECT LEVEL " + level_id);
+                        else
+                            Debug.Log(" SUCCESS TO CONNECT LEVEL " + level_id + " to stage " + curr_stage.id);
+
+                    }
+
                     // Connectors can connect diagonally
                     // Only one connector path with a target workds
                     if (poiIsConnector(poi))
@@ -433,6 +378,11 @@ public class Level : MonoBehaviour
     private bool poiIsConnectorTarget( WORLD_POI iPOI )
     {
         return ( (iPOI==WORLD_POI.LEVEL_CONNECTOR) || poiIsStage(iPOI) );
+    }
+
+    private bool poiIsLevelConnector( WORLD_POI iPOI )
+    {
+        return (iPOI==WORLD_POI.LEVEL_CONNECTOR);
     }
 
 }
