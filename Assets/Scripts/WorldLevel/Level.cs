@@ -100,10 +100,15 @@ public class Level : MonoBehaviour
             __stage_selector = go_stage_selector.GetComponent<StageSelector>();
             if (!!__stage_selector)
             {
-                if (InterSceneCache.world_from == InterSceneCache.UNDEFINED)
+                if ( (InterSceneCache.world_from == InterSceneCache.UNDEFINED) &&
+                     (InterSceneCache.stage_from == InterSceneCache.UNDEFINED) )
                     __stage_selector.init( level_id, lstages[0]); // default at stage 0
+                else if ( InterSceneCache.stage_from != InterSceneCache.UNDEFINED )
+                { // from stage
+                    __stage_selector.init( level_id, lstages[InterSceneCache.stage_from]);
+                }
                 else
-                {
+                { // from other world
                     foreach( LConnector lcon in lLConnectors )
                     {
                         if ( lcon.level_target == InterSceneCache.world_from )

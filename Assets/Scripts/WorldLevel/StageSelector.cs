@@ -96,10 +96,15 @@ public class StageSelector : MonoBehaviour
         else if ( enter )
         {
             if (!!selected_stage)
+            {
+                InterSceneCache.stage_from = selected_stage.id;
+                InterSceneCache.world_from = level_id;
                 selected_stage.Load();
+            }
             else if (!!selected_poi && !!selected_lconn)
             {
                 InterSceneCache.world_from = level_id;
+                InterSceneCache.stage_from = InterSceneCache.UNDEFINED;
                 selected_lconn.Load();
             }
             else
