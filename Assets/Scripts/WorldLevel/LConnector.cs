@@ -8,7 +8,6 @@ public class LConnector : POI
 {
     private readonly string prefix = "World";
 
-    // 
     public int level_target;
 
     // Start is called before the first frame update

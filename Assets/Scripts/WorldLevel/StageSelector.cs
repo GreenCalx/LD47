@@ -11,6 +11,7 @@ public class StageSelector : MonoBehaviour
     [HideInInspector]
     public LConnector selected_lconn;
     
+    private int level_id;
     private bool is_init = false;
 
     // Start is called before the first frame update
@@ -19,10 +20,21 @@ public class StageSelector : MonoBehaviour
         
     }
 
-    public void init( Stage iStartingStage )
+    public void init( int iLevelID, Stage iStartingStage )
     {
         selected_stage  = iStartingStage;
         selected_poi    = iStartingStage;
+        level_id        = iLevelID;
+        selected_lconn  = null;
+        is_init = true;
+    }
+
+    public void init( int iLevelID, LConnector iStartingLevelConnector )
+    {
+        selected_lconn  = iStartingLevelConnector;
+        selected_poi    = iStartingLevelConnector;
+        selected_stage  = null;
+        level_id        = iLevelID;
         is_init = true;
     }
 
@@ -85,8 +97,11 @@ public class StageSelector : MonoBehaviour
         {
             if (!!selected_stage)
                 selected_stage.Load();
-            else if (!!selected_poi)
+            else if (!!selected_poi && !!selected_lconn)
+            {
+                InterSceneCache.world_from = level_id;
                 selected_lconn.Load();
+            }
             else
                 Debug.Log("FAILED TO LOAD LEVEL SCENE. NO SELECTED STAGE.");
         }
@@ -97,4 +112,5 @@ public class StageSelector : MonoBehaviour
     {
         gameObject.transform.position = iDestination.position;
     }
+
 }

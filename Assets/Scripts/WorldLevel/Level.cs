@@ -100,9 +100,22 @@ public class Level : MonoBehaviour
             __stage_selector = go_stage_selector.GetComponent<StageSelector>();
             if (!!__stage_selector)
             {
-                __stage_selector.init(lstages[0]); // default at stage 0
-                Transform t_destination = __poi_locations[__stage_selector.selected_stage];
-                __stage_selector.moveTo(t_destination);    
+                if (InterSceneCache.world_from == InterSceneCache.UNDEFINED)
+                    __stage_selector.init( level_id, lstages[0]); // default at stage 0
+                else
+                {
+                    foreach( LConnector lcon in lLConnectors )
+                    {
+                        if ( lcon.level_target == InterSceneCache.world_from )
+                        {
+                            __stage_selector.init( level_id, lcon );
+                            break;
+                        }
+                    }
+                }
+
+                Transform t_destination = __poi_locations[__stage_selector.selected_poi];
+                __stage_selector.moveTo(t_destination);
             }
             
         }
@@ -288,7 +301,6 @@ public class Level : MonoBehaviour
                             Debug.Log(" FAILED TO CONNECT LEVEL " + level_id);
                         else
                             Debug.Log(" SUCCESS TO CONNECT LEVEL " + level_id + " to stage " + curr_stage.id);
-
                     }
 
                     // Connectors can connect diagonally
