@@ -112,6 +112,11 @@ public class POI : MonoBehaviour
       neighbors.Add( Tuple.Create(otherPOI, iDirection) );
     }
 
+    public void oneWayRevertConnectTo( POI otherPOI, POI.DIRECTIONS iDirection)
+    {
+      neighbors.Add( Tuple.Create(otherPOI, revertDirection(iDirection) ) );
+    }
+
     private POI.DIRECTIONS revertDirection( POI.DIRECTIONS iDirection)
     {
       if ( iDirection == POI.DIRECTIONS.UP ) return POI.DIRECTIONS.DOWN;

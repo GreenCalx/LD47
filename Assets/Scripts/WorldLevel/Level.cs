@@ -313,12 +313,18 @@ public class Level : MonoBehaviour
                     if (poiIsConnector(poi))
                     {
                         POI.DIRECTIONS direction = POI.getDirection(j, i);
-                        POI conn_target = findConnectorTarget( row, col, curr_path.Item1, curr_path.Item2, row_boundary, col_boundary ); 
+                        Tuple<POI, POI.DIRECTIONS> conn_target = findConnectorTarget( row, col, curr_path.Item1, curr_path.Item2, row_boundary, col_boundary ); 
                         if (conn_target == null)
                             continue;
-                        bool op_succ = curr_stage.connectTo( conn_target, direction);
-                        if (!op_succ)
-                            Debug.Log(" FAILED TO CONNECT LEVEL ");
+
+                        // We can use oneWayConnectTo if we want to be really precise
+                        // But i find it better if we have more option to crawl through the world
+                        // TBD by using it more if we change design and revert it to oneWayConnectTo.
+                        curr_stage.connectTo( conn_target.Item1, direction);
+
+                        // The revert connect use the direction from the connector path target to the last
+                        // connector of the path. We need to revert this direction thus oneWayRevertConnectTo.
+                        conn_target.Item1.oneWayRevertConnectTo( curr_stage, conn_target.Item2);
                     }
                     
 
@@ -328,9 +334,10 @@ public class Level : MonoBehaviour
 
     }
 
-    private POI findConnectorTarget( int conn_x, int conn_y, int from_x, int from_y, int row_boundary, int col_boundary)
+    // Returns the POI and the last direction to reach it from the last connector of the path
+    private Tuple<POI, POI.DIRECTIONS> findConnectorTarget( int conn_x, int conn_y, int from_x, int from_y, int row_boundary, int col_boundary)
     {
-        POI target = null;
+        Tuple<POI, POI.DIRECTIONS> target = null;
         for (int i = -1; i <= 1; i++)
         {
             for ( int j = -1; j <= 1; j++)
@@ -353,7 +360,7 @@ public class Level : MonoBehaviour
                     if ( poiIsStage(poi) )
                     {
                         int stage_id = __world_stage_layout[row,col];
-                        target = lstages[stage_id];
+                        target = Tuple.Create( (POI)lstages[stage_id], POI.getDirection(j, i));
                     } else // LConnector
                     {
                         int level_to_connect = __world_lconn_layout[row,col];
@@ -361,7 +368,7 @@ public class Level : MonoBehaviour
                         {
                             if ( lc.level_target == level_to_connect)
                             {
-                                target = lc;
+                                target = Tuple.Create( (POI)lc, POI.getDirection(j, i));
                                 break;
                             }
                         }
