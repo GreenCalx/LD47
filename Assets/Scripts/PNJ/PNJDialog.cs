@@ -81,6 +81,7 @@ public class PNJDialog : MonoBehaviour
             GameObject ui_go = Instantiate(dialogUI);
             __loaded_dialog_ui  = ui_go.GetComponent<UIDialog>();
             __curr_dialog_index = 0;
+            __talk_bubble.setIsTalking(true);
         }
 
         if (__loaded_dialog_ui == null)
@@ -98,7 +99,10 @@ public class PNJDialog : MonoBehaviour
             else 
             {
                 if (__curr_dialog_index >= __dialog.Length )
+                {
                     end_dialog();
+                    return;
+                }
             
                 __loaded_dialog_ui.display( npc_name, __dialog[__curr_dialog_index] );
                 playVoice(); 
@@ -125,6 +129,7 @@ public class PNJDialog : MonoBehaviour
         __dialog_ongoing = false;
         Destroy(__loaded_dialog_ui.gameObject);
         __curr_dialog_index  = 0;
+        __talk_bubble.setIsTalking(false);
     }
 
 }

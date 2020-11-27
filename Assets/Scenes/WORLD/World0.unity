@@ -168,6 +168,7 @@ MonoBehaviour:
   level_to_load: 0
   stage_to_load: 1
   id: 0
+  isStartingStage: 0
 --- !u!212 &58903303
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -266,6 +267,7 @@ MonoBehaviour:
   level_to_load: 0
   stage_to_load: 2
   id: 0
+  isStartingStage: 0
 --- !u!212 &131980966
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -430,6 +432,7 @@ MonoBehaviour:
   level_to_load: 0
   stage_to_load: 5
   id: 0
+  isStartingStage: 0
 --- !u!212 &221234247
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -734,6 +737,7 @@ MonoBehaviour:
   level_to_load: 0
   stage_to_load: 3
   id: 0
+  isStartingStage: 0
 --- !u!212 &458866010
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -831,6 +835,7 @@ MonoBehaviour:
   level_to_load: 0
   stage_to_load: 6
   id: 0
+  isStartingStage: 0
 --- !u!212 &765624079
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1171,6 +1176,7 @@ MonoBehaviour:
   level_to_load: 0
   stage_to_load: 0
   id: 0
+  isStartingStage: 0
 --- !u!212 &1145719908
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -4374,6 +4380,7 @@ MonoBehaviour:
   level_to_load: 0
   stage_to_load: 4
   id: 0
+  isStartingStage: 0
 --- !u!212 &1783284681
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -4541,6 +4548,7 @@ MonoBehaviour:
   level_to_load: 0
   stage_to_load: 7
   id: 0
+  isStartingStage: 0
 --- !u!212 &2055567882
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -4732,6 +4740,32 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: talkable_npc
+      objectReference: {fileID: 0}
+    - target: {fileID: 8325248421914903765, guid: 8d903503012a7d541ac0e8b48a744365,
+        type: 3}
+      propertyPath: is_talking_sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: c9df649fe6bc1314cba5a0d00db3c947,
+        type: 3}
+    - target: {fileID: 8771708732302040970, guid: 8d903503012a7d541ac0e8b48a744365,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.348
+      objectReference: {fileID: 0}
+    - target: {fileID: 8771708732302040970, guid: 8d903503012a7d541ac0e8b48a744365,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.69513124
+      objectReference: {fileID: 0}
+    - target: {fileID: 8771708732302040970, guid: 8d903503012a7d541ac0e8b48a744365,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.27
+      objectReference: {fileID: 0}
+    - target: {fileID: 8771708732302040970, guid: 8d903503012a7d541ac0e8b48a744365,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.6739596
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8d903503012a7d541ac0e8b48a744365, type: 3}

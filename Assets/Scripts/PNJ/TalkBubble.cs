@@ -30,6 +30,6 @@ public class TalkBubble : MonoBehaviour
 
     public void setIsTalking( bool iState )
     {
-        __sr.sprite = (iState) ? talk_bubble_sprite : is_talking_sprite;
+        __sr.sprite = (iState) ? is_talking_sprite :  talk_bubble_sprite;
     } 
 }
