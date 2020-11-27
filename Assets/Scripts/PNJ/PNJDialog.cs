@@ -23,6 +23,8 @@ public class PNJDialog : MonoBehaviour
     private int __curr_dialog_index;
     private UIDialog __loaded_dialog_ui;
 
+    private TalkBubble __talk_bubble;
+
 
     // Start is called before the first frame update
     void Start()
@@ -32,7 +34,7 @@ public class PNJDialog : MonoBehaviour
         __dialog = DialogBank.load(dialog_id);
 
         __audio_source = GetComponent<AudioSource>();
-
+        __talk_bubble  = GetComponentInChildren<TalkBubble>();
     }
 
     // Update is called once per frame
@@ -55,6 +57,8 @@ public class PNJDialog : MonoBehaviour
         if ( PC )
         {
             __is_talkable = true;
+            if (!!__talk_bubble)
+                __talk_bubble.display(true);
         }
     }
 
@@ -64,6 +68,8 @@ public class PNJDialog : MonoBehaviour
         if ( PC )
         {
             __is_talkable = false;
+            if (!!__talk_bubble)
+                __talk_bubble.display(false);
         }
     }
 
@@ -80,16 +86,25 @@ public class PNJDialog : MonoBehaviour
         if (__loaded_dialog_ui == null)
             return;
 
-        if ( !__loaded_dialog_ui.message_is_displayed() )
+        if ( !__loaded_dialog_ui.message_is_displayed() && 
+              __loaded_dialog_ui.has_a_message_to_display() )
             __loaded_dialog_ui.force_display();
         else
         {
-            if (__curr_dialog_index >= __dialog.Length )
-                end_dialog();
+            if ( __loaded_dialog_ui.overflows )
+            {
+                __loaded_dialog_ui.display( npc_name, __loaded_dialog_ui.overflowing_text );
+            }
+            else 
+            {
+                if (__curr_dialog_index >= __dialog.Length )
+                    end_dialog();
+            
+                __loaded_dialog_ui.display( npc_name, __dialog[__curr_dialog_index] );
+                playVoice(); 
+                __curr_dialog_index++;
+            }
 
-            __loaded_dialog_ui.display( npc_name, __dialog[__curr_dialog_index] );
-            playVoice(); 
-            __curr_dialog_index++;
         }
 
     }
