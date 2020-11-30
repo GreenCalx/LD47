@@ -63,13 +63,10 @@ public static class LEVEL_LAYOUTS
         {
             case 0:
                 return level0_POI;
-                break;
             case 1:
                 return level1_POI;
-                break;
             default:
                 return new string[0];
-                break;
         }
     }
     public static string[] load_level_stages(int id)
@@ -78,13 +75,10 @@ public static class LEVEL_LAYOUTS
         {
             case 0:
                 return level0_STAGES;
-                break;
             case 1:
                 return level1_STAGES;
-                break;
             default:
                 return new string[0];
-                break;
         }
     }
     public static string[] load_level_lconnectors(int id)
@@ -93,13 +87,10 @@ public static class LEVEL_LAYOUTS
         {
             case 0:
                 return level0_LCONNECTORS;
-                break;
             case 1:
                 return level1_LCONNECTORS;
-                break;
             default:
                 return new string[0];
-                break;
         }
     }
 

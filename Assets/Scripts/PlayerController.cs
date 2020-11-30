@@ -44,7 +44,7 @@ public class PlayerController : MonoBehaviour
     public LevelUI levelUI;
     public bool has_active_ui = false;
     [SerializeField] private LayerMask wallmask;
-    readonly float Speed = 1f;
+    //readonly float Speed = 1f;
     public bool WAIT_ORDER = false;
 
     public Looper L;

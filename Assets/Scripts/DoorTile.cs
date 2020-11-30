@@ -11,7 +11,7 @@ public class DoorTile : ActivableObject
     public AudioSource sound_off;
 
     // Start is called before the first frame update
-    void Start()
+    new void Start()
     {
         __collider2D = GetComponent<BoxCollider2D>();
         base.Start();

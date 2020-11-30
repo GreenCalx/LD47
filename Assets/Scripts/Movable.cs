@@ -8,8 +8,8 @@ using UnityEngine;
 
 public class Movable : MonoBehaviour
 {
-    [SerializeField] private LayerMask wallmask;
-    [SerializeField] private LayerMask movablemask;
+    [SerializeField] public LayerMask wallmask;
+    [SerializeField] public LayerMask movablemask;
     public float Speed = 1f;
 
     public bool ResetBetweenLoops = true;

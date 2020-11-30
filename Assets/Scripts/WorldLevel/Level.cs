@@ -243,7 +243,6 @@ public class Level : MonoBehaviour
     {
 
         List<Tuple<int,int>> paths = new List<Tuple<int,int>>{ Tuple.Create(__start_coord.Item1, __start_coord.Item2 ) };
-        int curr_stage_id   = 0;
         while ( paths.Any() )
         {
             Tuple<int, int> curr_path = paths[0];
