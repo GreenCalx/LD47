@@ -241,8 +241,7 @@ public class Save : MonoBehaviour
                 {
                     if (Events[i] != B.Events[i]) return false;
                 }
-                return 
-                                IsPaused == B.IsPaused &&
+                return IsPaused == B.IsPaused &&
                                 IsRunning == B.IsRunning &&
                                 IsRecording == B.IsRecording &&
                                 CurrentIdx == B.CurrentIdx;
@@ -320,8 +319,14 @@ public class Save : MonoBehaviour
             {
 
                 GameObject[] SceneGameObjects = GameObject.FindObjectsOfType<GameObject>();
+
                 foreach (GameObject go in SceneGameObjects)
                 {
+
+                    if(go.name.Contains("Tail") )
+                    {
+                        continue;
+                    }
                     GameObjects.Add(new MiniObject(go.transform, go.name));
                     if (go.name == "GameLoop")
                     {
