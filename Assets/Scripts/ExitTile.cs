@@ -86,6 +86,17 @@ public class ExitTile : MonoBehaviour
         }
         //string scene_to_load = LEVEL_NAME_PREFIX + ( current_level_exit_index + 1 ) ;
         string world_to_load = "World"+__level_id;
+
+        var S = GameObject.Find("Saver");
+        if (S)
+        {
+            var Save = S.GetComponent<Save>();
+            if(Save)
+            {
+                Save.EndLevel(); 
+            }
+        }
+
         SceneManager.LoadScene( world_to_load, LoadSceneMode.Single);
     }
 

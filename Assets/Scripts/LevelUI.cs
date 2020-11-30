@@ -136,7 +136,6 @@ public class LevelUI : MonoBehaviour
             }
             else if ( i < iTL.getTickForCursor() && (i ==__time_units_squares.Length-1) )
             {
-                    Debug.Log("Timeline over / Rewind is on");
                     // REWIND IS ON
                     if (!!rewind_image_GO)
                         current_tick_square_transform = rewind_image_GO.transform;

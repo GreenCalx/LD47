@@ -45,6 +45,7 @@ sealed class QuaternionSerializationSurrogate : ISerializationSurrogate
         info.AddValue("x", v3.x);
         info.AddValue("y", v3.y);
         info.AddValue("z", v3.z);
+        info.AddValue("w", v3.w);
         Debug.Log(v3);
     }
 
@@ -57,6 +58,7 @@ sealed class QuaternionSerializationSurrogate : ISerializationSurrogate
         v3.x = (float)info.GetValue("x", typeof(float));
         v3.y = (float)info.GetValue("y", typeof(float));
         v3.z = (float)info.GetValue("z", typeof(float));
+        v3.w = (float)info.GetValue("w", typeof(float));
         obj = v3;
         return obj;   // Formatters ignore this return value //Seems to have been fixed!
     }
@@ -102,16 +104,30 @@ public class Save : MonoBehaviour
         public class MiniObject
         {
             public Vector3 Position;
-            public Vector3 Scale;
+            public Vector3 LocalPosition;
+            public Vector3 LocalScale;
             public Quaternion Rotation;
+            public Quaternion LocalRotation;
             public String Name;
 
             public MiniObject(Transform T, String Name)
             {
                 Position = T.position;
-                Scale = T.localScale;
                 Rotation = T.rotation;
+                LocalPosition = T.localPosition;
+                LocalRotation = T.localRotation;
+                LocalScale = T.localScale;
                 this.Name = Name;
+            }
+
+            public override bool Equals(object obj)
+            {
+                MiniObject B = (MiniObject)obj;
+                return Position == B.Position &&
+                Rotation == B.Rotation &&
+                LocalPosition == B.LocalPosition &&
+                LocalRotation == B.LocalRotation &&
+                LocalScale == B.LocalScale && Name == B.Name;
             }
         }
         [Serializable]
@@ -173,6 +189,24 @@ public class Save : MonoBehaviour
                 WM.IsGoingBackward = IsGoingBackward;
                 WM.FixedUpdatePassed = FixedUpdatePassed;
             }
+
+            public override bool Equals(object obj)
+            {
+                WorldManagerData B = (WorldManagerData)obj;
+                for (int i = 0; i < Players.Count; ++i)
+                {
+                    if (!Players[i].Equals(B.Players[i])) return false;
+                }
+                return B.CurrentTick == CurrentTick &&
+                B.AutomaticReplayCurrentTime == AutomaticReplayCurrentTime &&
+                //B.CurrentTime == CurrentTime && // very sensible to breaking ODTs
+                B.NeedTick == NeedTick && // When player has chose a direction
+                B.WaitForInput == WaitForInput && // Playre is controlling so we wait for hi inputs
+                B.NeedReset == NeedReset &&
+                B.IsRewinding == IsRewinding &&
+                B.IsGoingBackward == IsGoingBackward &&
+                B.FixedUpdatePassed == FixedUpdatePassed;
+            }
         }
         [Serializable]
         public class LooperData
@@ -198,6 +232,21 @@ public class Save : MonoBehaviour
                 L.IsRunning = IsRunning;
                 L.IsRecording = IsRecording;
                 L.CurrentIdx = CurrentIdx;
+            }
+            public override bool Equals(object obj)
+            {
+                LooperData B = (LooperData)obj;
+
+                for (int i =0; i < Events.Count; ++i)
+                {
+                    if (Events[i] != B.Events[i]) return false;
+                }
+                return 
+                                IsPaused == B.IsPaused &&
+                                IsRunning == B.IsRunning &&
+                                IsRecording == B.IsRecording &&
+                                CurrentIdx == B.CurrentIdx;
+
             }
         }
         [Serializable]
@@ -244,6 +293,22 @@ public class Save : MonoBehaviour
                 PC.BreakingTick = BreakingTick;
                 PC.gameObject.GetComponentInChildren<SpriteRenderer>().color = SpriteColor;
             }
+            public override bool Equals(object obj)
+            {
+                PlayerData B = (PlayerData)obj;
+                return B.LastDpadAxisVertical == LastDpadAxisVertical &&
+                B.LastDpadAxisHorizontal == LastDpadAxisHorizontal &&
+                B.CurrentDirection == CurrentDirection &&
+                B.TickRequired == TickRequired &&
+                B.IsLoopedControled == IsLoopedControled &&
+                B.HasAlreadyBeenBreakedFrom == HasAlreadyBeenBreakedFrom &&
+                B.has_active_ui == has_active_ui &&
+                B.WAIT_ORDER == WAIT_ORDER &&
+                L.Equals(B.L) &&
+                B.BreakingTick == BreakingTick &&
+                SpriteColor.Equals(B.SpriteColor) ;
+
+            }
         }
 
         [Serializable]
@@ -272,8 +337,10 @@ public class Save : MonoBehaviour
                     if (CurrentGO)
                     {
                         CurrentGO.transform.position = go.Position;
-                        CurrentGO.transform.localScale = go.Scale;
+                        CurrentGO.transform.localPosition = go.LocalPosition;
+                        CurrentGO.transform.localScale = go.LocalScale;
                         CurrentGO.transform.rotation = go.Rotation;
+                        CurrentGO.transform.localRotation = go.LocalRotation;
 
                         if (go.Name == "GameLoop")
                         {
@@ -286,6 +353,17 @@ public class Save : MonoBehaviour
                     }
                 }
             }
+            public override bool Equals(object obj)
+            {
+                Frame B = (Frame)obj;
+                for(int i=0;i < GameObjects.Count; ++i)
+                {
+                    if (!GameObjects[i].Equals(B.GameObjects[i]))
+                        return false;
+                }
+
+                return WM.Equals(B.WM);
+            }
         }
         [Serializable]
         public class InputSaverInput
@@ -295,6 +373,19 @@ public class Save : MonoBehaviour
             public bool Down = false;
             public bool IsAxis = false;
             public float AxisValue = 0f;
+            public override bool Equals(object obj)
+            {
+                //Check for null and compare run-time types.
+                if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+                {
+                    return false;
+                }
+                else
+                {
+                    InputSaverInput B = (InputSaverInput)obj;
+                    return (IsUp == B.IsUp && IsDown == B.IsDown && Down == B.Down && IsAxis == B.IsAxis && AxisValue == B.AxisValue);
+                }
+            }
         }
         [Serializable]
         public class InputSaverEntry
@@ -317,9 +408,31 @@ public class Save : MonoBehaviour
                 }
                 Inputs.Add(s, I);
             }
+            public override bool Equals(System.Object obj)
+            {
+                //Check for null and compare run-time types.
+                if ((obj == null) || !this.GetType().Equals(obj.GetType()))
+                {
+                    return false;
+                }
+                else
+                {
+                    InputSaverEntry B = (InputSaverEntry)obj;
+
+                    foreach (KeyValuePair<String, InputSaverInput> Value in Inputs)
+                    {
+                        if (!B.Inputs[Value.Key].Equals(Value.Value)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+
         }
         public List<InputSaverEntry> InputsFrame = new List<InputSaverEntry>();
         public Frame FirstFrame = new Frame();
+        public Frame EndFrame = new Frame();
         public void Record()
         {
             InputSaverEntry Entry = new InputSaverEntry();
@@ -333,9 +446,9 @@ public class Save : MonoBehaviour
             Entry.Add("DPad_Vertical", true);
             Entry.Add("DPad_Horizontal", true);
 
-            if (InputsFrame.Count > 0 && Entry.Inputs == InputsFrame[InputsFrame.Count - 1].Inputs)
+            if (InputsFrame.Count > 0 && Entry.Equals(InputsFrame[InputsFrame.Count - 1]))
             {
-                var i = InputsFrame[InputsFrame.Count - 1].NumberOfFramesIsSame;
+                InputsFrame[InputsFrame.Count - 1].NumberOfFramesIsSame += 1;
             }
             else
             {
@@ -349,11 +462,15 @@ public class Save : MonoBehaviour
     bool IsSerializing = false;
     int CurrentReplayedCount = 0;
     int CurrentIdx = 0;
+    bool FrameLock = false;
+    public string FileName = "test";
     InputSaver IS = new InputSaver();
     public InputSaver.InputSaverEntry Tick(InputSaver.InputSaverEntry Entry)
     {
         if (IsReplaying)
         {
+
+            if(FrameLock) return  IS.InputsFrame[CurrentIdx];
             if (CurrentIdx < IS.InputsFrame.Count)
             {
                 var CurrentInputFrame = IS.InputsFrame[CurrentIdx];
@@ -361,16 +478,19 @@ public class Save : MonoBehaviour
                 {
                     ++CurrentIdx;
                     CurrentReplayedCount = 0;
-                    return Tick(Entry);
+                    return Tick(CurrentInputFrame);
                 }
                 ++CurrentReplayedCount;
+                if (!FrameLock) FrameLock = true;
                 return CurrentInputFrame;
             }
             else
             {
                 CurrentIdx = 0;
+                CurrentReplayedCount = 0;
                 IS.FirstFrame.Apply();
-                return Tick(Entry);
+                if (!FrameLock) FrameLock = true;
+                return Tick(IS.InputsFrame[CurrentIdx]);
             }
         }
         else return Entry;
@@ -379,7 +499,7 @@ public class Save : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        String Path = Application.persistentDataPath + "/test.save";
+        String Path = Application.persistentDataPath + "/" + FileName + ".save";
         bool StopSave = Input.GetKeyDown(KeyCode.M);
         bool StartSave = Input.GetKeyDown(KeyCode.L);
         bool Load = Input.GetKeyDown(KeyCode.K);
@@ -398,7 +518,11 @@ public class Save : MonoBehaviour
                 IsRecording = true;
                 IS.FirstFrame.Init();
             }
-            if (StopSave) IsRecording = false;
+            if (StopSave)
+            {
+                IsRecording = false;
+                IS.EndFrame.Init();
+            }
 
             if (IsRecording)
             {
@@ -433,6 +557,65 @@ public class Save : MonoBehaviour
         }
     }
 
+    private void LateUpdate()
+    {
+        // to be sure that we return only one frame\
+        FrameLock = false;
+    }
+
+    public void EndLevel()
+    {
+        if (IsRecording)
+        {
+                IS.EndFrame.Init();
+
+                String Path = Application.persistentDataPath + "/" + FileName + ".save";
+                if (!IsSerializing && !IsReplaying && IS.InputsFrame.Count != 0)
+                {
+                    BinaryFormatter BF = new BinaryFormatter();
+                    SurrogateSelector ss = new SurrogateSelector();
+                   ss.AddSurrogate(typeof(Vector3),
+                                    new StreamingContext(StreamingContextStates.All),
+                                     new Vector3SerializationSurrogate());
+                    ss.AddSurrogate(typeof(Quaternion),
+                                    new StreamingContext(StreamingContextStates.All),
+                                    new QuaternionSerializationSurrogate());
+                    ss.AddSurrogate(typeof(Color),
+                        new StreamingContext(StreamingContextStates.All),
+                        new ColorSerializationSurrogate());
+                    BF.SurrogateSelector = ss;
+
+                    FileStream file = File.Create(Path);
+                    IsSerializing = true;
+                    BF.Serialize(file, IS);
+                    IsSerializing = false;
+                    file.Close();
+
+                    IS = new InputSaver();
+                }
+        }
+
+        if (IsReplaying)
+        {
+            CompareEndFrames();
+        }
+    }
+
+    void CompareEndFrames()
+    {
+        InputSaver.Frame CurrentEndFrame = new InputSaver.Frame();
+        CurrentEndFrame.Init();
+
+        if (CurrentEndFrame.Equals(IS.EndFrame))
+        {
+            Debug.Log("[SUCCESS] TEST OK");
+        }
+        else
+        {
+            Debug.Log("[ERROR]   TEST KO");
+        }
+    }
+
     bool Load(String s)
     {
         if (!File.Exists(s))
@@ -451,7 +634,7 @@ public class Save : MonoBehaviour
                         new StreamingContext(StreamingContextStates.All),
                         new ColorSerializationSurrogate());
         BF.SurrogateSelector = ss;
-        using (FileStream stream = new FileStream(Application.persistentDataPath + "/test.save", FileMode.Open, FileAccess.Read))
+        using (FileStream stream = new FileStream(Application.persistentDataPath + "/" + FileName + ".save", FileMode.Open, FileAccess.Read))
         {
             IS = BF.Deserialize(stream) as InputSaver;
             stream.Close();

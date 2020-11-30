@@ -296,10 +296,31 @@ public class WorldManager : MonoBehaviour
                 return;
             }
         }
+        // NOTE(toffa): Saver stuff test
+        Save.InputSaver.InputSaverEntry Entry = new Save.InputSaver.InputSaverEntry();
+        Entry.Add("Up");
+        Entry.Add("Down");
+        Entry.Add("Right");
+        Entry.Add("Left");
+        Entry.Add("Break");
+        Entry.Add("Tick");
+        Entry.Add("Restart");
+        Entry.Add("DPad_Vertical", true);
+        Entry.Add("DPad_Horizontal", true);
+
+        var SaverGO = GameObject.Find("Saver");
+        if (SaverGO)
+        {
+            var Saver = SaverGO.GetComponent<Save>();
+            if (Saver)
+            {
+                Entry = Saver.Tick(Entry);
+            }
+        }
 
         // For now ticks are done by hand!
 
-        if (Input.GetButton("Tick"))
+        if ( Entry.Inputs["Tick"].Down)
         {
             AutomaticReplayCurrentTime += Time.deltaTime;
         }
@@ -307,7 +328,11 @@ public class WorldManager : MonoBehaviour
         {
             AutomaticReplayCurrentTime = 0;
         }
-        bool ForwardTick = Input.GetButtonDown("Tick") || (WaitForInput && NeedTick) || ( Input.GetButton("Tick") && AutomaticReplayCurrentTime > AutomaticReplayRate);
+
+
+
+
+        bool ForwardTick = Entry.Inputs["Tick"].IsDown || (WaitForInput && NeedTick) || ( Entry.Inputs["Tick"].Down && AutomaticReplayCurrentTime > AutomaticReplayRate);
         bool BackwardTick = Input.GetKeyDown(KeyCode.X) && FixedUpdatePassed && CurrentTick != -1;
 
         PlayerController LastPlayer = Players[Players.Count - 1].GetComponent<PlayerController>();
@@ -362,7 +387,6 @@ public class WorldManager : MonoBehaviour
                     bool CanMove = TL.getAt(CurrentTick);
                     bool TLOver = TL.isTimelineOver();
                     TL.setCurrentTick(CurrentTick);
-                    Debug.Log("CURRENT TICK: " + CurrentTick);
                     if (!!UI)
                         UI.refresh(); //update if new cell
                     if (TLOver)
