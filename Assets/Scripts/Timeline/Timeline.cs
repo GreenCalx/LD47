@@ -55,9 +55,12 @@ public class Timeline
         return last_tick+1;
     }
 
-    public int getTickForTimeUnits()
+    public int getTickForTimeUnits( bool Saturate = false)
     {
-        return last_tick;
+        if (Constraints.ShowNextInputsOnTimelineOnReplay && Saturate)
+            return 25;
+        else
+            return last_tick;
     }
 
     public void setCurrentTick(int iCurrentTick)

@@ -3,6 +3,14 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using UnityEngine;
 
+
+static class Constraints
+{
+    static public int InputMode = 0;
+    static public bool ShowDefaultTileOnCursor = true;
+    static public bool ShowNextInputsOnTimelineOnReplay = true;
+}
+
 public class WorldManager : MonoBehaviour
 {
     // for rewind just record everything
@@ -258,108 +266,113 @@ public class WorldManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!WaitForInput)
+        if (Constraints.InputMode == 0)
         {
-            CurrentTime += Time.deltaTime;
-        }
-
-        if (IsRewinding)
-        {
-            if (MixerControl) MixerControl.SetPhasedMode();
-
-            NeedTick = false;
-            WaitForInput = false;
-            NeedReset = false;
-
-            // If we were rewinding but it is finished, then we start the loops again
-            if (Rewind.IsEmpty())
+            if (!WaitForInput)
             {
-                if (MixerControl) MixerControl.SetNormalMode();
+                CurrentTime += Time.deltaTime;
+            }
 
-                NeedReset = true;
-                IsRewinding = false;
-                CurrentTick = -1;
+            if (IsRewinding)
+            {
+                if (MixerControl) MixerControl.SetPhasedMode();
 
-                foreach (var Player in Players)
+                NeedTick = false;
+                WaitForInput = false;
+                NeedReset = false;
+
+                // If we were rewinding but it is finished, then we start the loops again
+                if (Rewind.IsEmpty())
                 {
-                    var Controller = Player.GetComponent<PlayerController>();
-                    if (Controller) Controller.L.StartRunning();
+                    if (MixerControl) MixerControl.SetNormalMode();
+
+                    NeedReset = true;
+                    IsRewinding = false;
+                    CurrentTick = -1;
+
+                    foreach (var Player in Players)
+                    {
+                        var Controller = Player.GetComponent<PlayerController>();
+                        if (Controller) Controller.L.StartRunning();
+                    }
                 }
+                else
+                {
+                    if (CurrentTime > TickRate)
+                    {
+                        CurrentTime = 0;
+                        Rewind.Tick();
+                    }
+                    return;
+                }
+            }
+            // NOTE(toffa): Saver stuff test
+            Save.InputSaver.InputSaverEntry Entry = new Save.InputSaver.InputSaverEntry();
+            Entry.Add("Up");
+            Entry.Add("Down");
+            Entry.Add("Right");
+            Entry.Add("Left");
+            Entry.Add("Break");
+            Entry.Add("Tick");
+            Entry.Add("Restart");
+            Entry.Add("BackTick");
+            Entry.Add("DPad_Vertical", true);
+            Entry.Add("DPad_Horizontal", true);
+
+            var SaverGO = GameObject.Find("Saver");
+            if (SaverGO)
+            {
+                var Saver = SaverGO.GetComponent<Save>();
+                if (Saver)
+                {
+                    Entry = Saver.Tick(Entry);
+                }
+            }
+
+            bool ForwardTick = false;
+            bool BackwardTick = false;
+            // For now ticks are done by hand!
+
+            if (Entry.Inputs["Tick"].Down)
+            {
+                AutomaticReplayCurrentTime += Time.deltaTime;
             }
             else
             {
-                if (CurrentTime > TickRate)
-                {
-                    CurrentTime = 0;
-                    Rewind.Tick();
-                }
-                return;
+                AutomaticReplayCurrentTime = 0;
             }
-        }
-        // NOTE(toffa): Saver stuff test
-        Save.InputSaver.InputSaverEntry Entry = new Save.InputSaver.InputSaverEntry();
-        Entry.Add("Up");
-        Entry.Add("Down");
-        Entry.Add("Right");
-        Entry.Add("Left");
-        Entry.Add("Break");
-        Entry.Add("Tick");
-        Entry.Add("Restart");
-        Entry.Add("DPad_Vertical", true);
-        Entry.Add("DPad_Horizontal", true);
 
-        var SaverGO = GameObject.Find("Saver");
-        if (SaverGO)
-        {
-            var Saver = SaverGO.GetComponent<Save>();
-            if (Saver)
+
+
+
+            ForwardTick = Entry.Inputs["Tick"].IsDown || (WaitForInput && NeedTick) || (Entry.Inputs["Tick"].Down && AutomaticReplayCurrentTime > AutomaticReplayRate);
+            BackwardTick = Entry.Inputs["BackTick"].IsDown && FixedUpdatePassed && CurrentTick != -1;
+
+            PlayerController LastPlayer = Players[Players.Count - 1].GetComponent<PlayerController>();
+            BackwardTick = BackwardTick && (LastPlayer.IsLoopedControled || (!LastPlayer.IsLoopedControled && LastPlayer.BreakingTick != CurrentTick));
+
+
+            if (ForwardTick || BackwardTick)
             {
-                Entry = Saver.Tick(Entry);
-            }
-        }
 
-        // For now ticks are done by hand!
+                FixedUpdatePassed = false;
 
-        if ( Entry.Inputs["Tick"].Down)
-        {
-            AutomaticReplayCurrentTime += Time.deltaTime;
-        }
-        else
-        {
-            AutomaticReplayCurrentTime = 0;
-        }
+                IsGoingBackward = BackwardTick;
 
 
+                if (BackwardTick)
+                    CurrentTick--;
+                if (ForwardTick)
+                    CurrentTick++;
 
+                AutomaticReplayCurrentTime = 0;
 
-        bool ForwardTick = Entry.Inputs["Tick"].IsDown || (WaitForInput && NeedTick) || ( Entry.Inputs["Tick"].Down && AutomaticReplayCurrentTime > AutomaticReplayRate);
-        bool BackwardTick = Input.GetKeyDown(KeyCode.X) && FixedUpdatePassed && CurrentTick != -1;
-
-        PlayerController LastPlayer = Players[Players.Count - 1].GetComponent<PlayerController>();
-        BackwardTick = BackwardTick && (LastPlayer.IsLoopedControled || ( !LastPlayer.IsLoopedControled && LastPlayer.BreakingTick != CurrentTick));
-
-
-        if (ForwardTick || BackwardTick)
-        {
-
-            FixedUpdatePassed = false;
-
-            IsGoingBackward = BackwardTick;
-
-
-            if (BackwardTick)
-                CurrentTick--;
-            if (ForwardTick)
-                CurrentTick++;
-
-            AutomaticReplayCurrentTime = 0;
-
-            NeedTick = false;
-            //CurrentTime = 0;
-            // See if we arrived to the longest loop end
-            // if thats the case we reset all loops to be started again frame 0
-            NeedReset = false;
-            // now this is done by the timeline
+                NeedTick = false;
+                //CurrentTime = 0;
+                // See if we arrived to the longest loop end
+                // if thats the case we reset all loops to be started again frame 0
+                NeedReset = false;
+                // now this is done by the timeline
 #if false
             if (Players.Count >= 1) // No need if no players
             {
@@ -373,67 +386,68 @@ public class WorldManager : MonoBehaviour
                 }
             }
 #endif
-            // try consume energy for last player and update its ui
-            int PlayersCount = Players.Count;
-            if (PlayersCount > 0)
-            {
-                PlayerController CurrentController = Players[PlayersCount - 1].GetComponent<PlayerController>();
-                //EnergyCounter ec = curr_pc.energyCounter;
-                Timeline TL = CurrentController.timeline;
-                if (!NeedReset)
+                // try consume energy for last player and update its ui
+                int PlayersCount = Players.Count;
+                if (PlayersCount > 0)
                 {
-                    LevelUI UI = CurrentController.levelUI;
-
-                    bool CanMove = TL.getAt(CurrentTick);
-                    bool TLOver = TL.isTimelineOver();
-                    TL.setCurrentTick(CurrentTick);
-                    if (!!UI)
-                        UI.refresh(); //update if new cell
-                    if (TLOver)
+                    PlayerController CurrentController = Players[PlayersCount - 1].GetComponent<PlayerController>();
+                    //EnergyCounter ec = curr_pc.energyCounter;
+                    Timeline TL = CurrentController.timeline;
+                    if (!NeedReset)
                     {
-                        CurrentController.L.StopRecording();
-                        WaitForInput = false;
-                        NeedReset = true;
+                        LevelUI UI = CurrentController.levelUI;
+
+                        bool CanMove = TL.getAt(CurrentTick);
+                        bool TLOver = TL.isTimelineOver();
+                        TL.setCurrentTick(CurrentTick);
+                        if (!!UI)
+                            UI.refresh(); //update if new cell
+                        if (TLOver)
+                        {
+                            CurrentController.L.StopRecording();
+                            WaitForInput = false;
+                            NeedReset = true;
+                            TL.reset();
+                        }
+                        else
+                        {
+                            CurrentController.WAIT_ORDER = !CanMove;
+                        }
+                        if (!!UI)
+                            UI.refresh();
+                    }
+                    else
+                    {
                         TL.reset();
                     }
-                    else
-                    {
-                        CurrentController.WAIT_ORDER = !CanMove;
-                    }
-                    if (!!UI)
-                        UI.refresh();
                 }
-                else
+                // require world tick, update all loops, etc
+                foreach (var Player in Players)
                 {
-                    TL.reset();
-                }
-            }
-            // require world tick, update all loops, etc
-            foreach (var Player in Players)
-            {
-                var Controller = Player.GetComponent<PlayerController>();
-                if (Controller)
-                {
-                    if (NeedReset)
+                    var Controller = Player.GetComponent<PlayerController>();
+                    if (Controller)
                     {
-                        Controller.L.IsRunning = true;
-                        Controller.IsLoopedControled = true;
-                        IsRewinding = true;
-                    }
-                    else
-                    {
-                        // NOTE (toffa): this is weird but we have to ask for the last tick direction when going backward
-                        // or we will apply the direction from the previous tick to go back to it
-                        if (IsGoingBackward)
+                        if (NeedReset)
                         {
-                            Rewind.Tick(CurrentTick + 1);
-                            Rewind.DeleteRecord(CurrentTick + 1);
+                            Controller.L.IsRunning = true;
+                            Controller.IsLoopedControled = true;
+                            IsRewinding = true;
                         }
-                        //            Controller.RequireTick(CurrentTick + 1);
                         else
-                            Controller.RequireTick(CurrentTick);
-                    }
+                        {
+                            // NOTE (toffa): this is weird but we have to ask for the last tick direction when going backward
+                            // or we will apply the direction from the previous tick to go back to it
+                            if (IsGoingBackward)
+                            {
+                                Rewind.Tick(CurrentTick + 1);
+                                Rewind.DeleteRecord(CurrentTick + 1);
+                            }
+                            //            Controller.RequireTick(CurrentTick + 1);
+                            else
+                                Controller.RequireTick(CurrentTick);
+                        }
 
+                    }
                 }
             }
         }

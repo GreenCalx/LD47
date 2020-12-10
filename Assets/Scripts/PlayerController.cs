@@ -187,100 +187,104 @@ public class PlayerController : MonoBehaviour
     // Everything related to in^puts is done here
     void Update()
     {
-        // NOTE(toffa): Saver stuff test
-        Save.InputSaver.InputSaverEntry Entry = new Save.InputSaver.InputSaverEntry();
-        Entry.Add("Up");
-        Entry.Add("Down");
-        Entry.Add("Right");
-        Entry.Add("Left");
-        Entry.Add("Break");
-        Entry.Add("Tick");
-        Entry.Add("Restart");
-        Entry.Add("DPad_Vertical", true);
-        Entry.Add("DPad_Horizontal", true);
-
-        var SaverGO = GameObject.Find("Saver");
-        if (SaverGO)
+        if (Constraints.InputMode == 0)
         {
-            var Saver = SaverGO.GetComponent<Save>();
-            if (Saver)
+            // NOTE(toffa): Saver stuff test
+            Save.InputSaver.InputSaverEntry Entry = new Save.InputSaver.InputSaverEntry();
+            Entry.Add("Up");
+            Entry.Add("Down");
+            Entry.Add("Right");
+            Entry.Add("Left");
+            Entry.Add("Break");
+            Entry.Add("Tick");
+            Entry.Add("BackTick");
+            Entry.Add("Restart");
+            Entry.Add("DPad_Vertical", true);
+            Entry.Add("DPad_Horizontal", true);
+
+            var SaverGO = GameObject.Find("Saver");
+            if (SaverGO)
             {
-                Entry = Saver.Tick(Entry);
-            }
-        }
-
-
-        var isDpadDownPressed = Entry.Inputs["DPad_Vertical"].AxisValue == 1 && LastDpadAxisVertical != 1;
-        var isDpadUpPressed = Entry.Inputs["DPad_Vertical"].AxisValue == -1 && LastDpadAxisVertical != -1;
-        var isDpadLeftPressed = Entry.Inputs["DPad_Horizontal"].AxisValue == 1 && LastDpadAxisHorizontal != 1;
-        var isDpadRightPressed = Entry.Inputs["DPad_Horizontal"].AxisValue == -1 && LastDpadAxisHorizontal != -1;
-
-
-        LastDpadAxisHorizontal = Entry.Inputs["DPad_Horizontal"].AxisValue;
-        LastDpadAxisVertical = Entry.Inputs["DPad_Vertical"].AxisValue;
-
-        if (currentAnimationTime < animationtime)
-            testAnimation();
-        else
-        {
-            GetComponent<BoxCollider2D>().enabled = true;
-            // INPUTS RELATED
-            if (!IsLoopedControled)
-            {
-                if (WAIT_ORDER)
+                var Saver = SaverGO.GetComponent<Save>();
+                if (Saver)
                 {
-                    CurrentDirection = Direction.NONE;
-                    WAIT_ORDER = false;
+                    Entry = Saver.Tick(Entry);
+                }
+            }
+
+
+            var isDpadDownPressed = Entry.Inputs["DPad_Vertical"].AxisValue == 1 && LastDpadAxisVertical != 1;
+            var isDpadUpPressed = Entry.Inputs["DPad_Vertical"].AxisValue == -1 && LastDpadAxisVertical != -1;
+            var isDpadLeftPressed = Entry.Inputs["DPad_Horizontal"].AxisValue == 1 && LastDpadAxisHorizontal != 1;
+            var isDpadRightPressed = Entry.Inputs["DPad_Horizontal"].AxisValue == -1 && LastDpadAxisHorizontal != -1;
+
+
+            LastDpadAxisHorizontal = Entry.Inputs["DPad_Horizontal"].AxisValue;
+            LastDpadAxisVertical = Entry.Inputs["DPad_Vertical"].AxisValue;
+
+            if (currentAnimationTime < animationtime)
+                testAnimation();
+            else
+            {
+                GetComponent<BoxCollider2D>().enabled = true;
+                // INPUTS RELATED
+                if (!IsLoopedControled)
+                {
+                    if (WAIT_ORDER)
+                    {
+                        CurrentDirection = Direction.NONE;
+                        WAIT_ORDER = false;
+                    }
+                    else
+                    {
+                        var Up = Entry.Inputs[DirectionInputs[(int)Direction.UP]].IsDown || isDpadUpPressed;
+                        var Down = Entry.Inputs[DirectionInputs[(int)Direction.DOWN]].IsDown || isDpadDownPressed;
+                        var Right = Entry.Inputs[DirectionInputs[(int)Direction.RIGHT]].IsDown || isDpadRightPressed;
+                        var Left = Entry.Inputs[DirectionInputs[(int)Direction.LEFT]].IsDown || isDpadLeftPressed;
+
+                        if (Up) CurrentDirection = Direction.UP;
+                        if (Down) CurrentDirection = Direction.DOWN;
+                        if (Left) CurrentDirection = Direction.LEFT;
+                        if (Right) CurrentDirection = Direction.RIGHT;
+
+                        if (Up || Down || Right || Left)
+                        {
+                            WM.NeedTick = true;
+                        }
+                    }
+
                 }
                 else
                 {
-                    var Up = Entry.Inputs[DirectionInputs[(int)Direction.UP]].IsDown || isDpadUpPressed ;
+                    bool needBreak = false;
+                    var Up = Entry.Inputs[DirectionInputs[(int)Direction.UP]].IsDown || isDpadUpPressed;
                     var Down = Entry.Inputs[DirectionInputs[(int)Direction.DOWN]].IsDown || isDpadDownPressed;
                     var Right = Entry.Inputs[DirectionInputs[(int)Direction.RIGHT]].IsDown || isDpadRightPressed;
                     var Left = Entry.Inputs[DirectionInputs[(int)Direction.LEFT]].IsDown || isDpadLeftPressed;
 
-                    if (Up) CurrentDirection = Direction.UP;
-                    if (Down) CurrentDirection = Direction.DOWN;
-                    if (Left) CurrentDirection = Direction.LEFT;
-                    if (Right) CurrentDirection = Direction.RIGHT;
+                    needBreak = (Up || Down || Right || Left || Entry.Inputs["Break"].IsDown);
 
-                    if (Up || Down || Right || Left)
+
+                    if (needBreak && !HasAlreadyBeenBreakedFrom && !WM.IsRewinding)
                     {
+                        // break from the loop
+                        HasAlreadyBeenBreakedFrom = true;
+                        // create a new player at current position
+                        var GO = WM.AddPlayer(this.gameObject.transform.position);
+                        Direction Dir = Direction.NONE;
+                        if (Up) Dir = Direction.UP;
+                        if (Down) Dir = Direction.DOWN;
+                        if (Left) Dir = Direction.LEFT;
+                        if (Right) Dir = Direction.RIGHT;
+
+                        GO.GetComponent<PlayerController>().CurrentDirection = Dir;
+
                         WM.NeedTick = true;
                     }
                 }
-
             }
-            else
-            {
-                bool needBreak = false;
-                    var Up = Entry.Inputs[DirectionInputs[(int)Direction.UP]].IsDown || isDpadUpPressed ;
-                    var Down = Entry.Inputs[DirectionInputs[(int)Direction.DOWN]].IsDown || isDpadDownPressed;
-                    var Right = Entry.Inputs[DirectionInputs[(int)Direction.RIGHT]].IsDown || isDpadRightPressed;
-                    var Left = Entry.Inputs[DirectionInputs[(int)Direction.LEFT]].IsDown || isDpadLeftPressed;
-
-                needBreak = (Up || Down || Right || Left || Entry.Inputs["Break"].IsDown);
-
-
-                if (needBreak && !HasAlreadyBeenBreakedFrom && !WM.IsRewinding)
-                {
-                    // break from the loop
-                    HasAlreadyBeenBreakedFrom = true;
-                    // create a new player at current position
-                    var GO = WM.AddPlayer(this.gameObject.transform.position);
-                    Direction Dir = Direction.NONE;
-                    if (Up) Dir = Direction.UP;
-                    if (Down) Dir = Direction.DOWN;
-                    if (Left) Dir = Direction.LEFT;
-                    if (Right) Dir = Direction.RIGHT;
-
-                    GO.GetComponent<PlayerController>().CurrentDirection = Dir;
-
-                    WM.NeedTick = true;
-                }
-            }
+            if (has_active_ui)
+                levelUI.refresh();
         }
-        if (has_active_ui)
-            levelUI.refresh();
     }
 }

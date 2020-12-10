@@ -17,7 +17,6 @@ sealed class Vector3SerializationSurrogate : ISerializationSurrogate
         info.AddValue("x", v3.x);
         info.AddValue("y", v3.y);
         info.AddValue("z", v3.z);
-        Debug.Log(v3);
     }
 
     // Method called to deserialize a Vector3 object
@@ -46,7 +45,6 @@ sealed class QuaternionSerializationSurrogate : ISerializationSurrogate
         info.AddValue("y", v3.y);
         info.AddValue("z", v3.z);
         info.AddValue("w", v3.w);
-        Debug.Log(v3);
     }
 
     // Method called to deserialize a Quaternion object
@@ -76,7 +74,6 @@ sealed class ColorSerializationSurrogate : ISerializationSurrogate
         info.AddValue("g", v3.g);
         info.AddValue("b", v3.b);
         info.AddValue("a", v3.a);
-        Debug.Log(v3);
     }
 
     // Method called to deserialize a Color object
@@ -446,6 +443,7 @@ public class Save : MonoBehaviour
             Entry.Add("Right");
             Entry.Add("Left");
             Entry.Add("Break");
+            Entry.Add("BackTick");
             Entry.Add("Tick");
             Entry.Add("Restart");
             Entry.Add("DPad_Vertical", true);
@@ -465,6 +463,7 @@ public class Save : MonoBehaviour
     bool IsRecording = false;
     bool IsReplaying = false;
     bool IsSerializing = false;
+    public bool IsLooping = false;
     int CurrentReplayedCount = 0;
     int CurrentIdx = 0;
     bool FrameLock = false;
@@ -491,11 +490,18 @@ public class Save : MonoBehaviour
             }
             else
             {
-                CurrentIdx = 0;
-                CurrentReplayedCount = 0;
-                IS.FirstFrame.Apply();
-                if (!FrameLock) FrameLock = true;
-                return Tick(IS.InputsFrame[CurrentIdx]);
+                if (IsLooping)
+                {
+                    CurrentIdx = 0;
+                    CurrentReplayedCount = 0;
+                    IS.FirstFrame.Apply();
+                    if (!FrameLock) FrameLock = true;
+                    return Tick(IS.InputsFrame[CurrentIdx]);
+                } else
+                {
+                    CompareEndFrames();
+                    return Entry;
+                }
             }
         }
         else return Entry;
@@ -619,6 +625,7 @@ public class Save : MonoBehaviour
         {
             Debug.Log("[ERROR]   TEST KO");
         }
+        IsReplaying = false;
     }
 
     bool Load(String s)
