@@ -248,8 +248,6 @@ public class Save : MonoBehaviour
         [Serializable]
         public class PlayerData
         {
-            public float LastDpadAxisVertical = 0;
-            public float LastDpadAxisHorizontal = 0;
             public PlayerController.Direction CurrentDirection = PlayerController.Direction.NONE;
             public bool TickRequired = false;
             public bool IsLoopedControled = false;
@@ -262,12 +260,9 @@ public class Save : MonoBehaviour
 
             public PlayerData(PlayerController PC)
             {
-                LastDpadAxisVertical = PC.LastDpadAxisVertical;
-                LastDpadAxisHorizontal = PC.LastDpadAxisHorizontal;
                 CurrentDirection = PC.CurrentDirection;
                 TickRequired = PC.TickRequired;
                 IsLoopedControled = PC.IsLoopedControled;
-                HasAlreadyBeenBreakedFrom = PC.HasAlreadyBeenBreakedFrom;
                 has_active_ui = PC.has_active_ui;
                 WAIT_ORDER = PC.WAIT_ORDER;
                 L = new LooperData(PC.L);
@@ -277,12 +272,9 @@ public class Save : MonoBehaviour
             }
             public void Apply(PlayerController PC)
             {
-                PC.LastDpadAxisVertical = LastDpadAxisVertical;
-                PC.LastDpadAxisHorizontal = LastDpadAxisHorizontal;
                 PC.CurrentDirection = CurrentDirection;
                 PC.TickRequired = TickRequired;
                 PC.IsLoopedControled = IsLoopedControled;
-                PC.HasAlreadyBeenBreakedFrom = HasAlreadyBeenBreakedFrom;
                 PC.has_active_ui = has_active_ui;
                 PC.WAIT_ORDER = WAIT_ORDER;
                 L.Apply(PC.L);
@@ -292,12 +284,9 @@ public class Save : MonoBehaviour
             public override bool Equals(object obj)
             {
                 PlayerData B = (PlayerData)obj;
-                return B.LastDpadAxisVertical == LastDpadAxisVertical &&
-                B.LastDpadAxisHorizontal == LastDpadAxisHorizontal &&
-                B.CurrentDirection == CurrentDirection &&
+                return B.CurrentDirection == CurrentDirection &&
                 B.TickRequired == TickRequired &&
                 B.IsLoopedControled == IsLoopedControled &&
-                B.HasAlreadyBeenBreakedFrom == HasAlreadyBeenBreakedFrom &&
                 B.has_active_ui == has_active_ui &&
                 B.WAIT_ORDER == WAIT_ORDER &&
                 L.Equals(B.L) &&
@@ -394,6 +383,10 @@ public class Save : MonoBehaviour
         {
             public Dictionary<String, InputSaverInput> Inputs = new Dictionary<string, InputSaverInput>();
             public int NumberOfFramesIsSame = 1;
+            public bool isDpadDownPressed = false;
+            public bool isDpadUpPressed = false;
+            public bool isDpadLeftPressed = false;
+            public bool isDpadRightPressed = false;
             public void Add(String s, bool IsAxis = false)
             {
                 InputSaverInput I = new InputSaverInput();
@@ -427,6 +420,9 @@ public class Save : MonoBehaviour
                             return false;
                         }
                     }
+                    if (isDpadDownPressed != B.isDpadDownPressed || isDpadLeftPressed != B.isDpadLeftPressed ||
+                            isDpadRightPressed != B.isDpadRightPressed || isDpadUpPressed != B.isDpadUpPressed)
+                        return false;
                     return true;
                 }
             }

@@ -32,8 +32,11 @@ public class Movable : MonoBehaviour
     public float SpawnTailTime = 0.1f;
     public float CurrentSpawnTailTime = 0.1f;
 
+    public bool Freeze = false;
+
     public bool Move(PlayerController.Direction D, bool ApplyPhysicsBetweenPlayers = true)
     {
+        if (Freeze) return false;
         if (D == PlayerController.Direction.NONE) return false;
 
         bool NeedToBeMoved = false;

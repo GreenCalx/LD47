@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(Movable))]
 [RequireComponent(typeof(BoxCollider2D))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IControllable
 {
     /// <summary>
     /// Directions related variables
@@ -27,16 +27,12 @@ public class PlayerController : MonoBehaviour
         return D;
     }
 
-    public float LastDpadAxisVertical = 0;
-    public float LastDpadAxisHorizontal = 0;
-
     /// <summary>
     /// State variables
     /// </summary>
     public Direction CurrentDirection = Direction.NONE;
     public bool TickRequired = false;
     public bool IsLoopedControled = false;
-    public bool HasAlreadyBeenBreakedFrom = false;
     //public EnergyCounter energyCounter;
     public Timeline timeline;
     private GameObject levelUI_GOref;
@@ -48,6 +44,9 @@ public class PlayerController : MonoBehaviour
     public bool WAIT_ORDER = false;
 
     public Looper L;
+
+
+    public InputManager IM;
 
     List<GameObject> Tails = new List<GameObject>();
 
@@ -132,7 +131,7 @@ public class PlayerController : MonoBehaviour
 
             if (L.IsRecording)
             {
-                if (L.Events.Count-1 >= L.CurrentIdx)
+                if (L.Events.Count - 1 >= L.CurrentIdx)
                 {
                     // remove previous recorded input
                     L.Events[L.CurrentIdx] = CurrentDirection;
@@ -183,108 +182,45 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void IControllable.ProcessInputs(Save.InputSaver.InputSaverEntry Entry)
+    {
+        if (Constraints.InputMode == 0)
+        {
+            var Up = Entry.Inputs[DirectionInputs[(int)Direction.UP]].IsDown || Entry.isDpadUpPressed;
+            var Down = Entry.Inputs[DirectionInputs[(int)Direction.DOWN]].IsDown || Entry.isDpadDownPressed;
+            var Right = Entry.Inputs[DirectionInputs[(int)Direction.RIGHT]].IsDown || Entry.isDpadRightPressed;
+            var Left = Entry.Inputs[DirectionInputs[(int)Direction.LEFT]].IsDown || Entry.isDpadLeftPressed;
+
+            if (Up) CurrentDirection = Direction.UP;
+            if (Down) CurrentDirection = Direction.DOWN;
+            if (Left) CurrentDirection = Direction.LEFT;
+            if (Right) CurrentDirection = Direction.RIGHT;
+        }
+    }
+
     // Update is called once per frame
     // Everything related to in^puts is done here
     void Update()
     {
-        if (Constraints.InputMode == 0)
+        if (currentAnimationTime < animationtime)
         {
-            // NOTE(toffa): Saver stuff test
-            Save.InputSaver.InputSaverEntry Entry = new Save.InputSaver.InputSaverEntry();
-            Entry.Add("Up");
-            Entry.Add("Down");
-            Entry.Add("Right");
-            Entry.Add("Left");
-            Entry.Add("Break");
-            Entry.Add("Tick");
-            Entry.Add("BackTick");
-            Entry.Add("Restart");
-            Entry.Add("DPad_Vertical", true);
-            Entry.Add("DPad_Horizontal", true);
-
-            var SaverGO = GameObject.Find("Saver");
-            if (SaverGO)
-            {
-                var Saver = SaverGO.GetComponent<Save>();
-                if (Saver)
-                {
-                    Entry = Saver.Tick(Entry);
-                }
-            }
-
-
-            var isDpadDownPressed = Entry.Inputs["DPad_Vertical"].AxisValue == 1 && LastDpadAxisVertical != 1;
-            var isDpadUpPressed = Entry.Inputs["DPad_Vertical"].AxisValue == -1 && LastDpadAxisVertical != -1;
-            var isDpadLeftPressed = Entry.Inputs["DPad_Horizontal"].AxisValue == 1 && LastDpadAxisHorizontal != 1;
-            var isDpadRightPressed = Entry.Inputs["DPad_Horizontal"].AxisValue == -1 && LastDpadAxisHorizontal != -1;
-
-
-            LastDpadAxisHorizontal = Entry.Inputs["DPad_Horizontal"].AxisValue;
-            LastDpadAxisVertical = Entry.Inputs["DPad_Vertical"].AxisValue;
-
-            if (currentAnimationTime < animationtime)
-                testAnimation();
-            else
-            {
-                GetComponent<BoxCollider2D>().enabled = true;
-                // INPUTS RELATED
-                if (!IsLoopedControled)
-                {
-                    if (WAIT_ORDER)
-                    {
-                        CurrentDirection = Direction.NONE;
-                        WAIT_ORDER = false;
-                    }
-                    else
-                    {
-                        var Up = Entry.Inputs[DirectionInputs[(int)Direction.UP]].IsDown || isDpadUpPressed;
-                        var Down = Entry.Inputs[DirectionInputs[(int)Direction.DOWN]].IsDown || isDpadDownPressed;
-                        var Right = Entry.Inputs[DirectionInputs[(int)Direction.RIGHT]].IsDown || isDpadRightPressed;
-                        var Left = Entry.Inputs[DirectionInputs[(int)Direction.LEFT]].IsDown || isDpadLeftPressed;
-
-                        if (Up) CurrentDirection = Direction.UP;
-                        if (Down) CurrentDirection = Direction.DOWN;
-                        if (Left) CurrentDirection = Direction.LEFT;
-                        if (Right) CurrentDirection = Direction.RIGHT;
-
-                        if (Up || Down || Right || Left)
-                        {
-                            WM.NeedTick = true;
-                        }
-                    }
-
-                }
-                else
-                {
-                    bool needBreak = false;
-                    var Up = Entry.Inputs[DirectionInputs[(int)Direction.UP]].IsDown || isDpadUpPressed;
-                    var Down = Entry.Inputs[DirectionInputs[(int)Direction.DOWN]].IsDown || isDpadDownPressed;
-                    var Right = Entry.Inputs[DirectionInputs[(int)Direction.RIGHT]].IsDown || isDpadRightPressed;
-                    var Left = Entry.Inputs[DirectionInputs[(int)Direction.LEFT]].IsDown || isDpadLeftPressed;
-
-                    needBreak = (Up || Down || Right || Left || Entry.Inputs["Break"].IsDown);
-
-
-                    if (needBreak && !HasAlreadyBeenBreakedFrom && !WM.IsRewinding)
-                    {
-                        // break from the loop
-                        HasAlreadyBeenBreakedFrom = true;
-                        // create a new player at current position
-                        var GO = WM.AddPlayer(this.gameObject.transform.position);
-                        Direction Dir = Direction.NONE;
-                        if (Up) Dir = Direction.UP;
-                        if (Down) Dir = Direction.DOWN;
-                        if (Left) Dir = Direction.LEFT;
-                        if (Right) Dir = Direction.RIGHT;
-
-                        GO.GetComponent<PlayerController>().CurrentDirection = Dir;
-
-                        WM.NeedTick = true;
-                    }
-                }
-            }
-            if (has_active_ui)
-                levelUI.refresh();
+            var Movabl = gameObject.GetComponent<Movable>();
+            if (Movabl) Movabl.Freeze = true;
+            testAnimation();
         }
+        else
+        {
+            var Movabl = gameObject.GetComponent<Movable>();
+            if (Movabl) Movabl.Freeze = false;
+        }
+        if (WAIT_ORDER)
+        {
+            CurrentDirection = Direction.NONE;
+            WAIT_ORDER = false;
+        }
+
+
+        if (has_active_ui)
+            levelUI.refresh();
     }
 }
