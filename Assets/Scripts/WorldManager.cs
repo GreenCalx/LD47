@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Runtime.Serialization;
+using System.Reflection;
 using UnityEngine;
 
 
@@ -11,120 +13,47 @@ static class Constraints
     static public bool ShowNextInputsOnTimelineOnReplay = true;
 }
 
-public class WorldManager : MonoBehaviour, IControllable
-{
-    // for rewind just record everything
-    // TODO: do we really need a new class? cannot use a looper for this?
-    // well not really because we have to record everything happening in a tick for every
-    // players
-    // This is a shitty design as it is not easy to print the current timeline value while rewinding for instance
-    // the problem is that is can be hard to have something work well in reverse wioth physics and shit
-    public class Recorder
-    {
-        public void Record(int Tick, GameObject Go, PlayerController.Direction D)
-        {
-            // We are using a while loop because it is possible to 'leap' a tick
-            // and have to add 2 ticks instead of one
-            while (GameObjects.Count - 1 < Tick)
-            {
-                GameObjects.Add(new List<GameObject>());
-                Directions.Add(new List<PlayerController.Direction>());
-            }
-
-            GameObjects[Tick].Add(Go);
-            Directions[Tick].Add(D);
-        }
-
-        public void Tick()
-        {
-            var TickGameObjects = GameObjects[GameObjects.Count - 1];
-            var TickDirections = Directions[Directions.Count - 1];
-
-            TickGameObjects.Reverse();
-            TickDirections.Reverse();
-
-            for (int i = 0; i < TickGameObjects.Count; ++i)
-            {
-                var GO = TickGameObjects[i];
-                var D = TickDirections[i];
-                var Mover = GO.GetComponent<Movable>();
-                if (Mover) Mover.Move(PlayerController.InverseDirection(D), false);
-            }
-
-            GameObjects.RemoveAt(GameObjects.Count - 1);
-            Directions.RemoveAt(Directions.Count - 1);
-        }
-
-        public void Tick(int CurrentTick)
-        {
-
-            var TickGameObjects = GameObjects[CurrentTick];
-            var TickDirections = Directions[CurrentTick];
-
-            for (int i = 0; i < TickGameObjects.Count; ++i)
-            {
-                var GO = TickGameObjects[i];
-                var D = TickDirections[i];
-                var Mover = GO.GetComponent<Movable>();
-                if (Mover) Mover.Move(PlayerController.InverseDirection(D), false);
-            }
-        }
-
-        public void DeleteRecord(int Tick)
-        {
-            // for backward implementation we need to remove the last recoirded tick
-            if (GameObjects.Count -1 >= Tick)
-            {
-                GameObjects[Tick] = new List<GameObject>();
-                Directions[Tick] = new List<PlayerController.Direction>();
-            }
-
-        }
-
-        public bool IsEmpty()
-        {
-            return GameObjects.Count == 0;
-        }
-
-        List<List<GameObject>> GameObjects = new List<List<GameObject>>();
-        List<List<PlayerController.Direction>> Directions = new List<List<PlayerController.Direction>>();
-    }
-
+public class WorldManager : MonoBehaviour, IControllable, ISavable {
     // will be saved aka invariant
-    public Recorder Rewind = new Recorder();
-    public List<GameObject> Players = new List<GameObject>();
-    public int CurrentTick = -1;
-    public Vector2 StartPosition; //. First player will appear at this position
-    public float AutomaticReplayCurrentTime = 0;
-    public float CurrentTime = 0;
-    public bool NeedTick; // When player has chose a direction
-    public bool WaitForInput; // Playre is controlling so we wait for hi inputs
-    public bool NeedReset;
+    [System.Serializable]
+    public class Model : IModel
+    {
+        [System.NonSerialized]
+        public List<GameObject> Players = new List<GameObject>();
 
-    public bool IsRewinding = false;
-    public bool IsGoingBackward = true;
-    public bool FixedUpdatePassed = false;
+        public int CurrentTick = 0;
+        public float AutomaticReplayCurrentTime = 0;
+        public float CurrentTime = 0;
 
-    public bool AutomaticReplay = false;
-    public bool ForwardTick = false;
-    public bool BackwardTick = false;
+        public bool IsRewinding = false;
+        public bool IsGoingBackward = false;
+        public bool FixedUpdatePassed = false;
 
-    public InputManager IM;
+        public bool AutomaticReplay = false;
+        public bool ForwardTick = false;
+        public bool BackwardTick = false;
 
+        public float TickRate = 1f; // 2 seconds
+        public float AutomaticReplayRate = 0.2f;
+    }
+    IModel ISavable.GetModel()
+    {
+        return Mdl;
+    }
+    public Model Mdl = new Model();
     // will not be saved
     public GameObject PlayerPrefab;
     public GameObject levelUI_GOref;
+    private GameObject levelUI_GO;
 
-    public float TickRate = 1f; // 2 seconds
-    float AutomaticReplayRate = 0.2f;
+    public Vector2 StartPosition; //. First player will appear at this position
 
-
+    public InputManager IM;
 
     public MasterMixerControl MixerControl;
+    public Timeline TL;
 
-
-    // TODO: StateMachine
-
+    public bool UpdatePlayers = false;
     /// <summary>
     /// This function will create the prefab of player
     /// and add it to the current world manager to be managed by it for ticks
@@ -139,59 +68,44 @@ public class WorldManager : MonoBehaviour, IControllable
             // prefab is deactivated on spectree as it is used only as prefab
             // and we dont want it to work
             GO.SetActive(true);
-
             // if we create a new player it means that we have to wait for inputs now
-            WaitForInput = true;
-            NeedTick = false;
-
             // Not sure it is needed anymore but we deactivate all collision between players
             // as the first frame will be a player insisde another one (from which we break)
-            foreach (var Player in Players)
+            foreach (var Player in Mdl.Players)
             {
                 Physics2D.IgnoreCollision(Player.GetComponent<Collider2D>(), GO.GetComponent<Collider2D>());
             }
-            Players.Add(GO);
+            if (TL != null)
+               TL = TL.getNestedTimeline();
+            else
+               TL = new Timeline(0);
 
             // copy previous plqyer vqriqbles inside new one
-            if (Players.Count >= 2)
+            if (Mdl.Players.Count != 0)
             {
-                var PlayerA_Go = Players[Players.Count - 2];
-                var PlayerA = PlayerA_Go.GetComponent<PlayerController>();
+                var PlayerA = GetCurrentPlayer().GetComponent<PlayerController>();
+                Mdl.Players.Add(GO);
                 var PlayerB = GO.GetComponent<PlayerController>();
-                if (PlayerA && PlayerB)
+                PlayerB.Mdl.TL = TL;
+
+                for (int i = 0; i < TL.last_tick; ++i)
                 {
-                    // update energy loop to get nested counter
-                    //P.energyCounter = energyCounter.getNestedCounter();
-                    PlayerB.timeline = PlayerA.timeline.getNestedTimeline();
-                    if (!!PlayerA.levelUI)
+                    // IMPORTANT (mtn5): do not cache the count as we modify it during loop
+                    for (int j = 0; j < TL.Rewind.GameObjects[i].Count; ++j)
                     {
-                        PlayerB.levelUI = PlayerA.levelUI;
-                        PlayerB.levelUI.updatePlayerRef(GO);
-                        PlayerB.levelUI.refresh();
-                        PlayerB.has_active_ui = true; // switch ui
-                        PlayerA.has_active_ui = false;
+                        if (TL.Rewind.GameObjects[i][j] == PlayerA.gameObject)
+                        {
+                            TL.Rewind.GameObjects[i].Insert(j + 1, PlayerB.gameObject);
+                            TL.Rewind.Directions[i].Insert(j + 1, TL.Rewind.Directions[i][j]);
+                            j++;
+                        }
                     }
-
-                    // Update newly created looper with current loop previous
-                    // frames
-                    if (PlayerA.L.CurrentIdx != 0)
-                    {
-                        PlayerB.L.Events = PlayerA.L.Events.GetRange(0, PlayerA.L.CurrentIdx + 1);
-
-                        // copy into world recording for rewind
-                        for (int i = 0; i < PlayerB.L.Events.Count; ++i)
-                            Rewind.Record(i, GO, PlayerB.L.Events[i]); 
-
-                    }
-                    PlayerB.L.StartRecording();
-                    // IMPORTANT : this nees to be done after StartRecording as it will take current 
-                    // position as start position and we dont want that
-                    PlayerB.L.StartPosition = PlayerA.L.StartPosition;
-                    PlayerB.GetComponent<Movable>().StartPosition = PlayerB.L.StartPosition;
-
-                    PlayerB.BreakingTick = CurrentTick;
                 }
 
+                if (PlayerA && PlayerB)
+                {
+                    PlayerB.GetComponent<Movable>().StartPosition = PlayerA.GetComponent<Movable>().StartPosition;
+                }
                 // For now new players are randomly colored
                 var SpriteRender = GO.GetComponentInChildren<SpriteRenderer>();
                 if (SpriteRender)
@@ -199,16 +113,18 @@ public class WorldManager : MonoBehaviour, IControllable
                     // new player and current loop will always be the bright color
                     var c = PlayerA.gameObject.GetComponentInChildren<SpriteRenderer>().color;
                     SpriteRender.color = new Color(c.r, c.g, c.b, 1);
-
                     // then we uodate every other player color to be darker
-                    for (int i=0; i < Players.Count-1; ++i)
+                    for (int i=0; i < Mdl.Players.Count-1; ++i)
                     {
-                        Players[i].GetComponentInChildren<SpriteRenderer>().color *= 0.7f;
+                        Mdl.Players[i].GetComponentInChildren<SpriteRenderer>().color *= 0.7f;
                     }
-
-
                 }
-
+            }
+            else
+            {
+                Mdl.Players.Add(GO);
+                var PlayerB = GO.GetComponent<PlayerController>();
+                PlayerB.Mdl.TL = TL;
             }
         }
         return GO;
@@ -216,55 +132,53 @@ public class WorldManager : MonoBehaviour, IControllable
     // Start is called before the first frame update
     void Start()
     {
+        Mdl = new Model();
         var GO = AddPlayer(StartPosition);
         var PC = GO.GetComponent<PlayerController>();
         IM.Attach(PC);
         IM.Attach(this);
-        if (!!levelUI_GOref)
-            PC.initUI(levelUI_GOref);
-        else
-            Debug.Log("WorldManager : NO UI FOUND.");
 
-        // Todo : do we really need this?
-        // maybe we should use Awake?
-        PC.Start();
-        PC.has_active_ui = true;
-        PC.L.StartRecording();
+        levelUI_GO = Instantiate(levelUI_GOref);
+        levelUI_GO.GetComponent<LevelUI>().setModel(this);
 
         if (!MixerControl)
         {
             var Mixer = GameObject.Find("AudioMixerControl");
             if (Mixer) MixerControl = Mixer.GetComponent<MasterMixerControl>();
         }
-
     }
 
     public void AddRewindMove(GameObject go, PlayerController.Direction D)
     {
-        var Tick = CurrentTick;
-        Rewind.Record(Tick, go, D);
+        var Tick = Mdl.CurrentTick;
+        TL.Rewind.Record(Tick, go, D);
     }
 
     void FixedUpdate()
     {
-        if (!IsRewinding)
+        if (UpdatePlayers)
         {
-            // Update physique here
-            // it means that we can chose the order on which physics will be executed
-            // Lets do it first loop to last loop
-            if (!IsGoingBackward)
+            if (!Mdl.IsRewinding)
             {
-                for (int i = 0; i < Players.Count; ++i)
+                // Update physique here
+                // it means that we can chose the order on which physics will be executed
+                // Lets do it first loop to last loop
+                if (!Mdl.IsGoingBackward)
                 {
-                    var PC = Players[i].GetComponent<PlayerController>();
-                    PC.ApplyPhysics(IsGoingBackward);
-                    // IMPORTANT: sync tranforms between physics to change positions of object for
-                    // next physic tick
-                    Physics2D.SyncTransforms();
+                    for (int i = 0; i < Mdl.Players.Count; ++i)
+                    {
+                        var PC = Mdl.Players[i].GetComponent<PlayerController>();
+                        PC.ApplyPhysics(Mdl.IsGoingBackward);
+                        // IMPORTANT: sync tranforms between physics to change positions of object for
+                        // next physic tick
+                        Physics2D.SyncTransforms();
+                    }
+                    Mdl.CurrentTick++;
                 }
             }
+            UpdatePlayers = false;
         }
-        FixedUpdatePassed = true;
+        Mdl.FixedUpdatePassed = true;
     }
 
     void IControllable.ProcessInputs(Save.InputSaver.InputSaverEntry Entry)
@@ -277,165 +191,124 @@ public class WorldManager : MonoBehaviour, IControllable
         {
             if (Up || Down || Right || Left)
             {
-                NeedTick = true;
+                UpdatePlayers = true;
             }
         }
         else
         {
             bool needBreak = (Up || Down || Right || Left || Entry.Inputs["Break"].IsDown);
-            if (needBreak && !IsRewinding)
+            if (needBreak && !Mdl.IsRewinding)
             {
                 // create a new player at current position
-                if (Players.Count != 0)
+                if (Mdl.Players.Count != 0)
                 {
-                    var CurrentPlayer = Players[Players.Count - 1];
+                    var CurrentPlayer = Mdl.Players[Mdl.Players.Count - 1];
                     var GO = AddPlayer(CurrentPlayer.transform.position);
                     IM.Detach(CurrentPlayer.GetComponent<PlayerController>());
+                    CurrentPlayer.GetComponent<PlayerController>().IM = new InputManager();
+                    CurrentPlayer.GetComponent<PlayerController>().IM.CurrentMode = InputManager.Mode.REPLAY;
                     IM.Attach(GO.GetComponent<PlayerController>());
-                    GO.GetComponent<PlayerController>().TickRequired = true;
-                    NeedTick = true;
                     IM.CurrentMode = InputManager.Mode.RECORD;
                 }
             }
         }
 
-        ForwardTick = Entry.Inputs["Tick"].IsDown
-            || (WaitForInput && NeedTick)
-            || (Entry.Inputs["Tick"].Down && AutomaticReplayCurrentTime > AutomaticReplayRate);
-        BackwardTick = Entry.Inputs["BackTick"].IsDown && FixedUpdatePassed && CurrentTick != -1;
+        Mdl.ForwardTick = Entry.Inputs["Tick"].IsDown
+            || (Entry.Inputs["Tick"].Down && Mdl.AutomaticReplayCurrentTime > Mdl.AutomaticReplayRate);
+        Mdl.BackwardTick = Entry.Inputs["BackTick"].IsDown && Mdl.FixedUpdatePassed && Mdl.CurrentTick != -1;
 
-        if (Players.Count != 0)
+        if (Mdl.Players.Count != 0)
         {
-            PlayerController LastPlayer = Players[Players.Count - 1].GetComponent<PlayerController>();
-            BackwardTick = BackwardTick && (LastPlayer.IsLoopedControled || (!LastPlayer.IsLoopedControled && LastPlayer.BreakingTick != CurrentTick));
+            PlayerController LastPlayer = GetCurrentPlayer();
+            Mdl.BackwardTick = Mdl.BackwardTick && (IM.CurrentMode == InputManager.Mode.REPLAY || (TL.offset != Mdl.CurrentTick));
         }
+    }
 
-
+    public PlayerController GetCurrentPlayer()
+    {
+        if (Mdl.Players.Count != 0)
+            return Mdl.Players[Mdl.Players.Count - 1].GetComponent<PlayerController>();
+        else
+            return null;
     }
 
     void RewindTimeline()
     {
         if (MixerControl) MixerControl.SetPhasedMode();
-        NeedTick = false;
-        WaitForInput = false;
-        NeedReset = false;
+        Mdl.CurrentTime += Time.deltaTime;
 
         // If we were rewinding but it is finished, then we start the loops again
-        if (Rewind.IsEmpty())
+        if (TL.Rewind.IsEmpty())
         {
             if (MixerControl) MixerControl.SetNormalMode();
-
-            NeedReset = true;
-            IsRewinding = false;
-            CurrentTick = -1;
-
-            foreach (var Player in Players)
-            {
-                var Controller = Player.GetComponent<PlayerController>();
-                if (Controller) Controller.L.StartRunning();
-            }
+            Mdl.IsRewinding = false;
+            Mdl.CurrentTick = 0;
+            TL.reset();
         }
         else
         {
-            if (CurrentTime > TickRate)
+            if (Mdl.CurrentTime > Mdl.TickRate)
             {
-                CurrentTime = 0;
-                Rewind.Tick();
+                Mdl.CurrentTime = 0;
+                UpdateTimeLines(TL.Rewind.Tick());
             }
             return;
         }
 
     }
 
+    void UpdateTimeLines(int iTick)
+    {
+        foreach(GameObject PC in Mdl.Players)
+        {
+            PC.GetComponent<PlayerController>().Mdl.TL.setCurrentTick(iTick);
+        }
+    }
+
     void Update()
     {
-
         // todo: real timers
-        AutomaticReplayCurrentTime += Time.deltaTime;
-        if (!WaitForInput)
-        {
-            CurrentTime += Time.deltaTime;
-        }
-        // move all this in timeline?
+        Mdl.AutomaticReplayCurrentTime += Time.deltaTime;
         // Rewinding mechanic, deactivate all ticks
-        if (IsRewinding)
+        if (Mdl.IsRewinding)
         {
             RewindTimeline();
         }
         // applytick
-        else if (ForwardTick || BackwardTick)
+        else if (Mdl.ForwardTick || Mdl.BackwardTick)
         {
-            FixedUpdatePassed = false;
-            IsGoingBackward = BackwardTick;
+            Mdl.FixedUpdatePassed = false;
+            Mdl.IsGoingBackward = Mdl.BackwardTick;
 
-            if (BackwardTick)
-                CurrentTick--;
-            if (ForwardTick)
-                CurrentTick++;
+            if (Mdl.BackwardTick)
+                Mdl.CurrentTick--;
 
-            AutomaticReplayCurrentTime = 0;
+            Mdl.AutomaticReplayCurrentTime = 0;
 
-            NeedTick = false;
-            NeedReset = false;
-            int PlayersCount = Players.Count;
-            if (PlayersCount > 0)
+            if (Mdl.IsGoingBackward)
             {
-                PlayerController CurrentController = Players[PlayersCount - 1].GetComponent<PlayerController>();
-                Timeline TL = CurrentController.timeline;
-                if (!NeedReset)
-                {
-                    LevelUI UI = CurrentController.levelUI;
-
-                    bool CanMove = TL.getAt(CurrentTick);
-                    bool TLOver = TL.isTimelineOver();
-                    TL.setCurrentTick(CurrentTick);
-                    if (!!UI)
-                        UI.refresh(); //update if new cell
-                    if (TLOver)
-                    {
-                        CurrentController.L.StopRecording();
-                        WaitForInput = false;
-                        NeedReset = true;
-                        TL.reset();
-                    }
-                    else
-                    {
-                        CurrentController.WAIT_ORDER = !CanMove;
-                    }
-                    if (!!UI)
-                        UI.refresh();
-                }
-                else
-                {
-                    TL.reset();
-                }
+                TL.Rewind.Tick(Mdl.CurrentTick);
+                TL.Rewind.DeleteRecord(Mdl.CurrentTick);
             }
-            // require world tick, update all loops, etc
-            foreach (var Player in Players)
+            else
             {
-                var Controller = Player.GetComponent<PlayerController>();
-                if (Controller)
+                UpdateTimeLines(Mdl.CurrentTick);
+                if (TL.isTimelineOver())
                 {
-                    if (NeedReset)
-                    {
-                        Controller.L.IsRunning = true;
-                        Controller.IsLoopedControled = true;
-                        IsRewinding = true;
-                        IM.CurrentMode = InputManager.Mode.REPLAY;
-                    }
-                    else
-                    {
-                        // NOTE (toffa): this is weird but we have to ask for the last tick direction when going backward
-                        // or we will apply the direction from the previous tick to go back to it
-                        if (IsGoingBackward)
-                        {
-                            Rewind.Tick(CurrentTick + 1);
-                            Rewind.DeleteRecord(CurrentTick + 1);
-                        }
-                        else 
-                            Controller.RequireTick(CurrentTick);
-                    }
+                    Mdl.IsRewinding = true;
+                    Mdl.CurrentTime = 0;
                 }
+                UpdatePlayers = true;
+            }
+        }
+        else
+        {
+            Mdl.IsGoingBackward = false;
+            UpdateTimeLines(Mdl.CurrentTick);
+            if (TL.isTimelineOver())
+            {
+                Mdl.IsRewinding = true;
+                IM.CurrentMode = InputManager.Mode.REPLAY;
             }
         }
         if (Constraints.InputMode == 1)
@@ -443,5 +316,7 @@ public class WorldManager : MonoBehaviour, IControllable
             // modal mode
 
         }
+
+        levelUI_GO.GetComponent<LevelUI>().refresh(TL, IM.CurrentMode);
     }
 }

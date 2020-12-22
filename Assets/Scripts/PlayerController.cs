@@ -3,13 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Security.AccessControl;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using System.Runtime.Serialization;
 
 [RequireComponent(typeof(Movable))]
 [RequireComponent(typeof(BoxCollider2D))]
-public class PlayerController : MonoBehaviour, IControllable
-{
+public class PlayerController : MonoBehaviour, IControllable , ISavable {
     /// <summary>
     /// Directions related variables
     /// </summary>
@@ -30,69 +31,39 @@ public class PlayerController : MonoBehaviour, IControllable
     /// <summary>
     /// State variables
     /// </summary>
-    public Direction CurrentDirection = Direction.NONE;
-    public bool TickRequired = false;
-    public bool IsLoopedControled = false;
-    //public EnergyCounter energyCounter;
-    public Timeline timeline;
-    private GameObject levelUI_GOref;
-    private GameObject levelUI_GO;
-    public LevelUI levelUI;
-    public bool has_active_ui = false;
-    [SerializeField] private LayerMask wallmask;
-    //readonly float Speed = 1f;
-    public bool WAIT_ORDER = false;
-
-    public Looper L;
-
+   [System.Serializable]
+    public class Model : IModel
+    {
+        public Direction CurrentDirection = Direction.NONE;
+        [NonSerialized] private LayerMask wallmask;
+        public Timeline TL;
+    }
+    IModel ISavable.GetModel()
+    {
+        return Mdl;
+    }
+    public Model Mdl = new Model();
 
     public InputManager IM;
-
+    public WorldManager WM;
     List<GameObject> Tails = new List<GameObject>();
 
     /// <summary>
     /// References
     /// </summary>
-    public WorldManager WM;
     public GameObject TailPrefab;
 
+    public void Awake()
+    {
+        if (!TailPrefab) Debug.Log("[PlayerController] No TailPrefab reference in prefab");
+        Tails = new List<GameObject>();
 
-    public int BreakingTick = -1;
+        Mdl = new Model();
+    }
 
-    // Start is called before the first frame update
     public void Start()
     {
-        if (!WM) Debug.Log("[PlayerController] No WorldManager reference in prefab");
-        if (!TailPrefab) Debug.Log("[PlayerController] No TailPrefab reference in prefab");
-
-        // can it ever be !null at start?
-        if (timeline == null) timeline = new Timeline(0);
-
-        // needed due to the animation beiong played at startup
-        // we dont want it to collide yet
-        // it will be enabled again once the ani;ation is done
-        GetComponent<BoxCollider2D>().enabled = false;
-    }
-
-    public void initUI(GameObject iUIGORef)
-    {
-        levelUI_GOref = iUIGORef;
-        levelUI_GO = Instantiate(levelUI_GOref);
-        levelUI = levelUI_GO.GetComponent<LevelUI>();
-        levelUI.playerRef = this.gameObject;
-        levelUI.refresh();
-    }
-
-    /// <summary>
-    /// WorldManager will call this with its current tick as it is the 
-    /// master of ticks, this way all player's loops are synchronized
-    /// it will be used in FixedUpdate as it is fucking with physics possibily
-    /// </summary>
-    /// <param name="CurrentIdx"></param>
-    public void RequireTick(int CurrentIdx)
-    {
-        TickRequired = true;
-        L.CurrentIdx = CurrentIdx;
+        StartAnimation();
     }
 
     // TODO refacto: dont think it is needed?
@@ -121,64 +92,61 @@ public class PlayerController : MonoBehaviour, IControllable
     /// </summary>
     public void ApplyPhysics(bool ReverseDirection)
     {
-        if (TickRequired)
+        // We update the direction from the loop if it is loop controlled
+        if (IM.CurrentMode == InputManager.Mode.REPLAY)
+            Mdl.CurrentDirection = Mdl.TL.GetCurrent();
+        if (IM.CurrentMode == InputManager.Mode.RECORD)
         {
-            // We update the direction from the loop if it is loop controlled
-            if (L.IsRunning && IsLoopedControled)
-            {
-                CurrentDirection = L.Tick();
-            }
-
-            if (L.IsRecording)
-            {
-                if (L.Events.Count - 1 >= L.CurrentIdx)
-                {
-                    // remove previous recorded input
-                    L.Events[L.CurrentIdx] = CurrentDirection;
-                }
-                else
-                {
-                    L.Events.Add(CurrentDirection);
-                }
-            }
-            // Update position of the player
-            if (CurrentDirection != Direction.NONE)
-            {
-                // move
-                Movable Mover = GetComponent<Movable>();
-                if (ReverseDirection) CurrentDirection = InverseDirection(CurrentDirection);
-                if (Mover) Mover.Move(CurrentDirection);
-            }
-
-            // Reset position once we updated the player
-            // This way we expect the position to be None if the player is not
-            // touching any button during a tick
-            CurrentDirection = PlayerController.Direction.NONE;
-
-            foreach (var Tail in Tails)
-            {
-                if (Tail) Tail.GetComponent<Tail>().Tick();
-            }
+            if (!Mdl.TL.getAt(Mdl.TL.last_tick))
+                Mdl.CurrentDirection = Direction.NONE;
+            Mdl.TL.SetCurrent(Mdl.CurrentDirection);
         }
-        TickRequired = false;
+        // move
+        Movable Mover = GetComponent<Movable>();
+        if (ReverseDirection) Mdl.CurrentDirection = InverseDirection(Mdl.CurrentDirection);
+        if (Mover) Mover.Move(Mdl.CurrentDirection);
+        // Reset position once we updated the player
+        // This way we expect the position to be None if the player is not
+        // touching any button during a tick
+        Mdl.CurrentDirection = PlayerController.Direction.NONE;
+        foreach (var Tail in Tails)
+        {
+            if (Tail) Tail.GetComponent<Tail>().Tick();
+        }
     }
 
     // TODO refacto: do a real animation manager (also a real animation...)
     public float animationtime = 0.5f;
-    public float maxLocalScale = 200;
+    public float maxLocalScale = 2; //2 times bigger
     float currentAnimationTime = 0;
-    void testAnimation()
+    float startingScale = 0;
+    void StartAnimation()
+    {
+        // needed due to the animation beiong played at startup
+        // we dont want it to collide yet
+        // it will be enabled again once the animation is done
+        GetComponent<BoxCollider2D>().enabled = false;
+        currentAnimationTime = 0;
+        startingScale = transform.localScale.x;
+    }
+    void EndAnimation()
+    {
+        this.gameObject.transform.localScale = new Vector3(startingScale, startingScale, 1);
+        GetComponent<BoxCollider2D>().enabled = true;
+    }
+    bool Animate()
     {
         currentAnimationTime += Time.deltaTime;
-
         if (currentAnimationTime < animationtime)
         {
-            var s = Mathf.Max(100f, 100f + Mathf.Sin((animationtime - currentAnimationTime) * 20) * (maxLocalScale - 100f));
+            var s = Mathf.Max(startingScale, startingScale + Mathf.Sin((animationtime - currentAnimationTime) * 20) * startingScale * maxLocalScale);
             this.gameObject.transform.localScale = new Vector3(s, s, 1);
+            return true;
         }
         else
         {
-            this.gameObject.transform.localScale = new Vector3(100, 100, 1);
+            EndAnimation();
+            return false;
         }
     }
 
@@ -191,36 +159,24 @@ public class PlayerController : MonoBehaviour, IControllable
             var Right = Entry.Inputs[DirectionInputs[(int)Direction.RIGHT]].IsDown || Entry.isDpadRightPressed;
             var Left = Entry.Inputs[DirectionInputs[(int)Direction.LEFT]].IsDown || Entry.isDpadLeftPressed;
 
-            if (Up) CurrentDirection = Direction.UP;
-            if (Down) CurrentDirection = Direction.DOWN;
-            if (Left) CurrentDirection = Direction.LEFT;
-            if (Right) CurrentDirection = Direction.RIGHT;
+            if (Up) Mdl.CurrentDirection = Direction.UP;
+            if (Down) Mdl.CurrentDirection = Direction.DOWN;
+            if (Left) Mdl.CurrentDirection = Direction.LEFT;
+            if (Right) Mdl.CurrentDirection = Direction.RIGHT;
         }
     }
 
-    // Update is called once per frame
-    // Everything related to in^puts is done here
     void Update()
     {
-        if (currentAnimationTime < animationtime)
+        if (Animate())
         {
-            var Movabl = gameObject.GetComponent<Movable>();
-            if (Movabl) Movabl.Freeze = true;
-            testAnimation();
+            var Mover = gameObject.GetComponent<Movable>();
+            if (Mover) Mover.Freeze = true;
         }
         else
         {
-            var Movabl = gameObject.GetComponent<Movable>();
-            if (Movabl) Movabl.Freeze = false;
+            var Mover = gameObject.GetComponent<Movable>();
+            if (Mover) Mover.Freeze = false;
         }
-        if (WAIT_ORDER)
-        {
-            CurrentDirection = Direction.NONE;
-            WAIT_ORDER = false;
-        }
-
-
-        if (has_active_ui)
-            levelUI.refresh();
     }
 }

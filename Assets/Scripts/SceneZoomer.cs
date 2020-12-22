@@ -127,7 +127,7 @@ public class SceneZoomer : MonoBehaviour
         {
             // If map is not completely visible in camera frame, then
             // lerp the positions
-            GameObject player_go = __world_manager.Players.Last();
+            GameObject player_go = __world_manager.Mdl.Players.Last();
 
             Vector3 screenPos = __camera.WorldToScreenPoint(player_go.transform.position);
             float xratio = screenPos.x / __camera.pixelWidth;

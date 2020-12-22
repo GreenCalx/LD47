@@ -7,6 +7,168 @@ using System;
 using System.Collections.Specialized;
 using System.Runtime.Serialization;
 
+using System.Reflection;
+
+[Serializable]
+public abstract class IModel {
+    public void CopyData(IModel Dest)
+    {
+        var Props = GetType().GetFields();
+        foreach (FieldInfo property in Props)
+        {
+            var value = property.GetValue(this);
+            if (value != null)
+            {
+                property.SetValue(Dest, value);
+            }
+        }
+    }
+
+    public override bool Equals(object obj)
+    {
+        IModel In = (IModel)obj;
+        if (In == null) return false;
+        var Props = GetType().GetFields();
+        foreach (FieldInfo property in Props)
+        {
+            if(property.IsDefined(typeof(SerializableAttribute)))
+                if (!property.GetValue(this).Equals(property.GetValue(In)))
+                    return false;
+        }
+        return true;
+    }
+
+}
+
+public interface ISavable
+{
+    IModel GetModel();
+}
+
+// NOTE toffa: unfortunately we cannot instantiate gameobject and transofmr easily
+// those are the only two where we specifically have to create surrogate object to be
+// able to save their state
+[Serializable]
+public class Transform_Save {
+    Vector3 position;
+    Vector3 localPosition;
+    Quaternion localRotation;
+    Quaternion rotation;
+    Vector3 localScale;
+
+    int childCount;
+    GameObject_Save[] childs;
+
+    public Transform_Save(Transform T)
+    {
+        position = T.position;
+        localPosition = T.localPosition;
+        localRotation = T.localRotation;
+        rotation = T.rotation;
+        localScale = T.localScale;
+
+        childCount = T.childCount;
+        childs = new GameObject_Save[childCount];
+        for (int i = 0; i < T.childCount; ++i)
+        {
+           childs[i] = new GameObject_Save(T.GetChild(i).gameObject);
+        };
+    }
+
+    public void GetTransform(Transform T, bool CreateChilds)
+    {
+        T.position = position;
+        T.localPosition = localPosition;
+        T.localRotation = localRotation;
+        T.rotation = rotation;
+        T.localScale = localScale;
+
+        if (CreateChilds)
+        {
+            for (int i = 0; i < childCount; ++i)
+            {
+                GameObject go = new GameObject();
+                childs[i].GetGameObject(go, CreateChilds);
+            };
+        }
+    }
+
+    public override bool Equals(object obj)
+    {
+        Transform_Save In = (Transform_Save)obj;
+        if (In == null) return false;
+        var Fields = GetType().GetFields();
+        foreach (FieldInfo F in Fields)
+        {
+            if (!F.GetValue(this).Equals(F.GetValue(In)))
+                return false;
+        }
+        return true;
+    }
+}
+
+[Serializable]
+public class GameObject_Save
+{
+    string name;
+    int id;
+    Transform_Save transform;
+    List<IModel> Components = new List<IModel>();
+
+    public GameObject_Save(GameObject GO)
+    {
+        name = GO.name;
+        id = GO.GetInstanceID();
+        transform = new Transform_Save(GO.transform) ;
+
+        var Components_go = GO.GetComponents<MonoBehaviour>();
+        foreach (var Component in Components_go)
+        {
+            if (Component is ISavable)
+            {
+                var C = Activator.CreateInstance(Component.GetType());
+                (Component as ISavable).GetModel().CopyData((C as ISavable).GetModel());
+                Components.Add((C as ISavable).GetModel());
+            }
+        }
+    }
+
+    public void GetGameObject(GameObject GO, bool CreateChilds)
+    {
+        GO.name = name;
+        transform.GetTransform(GO.transform, CreateChilds);
+
+        var Components_go = GO.GetComponents<MonoBehaviour>();
+        for (int i = 0, j=0; i < Components_go.Length; ++i)
+        {
+            if (Components_go[i] is ISavable)
+            {
+                Components[j].CopyData((Components_go[i] as ISavable).GetModel());
+                j++;
+            }
+        }
+    }
+
+    public override bool Equals(object obj)
+    {
+        GameObject_Save In = obj as GameObject_Save;
+        if(In != null)
+        {
+            bool Result = In.name == this.name &&
+                In.transform.Equals(transform) && Components.Count == In.Components.Count;
+            if(Result)
+            {
+                for(int i = 0; i < Components.Count; ++i)
+                {
+                    if (!Components[i].Equals(In.Components[i])) return false;
+                }
+                return Result;
+            }
+        }
+        return false;
+    }
+}
+
 sealed class Vector3SerializationSurrogate : ISerializationSurrogate
 {
     // Method called to serialize a Vector3 object
@@ -91,269 +253,53 @@ sealed class ColorSerializationSurrogate : ISerializationSurrogate
     }
 }
 
-
 public class Save : MonoBehaviour
 {
     [Serializable]
     public class InputSaver
     {
         [Serializable]
-        public class MiniObject
-        {
-            public Vector3 Position;
-            public Vector3 LocalPosition;
-            public Vector3 LocalScale;
-            public Quaternion Rotation;
-            public Quaternion LocalRotation;
-            public String Name;
-
-            public MiniObject(Transform T, String Name)
-            {
-                Position = T.position;
-                Rotation = T.rotation;
-                LocalPosition = T.localPosition;
-                LocalRotation = T.localRotation;
-                LocalScale = T.localScale;
-                this.Name = Name;
-            }
-
-            public override bool Equals(object obj)
-            {
-                MiniObject B = (MiniObject)obj;
-                return Position == B.Position &&
-                Rotation == B.Rotation &&
-                LocalPosition == B.LocalPosition &&
-                LocalRotation == B.LocalRotation &&
-                LocalScale == B.LocalScale && Name == B.Name;
-            }
-        }
-        [Serializable]
-        public class WorldManagerData {
-            public List<PlayerData> Players = new List<PlayerData>();
-            public int CurrentTick = -1;
-            public float AutomaticReplayCurrentTime = 0;
-            public float CurrentTime = 0;
-            public bool NeedTick; // When player has chose a direction
-            public bool WaitForInput; // Playre is controlling so we wait for hi inputs
-            public bool NeedReset;
-            public bool IsRewinding = false;
-            public bool IsGoingBackward = true;
-            public bool FixedUpdatePassed = false;
-            public int PlayerCount = 0;
-
-            public WorldManagerData(WorldManager WM)
-            {
-                foreach (GameObject P in WM.Players)
-                {
-                    Players.Add(new PlayerData(P.GetComponent<PlayerController>()));
-                }
-                PlayerCount = WM.Players.Count;
-                CurrentTick = WM.CurrentTick;
-                AutomaticReplayCurrentTime = WM.AutomaticReplayCurrentTime;
-                CurrentTime = WM.CurrentTime;
-                NeedTick = WM.NeedTick; // When player has chose a direction
-                WaitForInput = WM.WaitForInput; // Playre is controlling so we wait for hi inputs
-                NeedReset = WM.NeedReset;
-                IsRewinding = WM.IsRewinding;
-                IsGoingBackward = WM.IsGoingBackward;
-                FixedUpdatePassed = WM.FixedUpdatePassed;
-
-            }
-            public void Apply(WorldManager WM)
-            {
-                // TODO: save recorder state
-                WM.Rewind = new WorldManager.Recorder();
-                for (int i = 0; i < WM.Players.Count; ++i)
-                {
-                    if(i >= Players.Count)
-                    {
-                        GameObject.Destroy(WM.Players[i]);
-                        WM.Players.RemoveAt(i);
-                    }
-                    else
-                    {
-                        Players[i].Apply(WM.Players[i].GetComponent<PlayerController>());
-                    }
-                }
-                WM.Players[WM.Players.Count-1].GetComponent<PlayerController>().levelUI.updatePlayerRef(WM.Players[WM.Players.Count-1]);
-                WM.CurrentTick = CurrentTick;
-                WM.AutomaticReplayCurrentTime = AutomaticReplayCurrentTime;
-                WM.CurrentTime = CurrentTime;
-                WM.NeedTick = NeedTick; // When player has chose a direction
-                WM.WaitForInput = WaitForInput; // Playre is controlling so we wait for hi inputs
-                WM.NeedReset = NeedReset;
-                WM.IsRewinding = IsRewinding;
-                WM.IsGoingBackward = IsGoingBackward;
-                WM.FixedUpdatePassed = FixedUpdatePassed;
-            }
-
-            public override bool Equals(object obj)
-            {
-                WorldManagerData B = (WorldManagerData)obj;
-                for (int i = 0; i < Players.Count; ++i)
-                {
-                    if (!Players[i].Equals(B.Players[i])) return false;
-                }
-                return B.CurrentTick == CurrentTick &&
-                B.AutomaticReplayCurrentTime == AutomaticReplayCurrentTime &&
-                //B.CurrentTime == CurrentTime && // very sensible to breaking ODTs
-                B.NeedTick == NeedTick && // When player has chose a direction
-                B.WaitForInput == WaitForInput && // Playre is controlling so we wait for hi inputs
-                B.NeedReset == NeedReset &&
-                B.IsRewinding == IsRewinding &&
-                B.IsGoingBackward == IsGoingBackward &&
-                B.FixedUpdatePassed == FixedUpdatePassed;
-            }
-        }
-        [Serializable]
-        public class LooperData
-        {
-            public List<PlayerController.Direction> Events = new List<PlayerController.Direction>();
-            public bool IsPaused = false;
-            public bool IsRunning = false;
-            public bool IsRecording = false;
-            public int CurrentIdx;
-
-            public LooperData(Looper L)
-            {
-                Events = L.Events;
-                IsPaused = L.IsPaused;
-                IsRunning = L.IsRunning;
-                IsRecording = L.IsRecording;
-                CurrentIdx = L.CurrentIdx;
-            }
-            public void Apply(Looper L)
-            {
-                L.Events = Events;
-                L.IsPaused = IsPaused;
-                L.IsRunning = IsRunning;
-                L.IsRecording = IsRecording;
-                L.CurrentIdx = CurrentIdx;
-            }
-            public override bool Equals(object obj)
-            {
-                LooperData B = (LooperData)obj;
-
-                for (int i =0; i < Events.Count; ++i)
-                {
-                    if (Events[i] != B.Events[i]) return false;
-                }
-                return IsPaused == B.IsPaused &&
-                                IsRunning == B.IsRunning &&
-                                IsRecording == B.IsRecording &&
-                                CurrentIdx == B.CurrentIdx;
-
-            }
-        }
-        [Serializable]
-        public class PlayerData
-        {
-            public PlayerController.Direction CurrentDirection = PlayerController.Direction.NONE;
-            public bool TickRequired = false;
-            public bool IsLoopedControled = false;
-            public bool HasAlreadyBeenBreakedFrom = false;
-            public bool has_active_ui = false;
-            public bool WAIT_ORDER = false;
-            public LooperData L;
-            public int BreakingTick = -1;
-            public Color SpriteColor;
-
-            public PlayerData(PlayerController PC)
-            {
-                CurrentDirection = PC.CurrentDirection;
-                TickRequired = PC.TickRequired;
-                IsLoopedControled = PC.IsLoopedControled;
-                has_active_ui = PC.has_active_ui;
-                WAIT_ORDER = PC.WAIT_ORDER;
-                L = new LooperData(PC.L);
-                BreakingTick = PC.BreakingTick;
-                SpriteColor = PC.gameObject.GetComponentInChildren<SpriteRenderer>().color;
-
-            }
-            public void Apply(PlayerController PC)
-            {
-                PC.CurrentDirection = CurrentDirection;
-                PC.TickRequired = TickRequired;
-                PC.IsLoopedControled = IsLoopedControled;
-                PC.has_active_ui = has_active_ui;
-                PC.WAIT_ORDER = WAIT_ORDER;
-                L.Apply(PC.L);
-                PC.BreakingTick = BreakingTick;
-                PC.gameObject.GetComponentInChildren<SpriteRenderer>().color = SpriteColor;
-            }
-            public override bool Equals(object obj)
-            {
-                PlayerData B = (PlayerData)obj;
-                return B.CurrentDirection == CurrentDirection &&
-                B.TickRequired == TickRequired &&
-                B.IsLoopedControled == IsLoopedControled &&
-                B.has_active_ui == has_active_ui &&
-                B.WAIT_ORDER == WAIT_ORDER &&
-                L.Equals(B.L) &&
-                B.BreakingTick == BreakingTick &&
-                SpriteColor.Equals(B.SpriteColor) ;
-
-            }
-        }
-
-        [Serializable]
         public class Frame
         {
-            public List<MiniObject> GameObjects = new List<MiniObject>();
-            public WorldManagerData WM;
+            public GameObject_Save[] SceneGameObjects;
             public void Init()
             {
-
-                GameObject[] SceneGameObjects = GameObject.FindObjectsOfType<GameObject>();
-
-                foreach (GameObject go in SceneGameObjects)
+                // NOTe toffa: we need to copy gameobject or else they will update once stored
+                // as they are stored by ref and not value
+                var SceneGameObjectsTemp = GameObject.FindObjectsOfType<GameObject>();
+                SceneGameObjects = new GameObject_Save[SceneGameObjectsTemp.Length];
+                int idx = 0;
+                foreach(GameObject go in SceneGameObjectsTemp)
                 {
-
-                    if(go.name.Contains("Tail") )
-                    {
-                        continue;
-                    }
-                    GameObjects.Add(new MiniObject(go.transform, go.name));
-                    if (go.name == "GameLoop")
-                    {
-                        WM = new WorldManagerData(go.GetComponent<WorldManager>());
-                    }
+                    SceneGameObjects[idx] = new GameObject_Save(go);
+                    idx++;
                 }
             }
             public void Apply()
             {
-                foreach (MiniObject go in GameObjects)
+                // NOTe toffa: we need to copy gameobject or else they will update once stored
+                // as they are stored by ref and not value
+                var SceneGameObjectsTemp = GameObject.FindObjectsOfType<GameObject>();
+                int idx = 0;
+                foreach(GameObject go in SceneGameObjectsTemp)
                 {
-                    GameObject CurrentGO = GameObject.Find(go.Name);
-                    if (CurrentGO)
-                    {
-                        CurrentGO.transform.position = go.Position;
-                        CurrentGO.transform.localPosition = go.LocalPosition;
-                        CurrentGO.transform.localScale = go.LocalScale;
-                        CurrentGO.transform.rotation = go.Rotation;
-                        CurrentGO.transform.localRotation = go.LocalRotation;
-
-                        if (go.Name == "GameLoop")
-                        {
-                            WorldManager CurrentWM = CurrentGO.GetComponent<WorldManager>();
-                            if (CurrentWM)
-                            {
-                                WM.Apply(CurrentWM);
-                            }
-                        }
-                    }
+                    SceneGameObjects[idx].GetGameObject(go, false);
+                    idx++;
                 }
             }
             public override bool Equals(object obj)
             {
-                Frame B = (Frame)obj;
-                for(int i=0;i < GameObjects.Count; ++i)
-                {
-                    if (!GameObjects[i].Equals(B.GameObjects[i]))
-                        return false;
-                }
+                Frame In = obj as Frame;
+                if (In != null && In.SceneGameObjects.Length != SceneGameObjects.Length) return false;
 
-                return WM.Equals(B.WM);
+                for(int i = 0; i < SceneGameObjects.Length;++i)
+                {
+                    if (!In.SceneGameObjects[i].Equals( SceneGameObjects[i]))
+                    {
+                        return false;
+                    }
+                }
+                return true;
             }
         }
         [Serializable]
@@ -416,7 +362,8 @@ public class Save : MonoBehaviour
 
                     foreach (KeyValuePair<String, InputSaverInput> Value in Inputs)
                     {
-                        if (!B.Inputs[Value.Key].Equals(Value.Value)) {
+                        if (!B.Inputs[Value.Key].Equals(Value.Value))
+                        {
                             return false;
                         }
                     }
@@ -470,7 +417,7 @@ public class Save : MonoBehaviour
         if (IsReplaying)
         {
 
-            if(FrameLock) return  IS.InputsFrame[CurrentIdx];
+            if (FrameLock) return IS.InputsFrame[CurrentIdx];
             if (CurrentIdx < IS.InputsFrame.Count)
             {
                 var CurrentInputFrame = IS.InputsFrame[CurrentIdx];
@@ -493,7 +440,8 @@ public class Save : MonoBehaviour
                     IS.FirstFrame.Apply();
                     if (!FrameLock) FrameLock = true;
                     return Tick(IS.InputsFrame[CurrentIdx]);
-                } else
+                }
+                else
                 {
                     CompareEndFrames();
                     return Entry;
@@ -541,9 +489,9 @@ public class Save : MonoBehaviour
                 {
                     BinaryFormatter BF = new BinaryFormatter();
                     SurrogateSelector ss = new SurrogateSelector();
-                   ss.AddSurrogate(typeof(Vector3),
-                                    new StreamingContext(StreamingContextStates.All),
-                                     new Vector3SerializationSurrogate());
+                    ss.AddSurrogate(typeof(Vector3),
+                                     new StreamingContext(StreamingContextStates.All),
+                                      new Vector3SerializationSurrogate());
                     ss.AddSurrogate(typeof(Quaternion),
                                     new StreamingContext(StreamingContextStates.All),
                                     new QuaternionSerializationSurrogate());
@@ -574,32 +522,33 @@ public class Save : MonoBehaviour
     {
         if (IsRecording)
         {
-                IS.EndFrame.Init();
+            IS.EndFrame.Init();
 
-                String Path = Application.persistentDataPath + "/" + FileName + ".save";
-                if (!IsSerializing && !IsReplaying && IS.InputsFrame.Count != 0)
-                {
-                    BinaryFormatter BF = new BinaryFormatter();
-                    SurrogateSelector ss = new SurrogateSelector();
-                   ss.AddSurrogate(typeof(Vector3),
-                                    new StreamingContext(StreamingContextStates.All),
-                                     new Vector3SerializationSurrogate());
-                    ss.AddSurrogate(typeof(Quaternion),
-                                    new StreamingContext(StreamingContextStates.All),
-                                    new QuaternionSerializationSurrogate());
-                    ss.AddSurrogate(typeof(Color),
-                        new StreamingContext(StreamingContextStates.All),
-                        new ColorSerializationSurrogate());
-                    BF.SurrogateSelector = ss;
+            String Path = Application.persistentDataPath + "/" + FileName + ".save";
+            if (!IsSerializing && !IsReplaying && IS.InputsFrame.Count != 0)
+            {
+                BinaryFormatter BF = new BinaryFormatter();
+                SurrogateSelector ss = new SurrogateSelector();
+                ss.AddSurrogate(typeof(Vector3),
+                                 new StreamingContext(StreamingContextStates.All),
+                                  new Vector3SerializationSurrogate());
+                ss.AddSurrogate(typeof(Quaternion),
+                                new StreamingContext(StreamingContextStates.All),
+                                new QuaternionSerializationSurrogate());
+                ss.AddSurrogate(typeof(Color),
+                    new StreamingContext(StreamingContextStates.All),
+                    new ColorSerializationSurrogate());
 
-                    FileStream file = File.Create(Path);
-                    IsSerializing = true;
-                    BF.Serialize(file, IS);
-                    IsSerializing = false;
-                    file.Close();
+                BF.SurrogateSelector = ss;
 
-                    IS = new InputSaver();
-                }
+                FileStream file = File.Create(Path);
+                IsSerializing = true;
+                BF.Serialize(file, IS);
+                IsSerializing = false;
+                file.Close();
+
+                IS = new InputSaver();
+            }
         }
 
         if (IsReplaying)
@@ -632,15 +581,15 @@ public class Save : MonoBehaviour
         }
         BinaryFormatter BF = new BinaryFormatter();
         SurrogateSelector ss = new SurrogateSelector();
-                   ss.AddSurrogate(typeof(Vector3),
-                                    new StreamingContext(StreamingContextStates.All),
-                                     new Vector3SerializationSurrogate());
-                    ss.AddSurrogate(typeof(Quaternion),
-                                    new StreamingContext(StreamingContextStates.All),
-                                    new QuaternionSerializationSurrogate());
-                    ss.AddSurrogate(typeof(Color),
+        ss.AddSurrogate(typeof(Vector3),
+                         new StreamingContext(StreamingContextStates.All),
+                          new Vector3SerializationSurrogate());
+        ss.AddSurrogate(typeof(Quaternion),
                         new StreamingContext(StreamingContextStates.All),
-                        new ColorSerializationSurrogate());
+                        new QuaternionSerializationSurrogate());
+        ss.AddSurrogate(typeof(Color),
+            new StreamingContext(StreamingContextStates.All),
+            new ColorSerializationSurrogate());
         BF.SurrogateSelector = ss;
         using (FileStream stream = new FileStream(Application.persistentDataPath + "/" + FileName + ".save", FileMode.Open, FileAccess.Read))
         {

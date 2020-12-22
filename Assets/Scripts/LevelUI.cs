@@ -12,8 +12,6 @@ public class LevelUI : MonoBehaviour
     private UITimeUnit[]    __time_units_squares;
     private UILooperState   __ui_looper_state;
     private UIInputsPanel   __ui_inputs_panel;
-    private PlayerController playerController = null;
-    private bool hasPlayerRef = false;
 
     public Sprite ui_input_up;
     public Sprite ui_input_left;
@@ -22,15 +20,12 @@ public class LevelUI : MonoBehaviour
     public Sprite ui_input_none;
     private const string ENERGY_PANEL_PREFIX = "ENERGY";
 
+    private WorldManager WM;
+
     // Start is called before the first frame update
     void Start()
     {
-        if ( playerRef != null)
-        {
-            playerController = playerRef.GetComponent<PlayerController>();
-            hasPlayerRef = (playerController != null);
-        }
-        __time_units_squares = GetComponentsInChildren<UITimeUnit>();
+              __time_units_squares = GetComponentsInChildren<UITimeUnit>();
        
         // update time cursor pos
 
@@ -49,42 +44,37 @@ public class LevelUI : MonoBehaviour
     {
     }
 
-    public void updatePlayerRef( GameObject newRef)
-    {
-        if (newRef == null)
-            return;
-        playerRef = newRef;
-        if ( playerRef != null)
-        {
-            playerController = playerRef.GetComponent<PlayerController>();
-            hasPlayerRef = (playerController != null);
-            
-        }
-    }
 
-    public void refresh()
+    public void refresh(Timeline TL, InputManager.Mode Mode)
     {
-        //updatePlayerRef(playerRef);
-        if (!!hasPlayerRef)
+        updateTimeUnits(TL);
+
+        if (Mode == InputManager.Mode.RECORD)
         {
-            Timeline tl = playerController.timeline;
-            if (tl != null)
-            {
-                updateTimeUnits(tl);
-                updateLooperState(playerController.L);
-                updateInfoPanel(playerController.L);
-            }
+            __ui_looper_state.setToRecording();
+            __ui_inputs_panel.setToRecording();
         }
-        else { Debug.Log("UITimeline : Player ref is missing"); }
+        else if (Mode == InputManager.Mode.REPLAY)
+        {
+            __ui_looper_state.setToReplay();
+            __ui_inputs_panel.setToReplay();
+        }
+        else
+        {
+            __ui_looper_state.setToEmpty();
+            __ui_inputs_panel.setToEmpty();
+        }
+        //updateLooperState(playerController.L);
+        //updateInfoPanel(playerController.L);
     }
 
     private void updateLooperState( Looper iLooper )
     {
         if ( __ui_looper_state == null )
             return;
-        if ( iLooper.IsRecording )
+        if ( iLooper.Data.IsRecording )
             __ui_looper_state.setToRecording();
-        else if ( iLooper.IsRunning )
+        else if ( iLooper.Data.IsRunning )
             __ui_looper_state.setToReplay();
         else
             __ui_looper_state.setToEmpty();
@@ -94,12 +84,17 @@ public class LevelUI : MonoBehaviour
     {
         if (__ui_inputs_panel == null)
             return;
-        if (iLooper.IsRecording)
+        if (iLooper.Data.IsRecording)
             __ui_inputs_panel.setToRecording();
-        else if (iLooper.IsRunning)
+        else if (iLooper.Data.IsRunning)
             __ui_inputs_panel.setToReplay();
         else
             __ui_inputs_panel.setToEmpty();
+    }
+
+    public void setModel(WorldManager WM)
+    {
+        this.WM = WM;
     }
 
     private void updateTimeUnits(Timeline iTL)
@@ -117,11 +112,10 @@ public class LevelUI : MonoBehaviour
                 __time_units_squares[i].showDisabled();
             }
             else {
-                if ( i > iTL.getTickForTimeUnits(Constraints.ShowNextInputsOnTimelineOnReplay && hasPlayerRef && playerController.IsLoopedControled))
+                if ( i > iTL.getTickForTimeUnits(Constraints.ShowNextInputsOnTimelineOnReplay && WM.IM.CurrentMode == InputManager.Mode.REPLAY))
                     __time_units_squares[i].showEnabled();
-                    //__time_units_squares[i].changeSprite( available_time_unit );
-                else if (playerController.L.Events.Count > i)
-                    updateSquareInputImage( i, playerController.L.Events[i]);
+                else if (i < WM.TL.last_tick)
+                    updateSquareInputImage( i, WM.TL.Events[i]);
             }
 
             // get current tick time unit square
@@ -132,7 +126,7 @@ public class LevelUI : MonoBehaviour
                     current_tick_square_transform = __time_units_squares[i].gameObject.transform;
                     current_time_unit_index = i;
                     __time_units_squares[i].setSelect(true);
-                    if(Constraints.ShowDefaultTileOnCursor && hasPlayerRef && !playerController.IsLoopedControled) {
+                    if(Constraints.ShowDefaultTileOnCursor && WM.IM.CurrentMode==InputManager.Mode.RECORD) {
                         // case record show default
                         if(square_is_active)
                             __time_units_squares[i].changeSprite(ui_input_none);

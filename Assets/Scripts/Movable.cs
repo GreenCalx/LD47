@@ -37,68 +37,59 @@ public class Movable : MonoBehaviour
     public bool Move(PlayerController.Direction D, bool ApplyPhysicsBetweenPlayers = true)
     {
         if (Freeze) return false;
-        if (D == PlayerController.Direction.NONE) return false;
-
         bool NeedToBeMoved = false;
-
-        var Direction = PlayerController.Directionf[(int)D];
-        Vector3 Dir3 = new Vector3(Direction.x, Direction.y, 0);
-        // WALL HITS
-        RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position + (0.6f * Dir3), Dir3, 0.5f, wallmask);
-        if (hits.Length != 0) return false;
-        // MOVABLE HITS
-        RaycastHit2D[] hitsm = Physics2D.RaycastAll(transform.position + (0.6f * Dir3), Dir3, 0.5f, movablemask);
-        hitsm = hitsm.Where(val => (val.collider.gameObject != this.gameObject)).ToArray(); // filter our own gameobject
-
-        if (!ApplyPhysicsBetweenPlayers)
-             hitsm = hitsm.Where(val => (val.collider.gameObject.GetComponent<PlayerController>() == null)).ToArray(); // filter our own gameobject
-
-        if (hitsm.Length == 0)
+        if (D != PlayerController.Direction.NONE)
         {
-            NeedToBeMoved = true;
-        }
-        else
-        {
-            foreach (RaycastHit2D hit in hitsm)
+            var Direction = PlayerController.Directionf[(int)D];
+            Vector3 Dir3 = new Vector3(Direction.x, Direction.y, 0);
+            // WALL HITS
+            RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position + (0.6f * Dir3), Dir3, 0.5f, wallmask);
+            if (hits.Length != 0) return false;
+            // MOVABLE HITS
+            RaycastHit2D[] hitsm = Physics2D.RaycastAll(transform.position + (0.6f * Dir3), Dir3, 0.5f, movablemask);
+            hitsm = hitsm.Where(val => (val.collider.gameObject != this.gameObject)).ToArray(); // filter our own gameobject
+
+            if (!ApplyPhysicsBetweenPlayers)
+                hitsm = hitsm.Where(val => (val.collider.gameObject.GetComponent<PlayerController>() == null)).ToArray(); // filter our own gameobject
+
+            if (hitsm.Length == 0)
             {
-                if (hit.collider.gameObject != this.gameObject) // not necessary should already be filtered
+                NeedToBeMoved = true;
+            }
+            else
+            {
+                foreach (RaycastHit2D hit in hitsm)
                 {
-                    if (hit.collider != null)
+                    if (hit.collider.gameObject != this.gameObject) // not necessary should already be filtered
                     {
-                        // Detect if we are colliding with a player
-                        // If the player asked for the same direction than us last event
-                        // We dont execute the move and simply move this object because physic
-                        // is executed in a certain order
-                        var PC = hit.collider.GetComponent<PlayerController>();
-                        var mePC = GetComponent<PlayerController>();
-
-                        var Mov = hit.collider.GetComponent<Movable>();
-                        if (Mov)
+                        if (hit.collider != null)
                         {
-                            if (PC && mePC && !PC.L.IsRecording)
+                            // Detect if we are colliding with a player
+                            // If the player asked for the same direction than us last event
+                            // We dont execute the move and simply move this object because physic
+                            // is executed in a certain order
+                            var PC = hit.collider.GetComponent<PlayerController>();
+                            var mePC = GetComponent<PlayerController>();
+
+                            var Mov = hit.collider.GetComponent<Movable>();
+                            if (Mov)
                             {
-                                if (PC.L.Events[PC.L.CurrentIdx] != mePC.L.Events[mePC.L.CurrentIdx])
+                                if (PC && mePC && !(PC.IM.CurrentMode == InputManager.Mode.RECORD))
                                 {
-                                    //execute move on player which colide
                                     NeedToBeMoved = Mov.Move(D);
                                 }
                                 else
                                 {
-                                    NeedToBeMoved = true;
+                                    NeedToBeMoved = Mov.Move(D);
                                 }
-                            }
-                            else
-                            {
-                                NeedToBeMoved = Mov.Move(D);
                             }
                         }
                     }
                 }
             }
+            if (NeedToBeMoved) UpdatePosition(Direction, D);
         }
-
-        if (NeedToBeMoved) UpdatePosition(Direction, D);
-        if (!WM.IsRewinding && ResetBetweenLoops &&!WM.IsGoingBackward) WM.AddRewindMove(this.gameObject, D);
+        if (!WM.Mdl.IsRewinding && ResetBetweenLoops &&!WM.Mdl.IsGoingBackward) WM.AddRewindMove(this.gameObject, D);
         return NeedToBeMoved;
     }
 
@@ -158,7 +149,7 @@ public class Movable : MonoBehaviour
             SR.transform.localPosition = Vector2.zero;
         }
 
-        if (WM.NeedReset && ResetBetweenLoops && !WM.IsRewinding)
+        if ( WM.Mdl.CurrentTick == 0 && ResetBetweenLoops && !WM.Mdl.IsRewinding)
         {
             this.gameObject.transform.position = StartPosition;
             SR.transform.localPosition = Vector2.zero;

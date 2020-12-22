@@ -1,38 +1,34 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
+using System.Reflection;
 
-public class Looper : MonoBehaviour
-{
-    // Needed to update some of PC state like:
-    // Position
-    // IsLoopControlled
+
+[System.Serializable]
+public class Looper : MonoBehaviour, ISavable {
     public PlayerController PC;
     // StartPosition is the position from which the record started
     public Vector2 StartPosition;
-    // Events are the recorded events that happened during a recording
-    // Be careful that the Event 0 is the first event to happen, therefor a Tick
-    // will be the NONE direction applied to the first tick
-    public List<PlayerController.Direction> Events = new List<PlayerController.Direction>();
-    /// <summary>
-    /// States
-    /// </summary>
-    public bool IsPaused = false;
-    public bool IsRunning = false;
-    public bool IsRecording = false;
-    // CurrentIdx is maintained by WorldManager... Yes, I know...
-    public int CurrentIdx;
-
-    /// <summary>
-    /// This is called from PlayerController to get the current tick direction
-    /// </summary>
-    /// <returns></returns>
-    public PlayerController.Direction Tick()
+    public class Model : IModel
     {
-        // If we asked for a Tick that is greater than current loop size, we simply return the None move
-        if (CurrentIdx >= Events.Count) return PlayerController.Direction.NONE;
-        else return Events[CurrentIdx];
+        // Events are the recorded events that happened during a recording
+        // Be careful that the Event 0 is the first event to happen, therefor a Tick
+        // will be the NONE direction applied to the first tick
+        public bool IsPaused = false;
+        public bool IsRunning = false;
+        public bool IsRecording = false;
+        // CurrentIdx is maintained by WorldManager... Yes, I know...
+        public int CurrentIdx;
     }
+
+    IModel ISavable.GetModel()
+    {
+        return Data;
+    }
+    public Model Data = new Model();
+
+
     /// <summary>
     /// Reset will put back invariant but most notably will reset the position of the object to the
     /// StartPosition
@@ -41,10 +37,10 @@ public class Looper : MonoBehaviour
     {
         PC.gameObject.transform.position = new Vector3(StartPosition.x, StartPosition.y, 0);
         PC.GetComponentInChildren<SpriteRenderer>().transform.localPosition = Vector3.zero;
-        IsRunning = false;
-        IsPaused = false;
-        IsRecording = false;
-        CurrentIdx = 0;
+        Data.IsRunning = false;
+        Data.IsPaused = false;
+        Data.IsRecording = false;
+        Data.CurrentIdx = 0;
     }
     /// <summary>
     /// Only call Reset for now
@@ -52,10 +48,8 @@ public class Looper : MonoBehaviour
     public void StartRunning()
     {
         Reset();
-        IsRunning = true;
+        Data.IsRunning = true;
 
-        PC.IsLoopedControled = true;
-        PC.WM.WaitForInput = false;
     }
     /// <summary>
     /// Only call reset for now
@@ -64,15 +58,14 @@ public class Looper : MonoBehaviour
     {
         Reset();
 
-        PC.IsLoopedControled = false;
     }
     /// <summary>
     /// Will pause the loop if running
     /// </summary>
     public void TogglePause()
     {
-        if (IsRunning) 
-            IsPaused = !IsPaused;
+        if (Data.IsRunning) 
+            Data.IsPaused = !Data.IsPaused;
     }
     /// <summary>
     /// Start a recording
@@ -81,22 +74,20 @@ public class Looper : MonoBehaviour
     public void StartRecording()
     {
         StartPosition = PC.gameObject.transform.position;
-        IsRecording = true;
-        IsPaused = false;
-        IsRunning = false;
+        Data.IsRecording = true;
+        Data.IsPaused = false;
+        Data.IsRunning = false;
 
-        PC.IsLoopedControled = false;
     }
     /// <summary>
     /// Update the invariant
     /// </summary>
     public void StopRecording()
     {
-        IsRecording = false;
-        IsRunning = false;
-        IsPaused = false;
+        Data.IsRecording = false;
+        Data.IsRunning = false;
+        Data.IsPaused = false;
 
-        PC.IsLoopedControled = false;
     }
     /// <summary>
     /// 

@@ -344,12 +344,18 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 1464468847}
   m_PrefabAsset: {fileID: 0}
---- !u!20 &327295586 stripped
-Camera:
-  m_CorrespondingSourceObject: {fileID: 8533916066985495850, guid: 1ed095b18ab63fd4482bae6724183a66,
+--- !u!114 &359155354 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6267420518410856645, guid: 56dc0bf154277214f97b9d48fc70c01b,
     type: 3}
-  m_PrefabInstance: {fileID: 8533916065978489438}
+  m_PrefabInstance: {fileID: 69680145}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bb662ad080fa6047a2fdbcf2ac1dfd4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &768062501
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -820,6 +826,31 @@ PrefabInstance:
       propertyPath: IM
       value: 
       objectReference: {fileID: 806235567}
+    - target: {fileID: 893246269087679359, guid: c83a65c7c8e8b1248beb94dd7164f8be,
+        type: 3}
+      propertyPath: Data.IM
+      value: 
+      objectReference: {fileID: 806235567}
+    - target: {fileID: 893246269087679359, guid: c83a65c7c8e8b1248beb94dd7164f8be,
+        type: 3}
+      propertyPath: Data.MixerControl
+      value: 
+      objectReference: {fileID: 359155354}
+    - target: {fileID: 893246269087679359, guid: c83a65c7c8e8b1248beb94dd7164f8be,
+        type: 3}
+      propertyPath: Data.StartPosition.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 893246269087679359, guid: c83a65c7c8e8b1248beb94dd7164f8be,
+        type: 3}
+      propertyPath: Data.StartPosition.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 893246269087679359, guid: c83a65c7c8e8b1248beb94dd7164f8be,
+        type: 3}
+      propertyPath: MixerControl
+      value: 
+      objectReference: {fileID: 359155354}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c83a65c7c8e8b1248beb94dd7164f8be, type: 3}
 --- !u!114 &1464468848 stripped

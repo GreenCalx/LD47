@@ -4,16 +4,95 @@ using UnityEngine;
 
 public class Timeline 
 {
+    // for rewind just record everything
+    // This is a shitty design as it is not easy to print the current timeline value while rewinding for instance
+    // the problem is that is can be hard to have something work well in reverse wioth physics and shit
+    public class Recorder
+    {
+        public void Record(int Tick, GameObject Go, PlayerController.Direction D)
+        {
+            // We are using a while loop because it is possible to 'leap' a tick
+            // and have to add 2 ticks instead of one
+            while (GameObjects.Count - 1 < Tick)
+            {
+                GameObjects.Add(new List<GameObject>());
+                Directions.Add(new List<PlayerController.Direction>());
+            }
+
+            GameObjects[Tick].Add(Go);
+            Directions[Tick].Add(D);
+        }
+
+        public int Tick()
+        {
+            var TickGameObjects = GameObjects[GameObjects.Count - 1];
+            var TickDirections = Directions[Directions.Count - 1];
+
+            TickGameObjects.Reverse();
+            TickDirections.Reverse();
+
+            for (int i = 0; i < TickGameObjects.Count; ++i)
+            {
+                var GO = TickGameObjects[i];
+                var D = TickDirections[i];
+                var Mover = GO.GetComponent<Movable>();
+                if (Mover) Mover.Move(PlayerController.InverseDirection(D), false);
+            }
+
+            GameObjects.RemoveAt(GameObjects.Count - 1);
+            Directions.RemoveAt(Directions.Count - 1);
+
+            return GameObjects.Count;
+        }
+
+        public void Tick(int CurrentTick)
+        {
+            var TickGameObjects = GameObjects[CurrentTick];
+            var TickDirections = Directions[CurrentTick];
+
+            for (int i = 0; i < TickGameObjects.Count; ++i)
+            {
+                var GO = TickGameObjects[i];
+                var D = TickDirections[i];
+                var Mover = GO.GetComponent<Movable>();
+                if (Mover) Mover.Move(PlayerController.InverseDirection(D), false);
+            }
+        }
+
+        public void DeleteRecord(int Tick)
+        {
+            // for backward implementation we need to remove the last recoirded tick
+            if (GameObjects.Count -1 >= Tick)
+            {
+                GameObjects[Tick] = new List<GameObject>();
+                Directions[Tick] = new List<PlayerController.Direction>();
+            }
+
+        }
+
+        public bool IsEmpty()
+        {
+            return GameObjects.Count == 0;
+        }
+
+        public List<List<GameObject>> GameObjects = new List<List<GameObject>>();
+        public List<List<PlayerController.Direction>> Directions = new List<List<PlayerController.Direction>>();
+    }
+
+
+    public Recorder Rewind = new Recorder();
+
     private const int N_MEASURES    = 5;
     private const int MEASURE_SIZE  = 5;
 
     // 0/F : silence
     // 1/T : play
+    public PlayerController.Direction[] Events;
     private BitArray    __timeLine;
-    private int          last_tick;
+    public int          last_tick;
     // offset is used to set timeline start to a given timeunit
     // used to avoid unwanted disabled time when getting a nested loop
-    private int offset;
+    public int offset;
     public  bool        timeline_finished;
 
     // Loop Level
@@ -27,6 +106,7 @@ public class Timeline
     public Timeline( int iLoopLevel )
     {
         offset = 0;
+        Events = new PlayerController.Direction[N_MEASURES * MEASURE_SIZE];
         reset(iLoopLevel);
     }
 
@@ -34,12 +114,23 @@ public class Timeline
     {
         offset      = iLastTick;
         last_tick   = iLastTick;
+        Events = new PlayerController.Direction[N_MEASURES * MEASURE_SIZE];
         reset(iLoopLevel, iLastTick);
     }
 
     public void reset( int iLoopLevel )
     {
         reset(iLoopLevel, -1);
+    }
+
+    public PlayerController.Direction GetCurrent()
+    {
+        return Events[last_tick];
+    }
+
+    public void SetCurrent(PlayerController.Direction Dir)
+    {
+        Events[last_tick] = Dir;
     }
 
     public void reset( int iLoopLevel, int iLastTick )
@@ -52,7 +143,7 @@ public class Timeline
 
     public int getTickForCursor()
     {
-        return last_tick+1;
+        return last_tick;
     }
 
     public int getTickForTimeUnits( bool Saturate = false)
@@ -76,16 +167,18 @@ public class Timeline
     public void init()
     {
         __timeLine = new BitArray( N_MEASURES * MEASURE_SIZE, true);
-        for ( int i=0; i < __timeLine.Count; i+=MEASURE_SIZE)
+        if (loop_level == 0) return;
+        for ( int i=offset; i < __timeLine.Count; ++i)
         {
-            if ( i < offset )
-                continue;
-            for ( int j=loop_level; j > 0; j--)
+            //remap to 1 - MEASURE_SIZE to avoid 0
+            int idx = (i - (((int)(i / MEASURE_SIZE)) * MEASURE_SIZE)) +1;
+            for(int j = MEASURE_SIZE - (loop_level-1); j <= MEASURE_SIZE; ++j)
             {
-                int k = i;                  // place cursor
-                k += (MEASURE_SIZE - j );   // apply offset
-                __timeLine[k] = false;
-            }//! for j
+                if( (idx)%j==0)
+                {
+                    __timeLine[i] = false;
+                }
+            }
         }//! for i
     }//! init
 
@@ -96,8 +189,7 @@ public class Timeline
 
     public bool isTimelineOver()
     {
-        // NOTE (Toffa) : We need to look at last_tick +1 because last_tick would be 24 as the first is 0 if we want to check for 25 steps
-        timeline_finished = ( last_tick+1 >= N_MEASURES*MEASURE_SIZE );
+        timeline_finished = ( last_tick >= N_MEASURES*MEASURE_SIZE );
         return timeline_finished;
     }
 
@@ -110,7 +202,10 @@ public class Timeline
 
     public Timeline getNestedTimeline()
     {
-        return new Timeline( loop_level+1, last_tick);
+        var Result = new Timeline( loop_level+1, last_tick);
+        System.Array.Copy(this.Events, Result.Events, last_tick);
+        Result.Rewind = (Rewind);
+        return Result; 
     }
 
 }
