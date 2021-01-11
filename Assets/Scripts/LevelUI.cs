@@ -102,6 +102,9 @@ public class LevelUI : MonoBehaviour
         // update time units sprites
         Transform current_tick_square_transform = null;
         int current_time_unit_index=0;
+        if (null==__time_units_squares)
+            return;
+
         for (int i=0; i<__time_units_squares.Length ;i++)
         {
             bool square_is_active = iTL.getAt(i);

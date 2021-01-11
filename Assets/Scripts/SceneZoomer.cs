@@ -99,8 +99,6 @@ public class SceneZoomer : MonoBehaviour
 
     private void tryCenter()
     {
-        Debug.Log("try center");
-
         Bounds tmap_bounds = __ground_tmap.localBounds;
 
         Vector3 screenPos_minbound = __camera.WorldToScreenPoint( tmap_bounds.min  + __ground_tmap.transform.position );

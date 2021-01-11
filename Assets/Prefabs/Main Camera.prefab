@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8533916066985495851}
   - component: {fileID: 8533916066985495850}
+  - component: {fileID: 7948679055537135247}
   - component: {fileID: 8533916066985495853}
   - component: {fileID: 8533916066985495848}
   m_Layer: 0
@@ -60,7 +61,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 8
+  orthographic size: 7.597002
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -76,6 +77,26 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!114 &7948679055537135247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8533916066985495852}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a160d838ff8b4b4693ac20007e008c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AssetsPPU: 100
+  m_RefResolutionX: 640
+  m_RefResolutionY: 480
+  m_UpscaleRT: 0
+  m_PixelSnapping: 0
+  m_CropFrameX: 0
+  m_CropFrameY: 0
+  m_StretchFill: 0
 --- !u!81 &8533916066985495853
 AudioListener:
   m_ObjectHideFlags: 0
@@ -97,6 +118,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   zoom_speed: 1
-  upper_bound: 20
-  lower_bound: 1
-  smooth_speed: 2
+  upper_zoom_bound: 8
+  lower_zoom_bound: 1
+  zoom_smooth_speed: 2
+  camera_upper_xbound: 0.7
+  camera_upper_ybound: 0.7
+  camera_lower_xbound: 0.3
+  camera_lower_ybound: 0.3
+  camera_follow_lerp_step: 0.01
+  camera_center_lerp_step: 0.01

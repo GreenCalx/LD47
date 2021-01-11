@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 851262058}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 100, y: 100, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6013280694991801666}
   m_RootOrder: 1
@@ -277,19 +277,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3298dd263b058444f85e1d93d92e6ee8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  LastDpadAxisVertical: 0
+  LastDpadAxisHorizontal: 0
   CurrentDirection: 4
+  TickRequired: 0
   IsLoopedControled: 0
+  HasAlreadyBeenBreakedFrom: 0
   levelUI: {fileID: 0}
+  has_active_ui: 0
   wallmask:
     serializedVersion: 2
     m_Bits: 1024
   WAIT_ORDER: 0
   L: {fileID: 2963608312177263724}
-  GameLoop: {fileID: 0}
   WM: {fileID: 0}
   TailPrefab: {fileID: 851262058}
+  BreakingTick: -1
   animationtime: 0.5
-  maxLocalScale: 200
+  maxLocalScale: 20
 --- !u!61 &1593470860993976547
 BoxCollider2D:
   m_ObjectHideFlags: 0

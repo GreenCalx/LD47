@@ -33,8 +33,8 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
         public bool ForwardTick = false;
         public bool BackwardTick = false;
 
-        public float TickRate = 1f; // 2 seconds
-        public float AutomaticReplayRate = 0.2f;
+        public float TickRate; // 2 seconds
+        public float AutomaticReplayRate;
     }
     IModel ISavable.GetModel()
     {
@@ -132,14 +132,14 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
     // Start is called before the first frame update
     void Start()
     {
-        Mdl = new Model();
+        //Mdl = new Model();
         var GO = AddPlayer(StartPosition);
         var PC = GO.GetComponent<PlayerController>();
         IM.Attach(PC);
         IM.Attach(this);
 
         levelUI_GO = Instantiate(levelUI_GOref);
-        levelUI_GO.GetComponent<LevelUI>().setModel(this);
+        levelUI_GO.GetComponent<UITimeline>().setModel(this);
 
         if (!MixerControl)
         {
@@ -316,7 +316,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
             // modal mode
 
         }
-
-        levelUI_GO.GetComponent<LevelUI>().refresh(TL, IM.CurrentMode);
+        if ( !!levelUI_GO )
+            levelUI_GO.GetComponent<UITimeline>().refresh(TL, IM.CurrentMode);
     }
 }
