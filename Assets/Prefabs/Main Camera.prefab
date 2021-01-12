@@ -126,4 +126,4 @@ MonoBehaviour:
   camera_lower_xbound: 0.3
   camera_lower_ybound: 0.3
   camera_follow_lerp_step: 0.01
-  camera_center_lerp_step: 0.01
+  camera_center_lerp_step: 2

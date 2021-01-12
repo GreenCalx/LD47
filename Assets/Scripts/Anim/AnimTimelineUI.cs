@@ -45,9 +45,7 @@ public class AnimTimelineUI : StateMachineBehaviour
         float blend = 0f;
 
         blend = __time / MAX_TIME;
-        Debug.Log(" blend : " + blend);
         animator.SetFloat( __blendTreeKeyParm, blend);
-        Debug.Log(" BLEND : " + animator.GetFloat(__blendTreeKeyParm));
     }
 
     public void updateTime( int iNewTime )

@@ -25,6 +25,8 @@ public class PNJDialog : MonoBehaviour
 
     private TalkBubble __talk_bubble;
 
+    private Animator __animator;
+    private const string __animator_talk_parm = "talk";
 
     // Start is called before the first frame update
     void Start()
@@ -35,6 +37,8 @@ public class PNJDialog : MonoBehaviour
 
         __audio_source = GetComponent<AudioSource>();
         __talk_bubble  = GetComponentInChildren<TalkBubble>();
+
+        __animator = GetComponentInChildren<Animator>();
     }
 
     // Update is called once per frame
@@ -82,6 +86,8 @@ public class PNJDialog : MonoBehaviour
             __loaded_dialog_ui  = ui_go.GetComponent<UIDialog>();
             __curr_dialog_index = 0;
             __talk_bubble.setIsTalking(true);
+            if (!!__animator)
+                __animator.SetBool( __animator_talk_parm, true);
         }
 
         if (__loaded_dialog_ui == null)
@@ -130,6 +136,9 @@ public class PNJDialog : MonoBehaviour
         Destroy(__loaded_dialog_ui.gameObject);
         __curr_dialog_index  = 0;
         __talk_bubble.setIsTalking(false);
+
+        if (!!__animator)
+            __animator.SetBool( __animator_talk_parm, false);
     }
 
 }
