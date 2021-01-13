@@ -13,6 +13,77 @@ static class Constraints
     static public bool ShowNextInputsOnTimelineOnReplay = true;
 }
 
+[System.Serializable]
+public class Timer {
+    private float _CurrentTime = 0;
+    [SerializeField]
+    private float _EndTime;
+    private bool _AutoRestart = false;
+    private bool _Running = false;
+    private bool _Ended = false;
+
+    public Timer( float Time )
+    {
+        _EndTime = Time;
+    }
+
+    private void Start()
+    {
+        _CurrentTime = 0;
+    }
+
+    public void Update(float Time)
+    {
+        if (_Running)
+        {
+            _CurrentTime += Time;
+            if(_CurrentTime >= _EndTime)
+            {
+                _Ended = true;
+                _Running = false;
+            }
+        }
+    }
+
+    public void Run()
+    {
+        _Running = true;
+        _Ended = false;
+    }
+
+    public void Pause()
+    {
+        _Running = false;
+    }
+
+    public void Reset()
+    {
+        _Running = false;
+        _Ended = false;
+        _CurrentTime = 0;
+    }
+
+    public void Restart()
+    {
+        Reset();
+        Run();
+    }
+
+    public bool Ended()
+    {
+        return (!_Running && _Ended);
+    }
+
+    public float GetTime()
+    {
+        return _CurrentTime;
+    }
+    public float Length()
+    {
+        return _EndTime;
+    }
+}
+
 public class WorldManager : MonoBehaviour, IControllable, ISavable {
     // will be saved aka invariant
     [System.Serializable]
@@ -22,8 +93,9 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
         public List<GameObject> Players = new List<GameObject>();
 
         public int CurrentTick = 0;
-        public float AutomaticReplayCurrentTime = 0;
-        public float CurrentTime = 0;
+        public Timer AutoReplayTick;
+        public Timer AutoRewindTick;
+
 
         public bool IsRewinding = false;
         public bool IsGoingBackward = false;
@@ -33,27 +105,23 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
         public bool ForwardTick = false;
         public bool BackwardTick = false;
 
-        public float TickRate; // 2 seconds
-        public float AutomaticReplayRate;
+        public Vector2 StartPosition; //. First player will appear at this position
     }
     IModel ISavable.GetModel()
     {
         return Mdl;
     }
-    public Model Mdl = new Model();
+    public Model Mdl;
     // will not be saved
     public GameObject PlayerPrefab;
     public GameObject levelUI_GOref;
     private GameObject levelUI_GO;
 
-    public Vector2 StartPosition; //. First player will appear at this position
-
     public InputManager IM;
-
     public MasterMixerControl MixerControl;
-    public Timeline TL;
 
-    public bool UpdatePlayers = false;
+    private bool UpdatePlayers = false;
+    public Timeline TL = null;
     /// <summary>
     /// This function will create the prefab of player
     /// and add it to the current world manager to be managed by it for ticks
@@ -132,8 +200,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
     // Start is called before the first frame update
     void Start()
     {
-        //Mdl = new Model();
-        var GO = AddPlayer(StartPosition);
+        var GO = AddPlayer(Mdl.StartPosition);
         var PC = GO.GetComponent<PlayerController>();
         IM.Attach(PC);
         IM.Attach(this);
@@ -146,9 +213,9 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
             var Mixer = GameObject.Find("AudioMixerControl");
             if (Mixer) MixerControl = Mixer.GetComponent<MasterMixerControl>();
         }
-    }
+}
 
-    public void AddRewindMove(GameObject go, PlayerController.Direction D)
+public void AddRewindMove(GameObject go, PlayerController.Direction D)
     {
         var Tick = Mdl.CurrentTick;
         TL.Rewind.Record(Tick, go, D);
@@ -168,7 +235,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
                     for (int i = 0; i < Mdl.Players.Count; ++i)
                     {
                         var PC = Mdl.Players[i].GetComponent<PlayerController>();
-                        PC.ApplyPhysics(Mdl.IsGoingBackward);
+                        PC.ApplyPhysics();
                         // IMPORTANT: sync tranforms between physics to change positions of object for
                         // next physic tick
                         Physics2D.SyncTransforms();
@@ -213,8 +280,10 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
             }
         }
 
+
         Mdl.ForwardTick = Entry.Inputs["Tick"].IsDown
-            || (Entry.Inputs["Tick"].Down && Mdl.AutomaticReplayCurrentTime > Mdl.AutomaticReplayRate);
+            || (Entry.Inputs["Tick"].Down && Mdl.AutoReplayTick.Ended());
+        if (Mdl.ForwardTick) Mdl.AutoReplayTick.Restart();
         Mdl.BackwardTick = Entry.Inputs["BackTick"].IsDown && Mdl.FixedUpdatePassed && Mdl.CurrentTick != -1;
 
         if (Mdl.Players.Count != 0)
@@ -235,8 +304,6 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
     void RewindTimeline()
     {
         if (MixerControl) MixerControl.SetPhasedMode();
-        Mdl.CurrentTime += Time.deltaTime;
-
         // If we were rewinding but it is finished, then we start the loops again
         if (TL.Rewind.IsEmpty())
         {
@@ -247,14 +314,12 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
         }
         else
         {
-            if (Mdl.CurrentTime > Mdl.TickRate)
+            if (Mdl.AutoRewindTick.Ended())
             {
-                Mdl.CurrentTime = 0;
+                Mdl.AutoRewindTick.Restart();
                 UpdateTimeLines(TL.Rewind.Tick());
             }
-            return;
         }
-
     }
 
     void UpdateTimeLines(int iTick)
@@ -265,15 +330,19 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
         }
     }
 
+    void UpdateTimers()
+    {
+        Mdl.AutoReplayTick.Update(Time.deltaTime);
+        Mdl.AutoRewindTick.Update(Time.deltaTime);
+    }
+
     void Update()
     {
-        // todo: real timers
-        Mdl.AutomaticReplayCurrentTime += Time.deltaTime;
+        UpdateTimers();
+
         // Rewinding mechanic, deactivate all ticks
         if (Mdl.IsRewinding)
-        {
             RewindTimeline();
-        }
         // applytick
         else if (Mdl.ForwardTick || Mdl.BackwardTick)
         {
@@ -282,8 +351,6 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
 
             if (Mdl.BackwardTick)
                 Mdl.CurrentTick--;
-
-            Mdl.AutomaticReplayCurrentTime = 0;
 
             if (Mdl.IsGoingBackward)
             {
@@ -296,11 +363,11 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
                 if (TL.isTimelineOver())
                 {
                     Mdl.IsRewinding = true;
-                    Mdl.CurrentTime = 0;
                 }
                 UpdatePlayers = true;
             }
         }
+        // move from player or else
         else
         {
             Mdl.IsGoingBackward = false;
@@ -309,12 +376,12 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
             {
                 Mdl.IsRewinding = true;
                 IM.CurrentMode = InputManager.Mode.REPLAY;
+                Mdl.AutoRewindTick.Restart();
             }
         }
         if (Constraints.InputMode == 1)
         {
             // modal mode
-
         }
         if ( !!levelUI_GO )
             levelUI_GO.GetComponent<UITimeline>().refresh(TL, IM.CurrentMode);

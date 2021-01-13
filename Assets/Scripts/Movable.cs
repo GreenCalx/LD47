@@ -25,13 +25,10 @@ public class Movable : MonoBehaviour
 
     public SpriteRenderer SR;
 
-    public float AnimationTime = 1;
-    public float CurrentTime = 1;
+    public Timer AnimationTimer;
     public bool EndAnimation = true;
 
-    public float SpawnTailTime = 0.1f;
-    public float CurrentSpawnTailTime = 0.1f;
-
+    public Timer TailsSpawm;
     public bool Freeze = false;
 
     public bool Move(PlayerController.Direction D, bool ApplyPhysicsBetweenPlayers = true)
@@ -103,6 +100,7 @@ public class Movable : MonoBehaviour
 
         NewPosition = this.gameObject.transform.position;
         EndAnimation = false;
+        AnimationTimer.Restart();
     }
 
     // Start is called before the first frame update
@@ -111,38 +109,41 @@ public class Movable : MonoBehaviour
         StartPosition = this.gameObject.transform.position;
         LastPosition = StartPosition;
         NewPosition = StartPosition;
-        CurrentTime = AnimationTime;
+        AnimationTimer = new Timer(1);
+        TailsSpawm = new Timer(0.1f);
+    }
+
+    void UpdateTimers()
+    {
+        AnimationTimer.Update(Time.deltaTime);
+        TailsSpawm.Update(Time.deltaTime);
     }
 
     // Update is called once per frame
     void Update()
     {
+        UpdateTimers();
         if (!EndAnimation)
         {
             if (IsSpawningTails)
             {
-                CurrentSpawnTailTime -= Time.deltaTime;
-                if (CurrentSpawnTailTime <= 0)
-                {
+                if(TailsSpawm.Ended()) {
                     // Spawn tail
                     // TODO : should not be in playercointreoller
                     var PC = GetComponent<PlayerController>();
                     if (PC)
                     {
-                        PC.SpawnTail();
+                        PC.Tails.SpawnTail(PC.GetComponentInChildren<SpriteRenderer>().transform.position, PC.GetComponentInChildren<SpriteRenderer>().color );
                     }
-                    CurrentSpawnTailTime = SpawnTailTime;
+                    TailsSpawm.Restart();
                 }
             }
-
-            CurrentTime -= (Time.deltaTime / AnimationTime);
-            if (CurrentTime <= 0)
+            if (AnimationTimer.Ended())
             {
                 EndAnimation = true;
-                CurrentTime = AnimationTime;
+                AnimationTimer.Reset();
             }
-
-            if (SR) SR.transform.position = Vector2.Lerp(LastPosition, NewPosition, 1 - CurrentTime);
+            if (SR) SR.transform.position = Vector2.Lerp(LastPosition, NewPosition, AnimationTimer.GetTime()/AnimationTimer.Length());
         }
         else
         {

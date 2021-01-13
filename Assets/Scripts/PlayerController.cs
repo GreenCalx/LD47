@@ -17,7 +17,6 @@ public class PlayerController : MonoBehaviour, IControllable , ISavable {
     public enum Direction { UP, DOWN, RIGHT, LEFT, NONE };
     static public readonly string[] DirectionInputs = { "Up", "Down", "Right", "Left" };
     static public readonly Vector2[] Directionf = { new Vector2(0, 1), new Vector2(0, -1), new Vector2(1, 0), new Vector2(-1, 0) };
-
     static public Direction InverseDirection(Direction D)
     {
         if (D == PlayerController.Direction.UP) D = PlayerController.Direction.DOWN;
@@ -28,10 +27,7 @@ public class PlayerController : MonoBehaviour, IControllable , ISavable {
         return D;
     }
 
-    /// <summary>
-    /// State variables
-    /// </summary>
-   [System.Serializable]
+    [System.Serializable]
     public class Model : IModel
     {
         public Direction CurrentDirection = Direction.NONE;
@@ -42,23 +38,38 @@ public class PlayerController : MonoBehaviour, IControllable , ISavable {
     {
         return Mdl;
     }
-    public Model Mdl = new Model();
+    public Model Mdl;
 
     public InputManager IM;
-    public WorldManager WM;
-    List<GameObject> Tails = new List<GameObject>();
 
-    /// <summary>
-    /// References
-    /// </summary>
-    public GameObject TailPrefab;
+    [Serializable]
+    public class TailSpawner
+    {
+        public GameObject TailPrefab;
+        private List<GameObject> Tails = new List<GameObject>();
+
+        public void SpawnTail(Vector3 Position, Color C)
+        {
+            Tails.Add(Instantiate(TailPrefab, Position, Quaternion.identity));
+            Tails[Tails.Count - 1].SetActive(true);
+            Tails[Tails.Count - 1].GetComponent<Tail>().SR.color = new Color(C.r, C.g, C.b, C.a * 0.8f);
+        }
+
+        public void Tick()
+        {
+            foreach (var Tail in Tails)
+            {
+                if (Tail) Tail.GetComponent<Tail>().Tick();
+            }
+        }
+    }
+    public TailSpawner Tails;
 
     public void Awake()
     {
-        if (!TailPrefab) Debug.Log("[PlayerController] No TailPrefab reference in prefab");
-        Tails = new List<GameObject>();
 
-        Mdl = new Model();
+        if (Tails != null && Tails.TailPrefab == null)
+            Debug.Log("Missing Tail prefab");
     }
 
     public void Start()
@@ -66,31 +77,12 @@ public class PlayerController : MonoBehaviour, IControllable , ISavable {
         StartAnimation();
     }
 
-    // TODO refacto: dont think it is needed?
-    void OnCollisionEnter2D(Collision2D collision)
-    {
-        var PC = collision.gameObject.GetComponent<PlayerController>();
-        if (PC)
-        {
-            Physics2D.IgnoreCollision(collision.collider, GetComponent<Collider2D>());
-        }
-    }
-
-    public void SpawnTail()
-    {
-        Tails.Add(Instantiate(TailPrefab, GetComponentInChildren<SpriteRenderer>().transform.position, Quaternion.identity));
-        Tails[Tails.Count - 1].SetActive(true);
-        //Tails[Tails.Count - 1].transform.localScale = Tails[Tails.Count - 1].transform.localScale * 0.8f;
-        var c = GetComponentInChildren<SpriteRenderer>().color;
-        Tails[Tails.Count - 1].GetComponent<Tail>().SR.color = new Color(c.r, c.g, c.b, c.a * 0.8f);
-    }
-
     /// <summary>
     /// This will apply physics to the object
     /// It will always be called from WorldManager FixedUpdate
     /// Therefore it should be treated as a FixedUpdate function
     /// </summary>
-    public void ApplyPhysics(bool ReverseDirection)
+    public void ApplyPhysics(bool ReverseDirection = false)
     {
         // We update the direction from the loop if it is loop controlled
         if (IM.CurrentMode == InputManager.Mode.REPLAY)
@@ -109,16 +101,12 @@ public class PlayerController : MonoBehaviour, IControllable , ISavable {
         // This way we expect the position to be None if the player is not
         // touching any button during a tick
         Mdl.CurrentDirection = PlayerController.Direction.NONE;
-        foreach (var Tail in Tails)
-        {
-            if (Tail) Tail.GetComponent<Tail>().Tick();
-        }
+        Tails.Tick();
     }
 
     // TODO refacto: do a real animation manager (also a real animation...)
-    public float animationtime = 0.5f;
+    public Timer animationtime;
     public float maxLocalScale = 2; //2 times bigger
-    float currentAnimationTime = 0;
     float startingScale = 0;
     void StartAnimation()
     {
@@ -126,8 +114,8 @@ public class PlayerController : MonoBehaviour, IControllable , ISavable {
         // we dont want it to collide yet
         // it will be enabled again once the animation is done
         GetComponent<BoxCollider2D>().enabled = false;
-        currentAnimationTime = 0;
         startingScale = transform.localScale.x;
+        animationtime.Restart();
     }
     void EndAnimation()
     {
@@ -136,10 +124,10 @@ public class PlayerController : MonoBehaviour, IControllable , ISavable {
     }
     bool Animate()
     {
-        currentAnimationTime += Time.deltaTime;
-        if (currentAnimationTime < animationtime)
+        animationtime.Update(Time.deltaTime);
+        if (!animationtime.Ended())
         {
-            var s = Mathf.Max(startingScale, startingScale + Mathf.Sin((animationtime - currentAnimationTime) * 20) * startingScale * maxLocalScale);
+            var s = Mathf.Max(startingScale, startingScale + Mathf.Sin((animationtime.Length() - animationtime.GetTime()) * 20) * startingScale * maxLocalScale);
             this.gameObject.transform.localScale = new Vector3(s, s, 1);
             return true;
         }

@@ -21,12 +21,11 @@ public class LevelUI : MonoBehaviour
     private const string ENERGY_PANEL_PREFIX = "ENERGY";
 
     private WorldManager WM;
-
     // Start is called before the first frame update
     void Start()
     {
-              __time_units_squares = GetComponentsInChildren<UITimeUnit>();
-       
+        __time_units_squares = GetComponentsInChildren<UITimeUnit>();
+
         // update time cursor pos
 
         if (!!time_cursor_GO && __time_units_squares.Length > 0)
@@ -39,54 +38,28 @@ public class LevelUI : MonoBehaviour
         __ui_inputs_panel = GetComponentInChildren<UIInputsPanel>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-    }
-
-
     public void refresh(Timeline TL, InputManager.Mode Mode)
     {
-        updateTimeUnits(TL);
+        updateTimeUnits(TL, Mode);
+        updateLooperState(Mode);
+        updateInfoPanel(Mode);
+    }
 
-        if (Mode == InputManager.Mode.RECORD)
-        {
+    private void updateLooperState( InputManager.Mode Mode )
+    {
+         if (Mode == InputManager.Mode.RECORD)
             __ui_looper_state.setToRecording();
-            __ui_inputs_panel.setToRecording();
-        }
         else if (Mode == InputManager.Mode.REPLAY)
-        {
-            __ui_looper_state.setToReplay();
-            __ui_inputs_panel.setToReplay();
-        }
-        else
-        {
-            __ui_looper_state.setToEmpty();
-            __ui_inputs_panel.setToEmpty();
-        }
-        //updateLooperState(playerController.L);
-        //updateInfoPanel(playerController.L);
-    }
-
-    private void updateLooperState( Looper iLooper )
-    {
-        if ( __ui_looper_state == null )
-            return;
-        if ( iLooper.Data.IsRecording )
-            __ui_looper_state.setToRecording();
-        else if ( iLooper.Data.IsRunning )
             __ui_looper_state.setToReplay();
         else
             __ui_looper_state.setToEmpty();
     }
 
-    private void updateInfoPanel(Looper iLooper)
+    private void updateInfoPanel( InputManager.Mode Mode )
     {
-        if (__ui_inputs_panel == null)
-            return;
-        if (iLooper.Data.IsRecording)
+        if (Mode == InputManager.Mode.RECORD)
             __ui_inputs_panel.setToRecording();
-        else if (iLooper.Data.IsRunning)
+        else if (Mode == InputManager.Mode.REPLAY)
             __ui_inputs_panel.setToReplay();
         else
             __ui_inputs_panel.setToEmpty();
@@ -97,7 +70,7 @@ public class LevelUI : MonoBehaviour
         this.WM = WM;
     }
 
-    private void updateTimeUnits(Timeline iTL)
+    private void updateTimeUnits(Timeline iTL, InputManager.Mode Mode)
     {
         // update time units sprites
         Transform current_tick_square_transform = null;
@@ -115,10 +88,10 @@ public class LevelUI : MonoBehaviour
                 __time_units_squares[i].showDisabled();
             }
             else {
-                if ( i > iTL.getTickForTimeUnits(Constraints.ShowNextInputsOnTimelineOnReplay && WM.IM.CurrentMode == InputManager.Mode.REPLAY))
+                if ( i > iTL.getTickForTimeUnits(Constraints.ShowNextInputsOnTimelineOnReplay && Mode == InputManager.Mode.REPLAY))
                     __time_units_squares[i].showEnabled();
-                else if (i < WM.TL.last_tick)
-                    updateSquareInputImage( i, WM.TL.Events[i]);
+                else if (i < iTL.last_tick)
+                    updateSquareInputImage( i, iTL.Events[i]);
             }
 
             // get current tick time unit square
@@ -129,7 +102,7 @@ public class LevelUI : MonoBehaviour
                     current_tick_square_transform = __time_units_squares[i].gameObject.transform;
                     current_time_unit_index = i;
                     __time_units_squares[i].setSelect(true);
-                    if(Constraints.ShowDefaultTileOnCursor && WM.IM.CurrentMode==InputManager.Mode.RECORD) {
+                    if(Constraints.ShowDefaultTileOnCursor && Mode ==InputManager.Mode.RECORD) {
                         // case record show default
                         if(square_is_active)
                             __time_units_squares[i].changeSprite(ui_input_none);
