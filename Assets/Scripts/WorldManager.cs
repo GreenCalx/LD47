@@ -153,6 +153,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
             {
                 var PlayerA = GetCurrentPlayer().GetComponent<PlayerController>();
                 Mdl.Players.Add(GO);
+                GO.name = "Player " + Mdl.Players.Count;
                 var PlayerB = GO.GetComponent<PlayerController>();
                 PlayerB.Mdl.TL = TL;
 
@@ -213,9 +214,9 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
             var Mixer = GameObject.Find("AudioMixerControl");
             if (Mixer) MixerControl = Mixer.GetComponent<MasterMixerControl>();
         }
-}
+    }
 
-public void AddRewindMove(GameObject go, PlayerController.Direction D)
+    public void AddRewindMove(GameObject go, PlayerController.Direction D)
     {
         var Tick = Mdl.CurrentTick;
         TL.Rewind.Record(Tick, go, D);
@@ -234,7 +235,34 @@ public void AddRewindMove(GameObject go, PlayerController.Direction D)
                 {
                     for (int i = 0; i < Mdl.Players.Count; ++i)
                     {
+                        // deactivate physics if before break point to avoid any confusion
+                        // when resolving physics between two loops not already breaken
+                        //from
                         var PC = Mdl.Players[i].GetComponent<PlayerController>();
+
+                        if(PC)
+                        {
+                            var BreakTick = PC.Mdl.TL.offset;
+                            if(TL.last_tick < BreakTick)
+                            {
+                                // deactivate physics with all previous players
+                                for (int j = 0; j < i; ++j)
+                                {
+                                    var PreviousPC = Mdl.Players[j].GetComponent<PlayerController>();
+                                    Physics2D.IgnoreCollision(PC.GetComponent<BoxCollider2D>(), PreviousPC.GetComponent<BoxCollider2D>());
+                                }
+                            }
+                            else
+                            {
+                                // activate all collisions
+                                for (int j = 0; j < i; ++j)
+                                {
+                                    var PreviousPC = Mdl.Players[j].GetComponent<PlayerController>();
+                                    Physics2D.IgnoreCollision(PC.GetComponent<BoxCollider2D>(), PreviousPC.GetComponent<BoxCollider2D>(), false);
+                                }
+                            }
+                        }
+
                         PC.ApplyPhysics();
                         // IMPORTANT: sync tranforms between physics to change positions of object for
                         // next physic tick
@@ -372,7 +400,7 @@ public void AddRewindMove(GameObject go, PlayerController.Direction D)
         {
             Mdl.IsGoingBackward = false;
             UpdateTimeLines(Mdl.CurrentTick);
-            if (TL.isTimelineOver())
+            if (TL != null && TL.isTimelineOver())
             {
                 Mdl.IsRewinding = true;
                 IM.CurrentMode = InputManager.Mode.REPLAY;

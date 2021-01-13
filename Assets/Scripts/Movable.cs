@@ -15,7 +15,6 @@ public class Movable : MonoBehaviour
     public bool ResetBetweenLoops = true;
 
     public Vector2 StartPosition;
-
     public Vector2 LastPosition;
     public Vector2 NewPosition;
 
@@ -26,8 +25,6 @@ public class Movable : MonoBehaviour
     public SpriteRenderer SR;
 
     public Timer AnimationTimer;
-    public bool EndAnimation = true;
-
     public Timer TailsSpawm;
     public bool Freeze = false;
 
@@ -66,14 +63,20 @@ public class Movable : MonoBehaviour
                             // We dont execute the move and simply move this object because physic
                             // is executed in a certain order
                             var PC = hit.collider.GetComponent<PlayerController>();
-                            var mePC = GetComponent<PlayerController>();
-
                             var Mov = hit.collider.GetComponent<Movable>();
+                            var mePC = GetComponent<PlayerController>();
                             if (Mov)
                             {
                                 if (PC && mePC && !(PC.IM.CurrentMode == InputManager.Mode.RECORD))
                                 {
-                                    NeedToBeMoved = Mov.Move(D);
+                                    if (Physics2D.GetIgnoreCollision(mePC.GetComponent<BoxCollider2D>(), PC.GetComponent<BoxCollider2D>()))
+                                    {
+                                        NeedToBeMoved = true;
+                                    }
+                                    else
+                                    {
+                                        NeedToBeMoved = Mov.Move(D);
+                                    }
                                 }
                                 else
                                 {
@@ -99,9 +102,9 @@ public class Movable : MonoBehaviour
                                             0);
 
         NewPosition = this.gameObject.transform.position;
-        EndAnimation = false;
         AnimationTimer.Restart();
-    }
+        TailsSpawm.Restart();
+   }
 
     // Start is called before the first frame update
     void Awake()
@@ -109,8 +112,6 @@ public class Movable : MonoBehaviour
         StartPosition = this.gameObject.transform.position;
         LastPosition = StartPosition;
         NewPosition = StartPosition;
-        AnimationTimer = new Timer(1);
-        TailsSpawm = new Timer(0.1f);
     }
 
     void UpdateTimers()
@@ -123,7 +124,7 @@ public class Movable : MonoBehaviour
     void Update()
     {
         UpdateTimers();
-        if (!EndAnimation)
+        if (!AnimationTimer.Ended())
         {
             if (IsSpawningTails)
             {
@@ -138,12 +139,7 @@ public class Movable : MonoBehaviour
                     TailsSpawm.Restart();
                 }
             }
-            if (AnimationTimer.Ended())
-            {
-                EndAnimation = true;
-                AnimationTimer.Reset();
-            }
-            if (SR) SR.transform.position = Vector2.Lerp(LastPosition, NewPosition, AnimationTimer.GetTime()/AnimationTimer.Length());
+            if (SR) SR.transform.position = Vector2.Lerp(LastPosition, NewPosition, AnimationTimer.GetTime() / AnimationTimer.Length());
         }
         else
         {
