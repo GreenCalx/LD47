@@ -13,9 +13,10 @@ public class UITimeline : MonoBehaviour
     public Sprite ui_input_none;
 
     /// UI
-    private UITimelineInput[]    __time_units;
-    private UILooperState   __ui_looper_state;
-    private Animator        __timeline_animator;
+    private UITimelineInput[]       __time_units;
+    private UILooperState           __ui_looper_state;
+    public UITimelineModFrame       __ui_modframe;
+    private Animator                __timeline_animator;
 
     /// Model
     private WorldManager __WM;
@@ -30,8 +31,8 @@ public class UITimeline : MonoBehaviour
         __timeline_animator = GetComponentInChildren<Animator>();
         __time_units        = GetComponentsInChildren<UITimelineInput>();
 
-        __ui_looper_state = GetComponentInChildren<UILooperState>();
-
+        __ui_looper_state   = GetComponentInChildren<UILooperState>();
+        __ui_modframe       = GetComponentInChildren<UITimelineModFrame>();
     }
 
     // Update is called once per frame
@@ -44,20 +45,27 @@ public class UITimeline : MonoBehaviour
     {
         updateUI(TL);
 
-        if (null==__ui_looper_state)
+        if ((null==__ui_looper_state) || (null==__ui_modframe))
+        {
+            Debug.Log(" UITimeline.cs l:50 - Missing UI component in refresh. ABORTING refresh().");
             return;
+        }
+
 
         if (Mode == InputManager.Mode.RECORD)
         {
             __ui_looper_state.setToRecording();
+            __ui_modframe.setToRecord();
         }
         else if (Mode == InputManager.Mode.REPLAY)
         {
             __ui_looper_state.setToReplay();
+            __ui_modframe.setToReplay();
         }
         else
         {
             __ui_looper_state.setToEmpty();
+            __ui_modframe.setToRewind();
         }
         //updateLooperState(playerController.L);
     }
