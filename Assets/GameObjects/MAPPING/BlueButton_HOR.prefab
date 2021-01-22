@@ -332,9 +332,9 @@ MonoBehaviour:
   activables:
   - {fileID: 0}
   signalKey: 1
-  sprite_on: {fileID: -2556607537536609339, guid: 4e11435977d1d164fa8a650765617e3f,
+  sprite_on: {fileID: 7937025411160153722, guid: 6640df0b804554e4097b0760265a21cc,
     type: 3}
-  sprite_off: {fileID: -4820600039200905050, guid: 4e11435977d1d164fa8a650765617e3f,
+  sprite_off: {fileID: 6382593641217309797, guid: 6640df0b804554e4097b0760265a21cc,
     type: 3}
   sound_on: {fileID: 5172090804725577941}
   sound_off: {fileID: 6517070680497696618}
@@ -408,7 +408,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: -4820600039200905050, guid: 4e11435977d1d164fa8a650765617e3f,
+  m_Sprite: {fileID: 6382593641217309797, guid: 6640df0b804554e4097b0760265a21cc,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
