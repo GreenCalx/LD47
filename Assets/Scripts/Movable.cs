@@ -27,6 +27,7 @@ public class Movable : MonoBehaviour
     public Timer AnimationTimer;
     public Timer TailsSpawm;
     public bool Freeze = false;
+    public bool BumpAnimation = false;
 
     public bool Move(PlayerController.Direction D, bool ApplyPhysicsBetweenPlayers = true)
     {
@@ -38,7 +39,11 @@ public class Movable : MonoBehaviour
             Vector3 Dir3 = new Vector3(Direction.x, Direction.y, 0);
             // WALL HITS
             RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position + (0.6f * Dir3), Dir3, 0.5f, wallmask);
-            if (hits.Length != 0) return false;
+            if (hits.Length != 0)
+            {
+                UpdatePositionBump(Direction, D);
+                return false;
+            }
             // MOVABLE HITS
             RaycastHit2D[] hitsm = Physics2D.RaycastAll(transform.position + (0.6f * Dir3), Dir3, 0.5f, movablemask);
             hitsm = hitsm.Where(val => (val.collider.gameObject != this.gameObject)).ToArray(); // filter our own gameobject
@@ -88,10 +93,26 @@ public class Movable : MonoBehaviour
                 }
             }
             if (NeedToBeMoved) UpdatePosition(Direction, D);
+
+            if (D != PlayerController.Direction.NONE && !NeedToBeMoved)
+            {
+                // Do a bump into wall animation
+                UpdatePositionBump(Direction, D);
+            }
         }
         if (!WM.Mdl.IsRewinding && ResetBetweenLoops &&!WM.Mdl.IsGoingBackward) WM.AddRewindMove(this.gameObject, D);
         return NeedToBeMoved;
     }
+
+    void UpdatePositionBump(Vector2 Direction, PlayerController.Direction D)
+    {
+        LastPosition = this.gameObject.transform.position;
+        NewPosition = LastPosition + new Vector2(Speed * Direction.x, Speed * Direction.y);
+
+        AnimationTimer.Restart();
+        TailsSpawm.Restart();
+        BumpAnimation = true;
+   }
 
     void UpdatePosition(Vector2 Direction, PlayerController.Direction D)
     {
@@ -104,7 +125,7 @@ public class Movable : MonoBehaviour
         NewPosition = this.gameObject.transform.position;
         AnimationTimer.Restart();
         TailsSpawm.Restart();
-   }
+    }
 
     // Start is called before the first frame update
     void Awake()
@@ -112,6 +133,11 @@ public class Movable : MonoBehaviour
         StartPosition = this.gameObject.transform.position;
         LastPosition = StartPosition;
         NewPosition = StartPosition;
+    }
+
+    public bool CanMove()
+    {
+        return !Freeze && (AnimationTimer.GetTime() == 0 || AnimationTimer.Ended());
     }
 
     void UpdateTimers()
@@ -126,30 +152,41 @@ public class Movable : MonoBehaviour
         UpdateTimers();
         if (!AnimationTimer.Ended())
         {
-            if (IsSpawningTails)
+            if (BumpAnimation)
             {
-                if(TailsSpawm.Ended()) {
-                    // Spawn tail
-                    // TODO : should not be in playercointreoller
-                    var PC = GetComponent<PlayerController>();
-                    if (PC)
-                    {
-                        PC.Tails.SpawnTail(PC.GetComponentInChildren<SpriteRenderer>().transform.position, PC.GetComponentInChildren<SpriteRenderer>().color );
-                    }
-                    TailsSpawm.Restart();
-                }
+                if (SR) SR.transform.position = Vector2.Lerp(LastPosition,
+                                                             NewPosition,
+                                                             Mathf.Sin( (AnimationTimer.GetTime() / AnimationTimer.Length())*Mathf.PI) * 0.2f);
             }
-            if (SR) SR.transform.position = Vector2.Lerp(LastPosition, NewPosition, AnimationTimer.GetTime() / AnimationTimer.Length());
+            else
+            {
+                if (IsSpawningTails)
+                {
+                    if (TailsSpawm.Ended())
+                    {
+                        // Spawn tail
+                        // TODO : should not be in playercointreoller
+                        var PC = GetComponent<PlayerController>();
+                        if (PC)
+                        {
+                            PC.Tails.SpawnTail(PC.GetComponentInChildren<SpriteRenderer>().transform.position, PC.GetComponentInChildren<SpriteRenderer>().color);
+                        }
+                        TailsSpawm.Restart();
+                    }
+                }
+                if (SR) SR.transform.position = Vector2.Lerp(LastPosition, NewPosition, AnimationTimer.GetTime() / AnimationTimer.Length());
+            }
         }
         else
         {
+            BumpAnimation = false;
             SR.transform.localPosition = Vector2.zero;
+            if (WM.Mdl.CurrentTick == 0 && ResetBetweenLoops && !WM.Mdl.IsRewinding)
+            {
+                this.gameObject.transform.position = StartPosition;
+                SR.transform.localPosition = Vector2.zero;
+            }
         }
 
-        if ( WM.Mdl.CurrentTick == 0 && ResetBetweenLoops && !WM.Mdl.IsRewinding)
-        {
-            this.gameObject.transform.position = StartPosition;
-            SR.transform.localPosition = Vector2.zero;
-        }
     }
 }

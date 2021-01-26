@@ -47,6 +47,12 @@ public class Timeline
 
         public void Tick(int CurrentTick)
         {
+            if (CurrentTick >= GameObjects.Count)
+            {
+                Debug.Log("ERROR: Tick");
+                return;
+            }
+
             var TickGameObjects = GameObjects[CurrentTick];
             var TickDirections = Directions[CurrentTick];
 

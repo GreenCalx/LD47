@@ -224,7 +224,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
 
     void FixedUpdate()
     {
-        if (UpdatePlayers)
+        if (UpdatePlayers && GetCurrentPlayer().GetComponent<Movable>().CanMove())
         {
             if (!Mdl.IsRewinding)
             {
@@ -316,8 +316,8 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
 
         if (Mdl.Players.Count != 0)
         {
-            PlayerController LastPlayer = GetCurrentPlayer();
             Mdl.BackwardTick = Mdl.BackwardTick && (IM.CurrentMode == InputManager.Mode.REPLAY || (TL.offset != Mdl.CurrentTick));
+            Mdl.BackwardTick = Mdl.BackwardTick && (GetCurrentPlayer().GetComponent<Movable>().CanMove());
         }
     }
 
