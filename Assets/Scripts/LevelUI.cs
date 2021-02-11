@@ -88,7 +88,7 @@ public class LevelUI : MonoBehaviour
                 __time_units_squares[i].showDisabled();
             }
             else {
-                if ( i > iTL.getTickForTimeUnits(Constraints.ShowNextInputsOnTimelineOnReplay && Mode == InputManager.Mode.REPLAY))
+                if ( i > iTL.getTickForTimeUnits(Constants.ShowNextInputsOnTimelineOnReplay && Mode == InputManager.Mode.REPLAY))
                     __time_units_squares[i].showEnabled();
                 else if (i < iTL.last_tick)
                     updateSquareInputImage( i, iTL.Events[i]);
@@ -102,7 +102,7 @@ public class LevelUI : MonoBehaviour
                     current_tick_square_transform = __time_units_squares[i].gameObject.transform;
                     current_time_unit_index = i;
                     __time_units_squares[i].setSelect(true);
-                    if(Constraints.ShowDefaultTileOnCursor && Mode ==InputManager.Mode.RECORD) {
+                    if(Constants.ShowDefaultTileOnCursor && Mode ==InputManager.Mode.RECORD) {
                         // case record show default
                         if(square_is_active)
                             __time_units_squares[i].changeSprite(ui_input_none);

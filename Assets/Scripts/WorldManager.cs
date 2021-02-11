@@ -6,17 +6,19 @@ using System.Reflection;
 using UnityEngine;
 
 
-static class Constraints
-{
+static class Constants {
+    // Debug
     static public int InputMode = 0;
     static public bool ShowDefaultTileOnCursor = true;
     static public bool ShowNextInputsOnTimelineOnReplay = true;
+    // Global state
+    static public float MoveAnimationTime = 0.2f;
+    static public float RewindAnimationTime = 0.1f;
 }
 
 [System.Serializable]
 public class Timer {
     private float _CurrentTime = 0;
-    [SerializeField]
     private float _EndTime;
     private bool _AutoRestart = false;
     private bool _Running = false;
@@ -73,6 +75,11 @@ public class Timer {
     {
         return (!_Running && _Ended);
     }
+    
+    public bool Running()
+    {
+        return _Running;
+    }
 
     public float GetTime()
     {
@@ -81,6 +88,11 @@ public class Timer {
     public float Length()
     {
         return _EndTime;
+    }
+    public void SetEndTime(float Time)
+    {
+        _EndTime = Time;
+        if (_EndTime <= _CurrentTime) Reset();
     }
 }
 
@@ -122,6 +134,9 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
 
     private bool UpdatePlayers = false;
     public Timeline TL = null;
+
+    private bool IsWaitingForAnimation = false;
+    private int SavedIdx = 0;
     /// <summary>
     /// This function will create the prefab of player
     /// and add it to the current world manager to be managed by it for ticks
@@ -214,6 +229,9 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
             var Mixer = GameObject.Find("AudioMixerControl");
             if (Mixer) MixerControl = Mixer.GetComponent<MasterMixerControl>();
         }
+
+        Mdl.AutoRewindTick = new Timer(Constants.RewindAnimationTime);
+        Movable.AnimationTime = Constants.MoveAnimationTime;
     }
 
     public void AddRewindMove(GameObject go, PlayerController.Direction D)
@@ -233,7 +251,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
                 // Lets do it first loop to last loop
                 if (!Mdl.IsGoingBackward)
                 {
-                    for (int i = 0; i < Mdl.Players.Count; ++i)
+                    for (int i = SavedIdx; i < Mdl.Players.Count; ++i)
                     {
                         // deactivate physics if before break point to avoid any confusion
                         // when resolving physics between two loops not already breaken
@@ -263,7 +281,14 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
                             }
                         }
 
-                        PC.ApplyPhysics();
+                        Movable.MoveResult Result = PC.ApplyPhysics();
+                        if(Result == Movable.MoveResult.IsAnimating)
+                        {
+                            // halt physics execution until animation of the object causing trouble is finished
+                            IsWaitingForAnimation = true;
+                            SavedIdx = i;
+                            return;
+                        }
                         // IMPORTANT: sync tranforms between physics to change positions of object for
                         // next physic tick
                         Physics2D.SyncTransforms();
@@ -272,6 +297,8 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
                 }
             }
             UpdatePlayers = false;
+            IsWaitingForAnimation = false;
+            SavedIdx = 0;
         }
         Mdl.FixedUpdatePassed = true;
     }
@@ -312,7 +339,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
         Mdl.ForwardTick = Entry.Inputs["Tick"].IsDown
             || (Entry.Inputs["Tick"].Down && Mdl.AutoReplayTick.Ended());
         if (Mdl.ForwardTick) Mdl.AutoReplayTick.Restart();
-        Mdl.BackwardTick = Entry.Inputs["BackTick"].IsDown && Mdl.FixedUpdatePassed && Mdl.CurrentTick != -1;
+        Mdl.BackwardTick = Entry.Inputs["BackTick"].IsDown && Mdl.FixedUpdatePassed && Mdl.CurrentTick != 0;
 
         if (Mdl.Players.Count != 0)
         {
@@ -331,6 +358,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
 
     void RewindTimeline()
     {
+        Movable.AnimationTime = Constants.RewindAnimationTime;
         if (MixerControl) MixerControl.SetPhasedMode();
         // If we were rewinding but it is finished, then we start the loops again
         if (TL.Rewind.IsEmpty())
@@ -339,13 +367,24 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
             Mdl.IsRewinding = false;
             Mdl.CurrentTick = 0;
             TL.reset();
+            Movable.AnimationTime = Constants.MoveAnimationTime;
         }
         else
         {
-            if (Mdl.AutoRewindTick.Ended())
+            if (IsWaitingForAnimation || Mdl.AutoRewindTick.Ended())
             {
                 Mdl.AutoRewindTick.Restart();
-                UpdateTimeLines(TL.Rewind.Tick());
+
+                SavedIdx = TL.Rewind.Tick(TL.Rewind.GameObjects.Count-1, SavedIdx);
+                if (SavedIdx == -1)
+                {
+                    SavedIdx = 0;
+                    TL.Rewind.DeleteRecord(TL.Rewind.GameObjects.Count-1, true);
+                    IsWaitingForAnimation = false;
+                    UpdateTimeLines(TL.Rewind.GameObjects.Count);
+                }
+                else IsWaitingForAnimation = true;
+                return;
             }
         }
     }
@@ -366,8 +405,30 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
 
     void Update()
     {
-        UpdateTimers();
+        if(IsWaitingForAnimation)
+        {
+            if(Mdl.IsRewinding)
+            {
+                RewindTimeline();
+                return;
+            }
 
+            if (!Mdl.IsGoingBackward)
+                return;
+            else
+            {
+                SavedIdx = TL.Rewind.Tick(Mdl.CurrentTick, SavedIdx);
+                if (SavedIdx == -1)
+                {
+                    SavedIdx = 0;
+                    TL.Rewind.DeleteRecord(Mdl.CurrentTick, false);
+                    IsWaitingForAnimation = false;
+                }
+                return;
+            }
+        }
+
+        UpdateTimers();
         // Rewinding mechanic, deactivate all ticks
         if (Mdl.IsRewinding)
             RewindTimeline();
@@ -382,8 +443,17 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
 
             if (Mdl.IsGoingBackward)
             {
-                TL.Rewind.Tick(Mdl.CurrentTick);
-                TL.Rewind.DeleteRecord(Mdl.CurrentTick);
+                SavedIdx = TL.Rewind.Tick(Mdl.CurrentTick, SavedIdx);
+                if (SavedIdx == -1)
+                {
+                    SavedIdx = 0;
+                    TL.Rewind.DeleteRecord(Mdl.CurrentTick, false);
+                    IsWaitingForAnimation = false;
+                }
+                else
+                {
+                    IsWaitingForAnimation = true;
+                }
             }
             else
             {
@@ -407,7 +477,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
                 Mdl.AutoRewindTick.Restart();
             }
         }
-        if (Constraints.InputMode == 1)
+        if (Constants.InputMode == 1)
         {
             // modal mode
         }

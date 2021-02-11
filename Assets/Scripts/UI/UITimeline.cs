@@ -129,7 +129,7 @@ public class UITimeline : MonoBehaviour
                 __time_units[i].showDisabled();
             }
             else {
-                if ( i > iTL.getTickForTimeUnits(Constraints.ShowNextInputsOnTimelineOnReplay && __WM.IM.CurrentMode == InputManager.Mode.REPLAY))
+                if ( i > iTL.getTickForTimeUnits(Constants.ShowNextInputsOnTimelineOnReplay && __WM.IM.CurrentMode == InputManager.Mode.REPLAY))
                     __time_units[i].showEnabled();
                 else if (i < __WM.TL.last_tick)
                     updateSquareInputImage( i, __WM.TL.Events[i]);
@@ -143,7 +143,7 @@ public class UITimeline : MonoBehaviour
                     current_tick_square_transform = __time_units[i].gameObject.transform;
                     current_time_unit_index = i;
                     //__time_units[i].setSelect(true);
-                    if(Constraints.ShowDefaultTileOnCursor && __WM.IM.CurrentMode==InputManager.Mode.RECORD) {
+                    if(Constants.ShowDefaultTileOnCursor && __WM.IM.CurrentMode==InputManager.Mode.RECORD) {
                         // case record show default
                         if(square_is_active)
                             __time_units[i].changeSprite(ui_input_none);

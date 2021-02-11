@@ -420,11 +420,6 @@ PrefabInstance:
       objectReference: {fileID: 244865499}
     - target: {fileID: 5427947463286776092, guid: fe40bb787fcbda24e86031d229a96cf4,
         type: 3}
-      propertyPath: AnimationTimer._EndTime
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 5427947463286776092, guid: fe40bb787fcbda24e86031d229a96cf4,
-        type: 3}
       propertyPath: StartPosition.x
       value: 2
       objectReference: {fileID: 0}
@@ -432,11 +427,6 @@ PrefabInstance:
         type: 3}
       propertyPath: StartPosition.y
       value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 5427947463286776092, guid: fe40bb787fcbda24e86031d229a96cf4,
-        type: 3}
-      propertyPath: TailsSpawm._EndTime
-      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 6013280694991801665, guid: fe40bb787fcbda24e86031d229a96cf4,
         type: 3}
@@ -448,16 +438,6 @@ PrefabInstance:
       propertyPath: IM
       value: 
       objectReference: {fileID: 4189603963778965640}
-    - target: {fileID: 6013280694991801665, guid: fe40bb787fcbda24e86031d229a96cf4,
-        type: 3}
-      propertyPath: maxLocalScale
-      value: 1.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 6013280694991801665, guid: fe40bb787fcbda24e86031d229a96cf4,
-        type: 3}
-      propertyPath: Tails.TailPrefab
-      value: 
-      objectReference: {fileID: 1716013740}
     - target: {fileID: 6013280694991801666, guid: fe40bb787fcbda24e86031d229a96cf4,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -497,31 +477,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_RootOrder
       value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 6013280694991801666, guid: fe40bb787fcbda24e86031d229a96cf4,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6013280694991801666, guid: fe40bb787fcbda24e86031d229a96cf4,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6013280694991801666, guid: fe40bb787fcbda24e86031d229a96cf4,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6013280694991801666, guid: fe40bb787fcbda24e86031d229a96cf4,
-        type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6013280694991801666, guid: fe40bb787fcbda24e86031d229a96cf4,
-        type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6013280694991801692, guid: fe40bb787fcbda24e86031d229a96cf4,
         type: 3}
@@ -1049,16 +1004,6 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 8602325133816503, guid: a0d3f78e2975e454b98d1dcd4547bd28,
         type: 3}
-    - target: {fileID: 893246269087679359, guid: c83a65c7c8e8b1248beb94dd7164f8be,
-        type: 3}
-      propertyPath: Mdl.StartPosition.x
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 893246269087679359, guid: c83a65c7c8e8b1248beb94dd7164f8be,
-        type: 3}
-      propertyPath: Mdl.StartPosition.y
-      value: 2
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c83a65c7c8e8b1248beb94dd7164f8be, type: 3}
 --- !u!114 &1556098187
@@ -1095,12 +1040,6 @@ MonoBehaviour:
   m_InstancedGameObject: {fileID: 0}
   m_Flags: 3
   m_ColliderType: 1
---- !u!1 &1716013740 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 851262058, guid: fe40bb787fcbda24e86031d229a96cf4,
-    type: 3}
-  m_PrefabInstance: {fileID: 928096150}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1743169642
 PrefabInstance:
   m_ObjectHideFlags: 0

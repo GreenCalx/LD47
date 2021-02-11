@@ -23,55 +23,55 @@ public class Timeline
             Directions[Tick].Add(D);
         }
 
-        public int Tick()
+        // return -1 for success and failure, yes I know...
+        // return index in case of waiting for animation
+        public int Tick(int CurrentTick, int StartingIdx = 0)
         {
-            var TickGameObjects = GameObjects[GameObjects.Count - 1];
-            var TickDirections = Directions[Directions.Count - 1];
-
-            TickGameObjects.Reverse();
-            TickDirections.Reverse();
-
-            for (int i = 0; i < TickGameObjects.Count; ++i)
-            {
-                var GO = TickGameObjects[i];
-                var D = TickDirections[i];
-                var Mover = GO.GetComponent<Movable>();
-                if (Mover) Mover.Move(PlayerController.InverseDirection(D), false);
-            }
-
-            GameObjects.RemoveAt(GameObjects.Count - 1);
-            Directions.RemoveAt(Directions.Count - 1);
-
-            return GameObjects.Count;
-        }
-
-        public void Tick(int CurrentTick)
-        {
-            if (CurrentTick >= GameObjects.Count)
+            if (CurrentTick < 0 || CurrentTick >= GameObjects.Count)
             {
                 Debug.Log("ERROR: Tick");
-                return;
+                return -1;
             }
 
             var TickGameObjects = GameObjects[CurrentTick];
             var TickDirections = Directions[CurrentTick];
 
-            for (int i = 0; i < TickGameObjects.Count; ++i)
+            for (int i = StartingIdx; i < TickGameObjects.Count; ++i)
             {
                 var GO = TickGameObjects[i];
                 var D = TickDirections[i];
                 var Mover = GO.GetComponent<Movable>();
-                if (Mover) Mover.Move(PlayerController.InverseDirection(D), false);
+                if (Mover)
+                {
+                   Movable.MoveResult Result = Mover.Move(PlayerController.InverseDirection(D), false);
+                    if (Result == Movable.MoveResult.IsAnimating)
+                        return i;
+                }
             }
+            return -1;
         }
 
-        public void DeleteRecord(int Tick)
+        // bool REmove: wether we just want to empty the tick, or completely remove it
+        public void DeleteRecord(int Tick, bool Remove)
         {
+            if (Tick < 0)
+            {
+                Debug.Log("PROBLEMOOOO");
+                return;
+            }
             // for backward implementation we need to remove the last recoirded tick
             if (GameObjects.Count -1 >= Tick)
             {
-                GameObjects[Tick] = new List<GameObject>();
-                Directions[Tick] = new List<PlayerController.Direction>();
+                if (Remove)
+                {
+                    GameObjects.RemoveAt(Tick);
+                    Directions.RemoveAt(Tick);
+                }
+                else
+                {
+                    GameObjects[Tick] = new List<GameObject>();
+                    Directions[Tick] = new List<PlayerController.Direction>();
+                }
             }
 
         }
@@ -154,7 +154,7 @@ public class Timeline
 
     public int getTickForTimeUnits( bool Saturate = false)
     {
-        if (Constraints.ShowNextInputsOnTimelineOnReplay && Saturate)
+        if (Constants.ShowNextInputsOnTimelineOnReplay && Saturate)
             return 25;
         else
             return last_tick;

@@ -43,16 +43,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 414abb2bb3d6fa84e8c071e7be3a1876, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Mdl:
+    CurrentTick: 0
+    IsRewinding: 0
+    IsGoingBackward: 0
+    FixedUpdatePassed: 0
+    AutomaticReplay: 0
+    ForwardTick: 0
+    BackwardTick: 0
+    StartPosition: {x: 2, y: 2}
   PlayerPrefab: {fileID: 0}
   levelUI_GOref: {fileID: 4572336713623461571, guid: 53f7225b65841de4fb9287a75425319e,
     type: 3}
-  CurrentTick: -1
-  TickRate: 0.1
-  StartPosition: {x: 0, y: 0}
-  NeedTick: 0
-  WaitForInput: 0
-  NeedReset: 0
-  IsRewinding: 0
-  IsGoingBackward: 1
-  FixedUpdatePassed: 0
+  IM: {fileID: 0}
   MixerControl: {fileID: 0}

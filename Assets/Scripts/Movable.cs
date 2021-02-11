@@ -8,6 +8,9 @@ using UnityEngine;
 
 public class Movable : MonoBehaviour
 {
+    static public float AnimationTime = 1.0f;
+    static public float TailsMultiplier = 3.0f; // want to spawn X tails during animation
+
     [SerializeField] public LayerMask wallmask;
     [SerializeField] public LayerMask movablemask;
     public float Speed = 1f;
@@ -29,10 +32,14 @@ public class Movable : MonoBehaviour
     public bool Freeze = false;
     public bool BumpAnimation = false;
 
-    public bool Move(PlayerController.Direction D, bool ApplyPhysicsBetweenPlayers = true)
+    public enum MoveResult { CanMove, CannotMove, IsAnimating }
+    public MoveResult Move(PlayerController.Direction D, bool ApplyPhysicsBetweenPlayers = true)
     {
-        if (Freeze) return false;
-        bool NeedToBeMoved = false;
+        if (Freeze) return MoveResult.CannotMove;
+        if (!CanMove()) return MoveResult.IsAnimating; 
+
+        MoveResult NeedToBeMoved = MoveResult.CannotMove;
+
         if (D != PlayerController.Direction.NONE)
         {
             var Direction = PlayerController.Directionf[(int)D];
@@ -42,7 +49,7 @@ public class Movable : MonoBehaviour
             if (hits.Length != 0)
             {
                 UpdatePositionBump(Direction, D);
-                return false;
+                return MoveResult.CannotMove;
             }
             // MOVABLE HITS
             RaycastHit2D[] hitsm = Physics2D.RaycastAll(transform.position + (0.6f * Dir3), Dir3, 0.5f, movablemask);
@@ -53,7 +60,7 @@ public class Movable : MonoBehaviour
 
             if (hitsm.Length == 0)
             {
-                NeedToBeMoved = true;
+                NeedToBeMoved = MoveResult.CanMove;
             }
             else
             {
@@ -76,7 +83,7 @@ public class Movable : MonoBehaviour
                                 {
                                     if (Physics2D.GetIgnoreCollision(mePC.GetComponent<BoxCollider2D>(), PC.GetComponent<BoxCollider2D>()))
                                     {
-                                        NeedToBeMoved = true;
+                                        NeedToBeMoved = MoveResult.CanMove;
                                     }
                                     else
                                     {
@@ -92,15 +99,15 @@ public class Movable : MonoBehaviour
                     }
                 }
             }
-            if (NeedToBeMoved) UpdatePosition(Direction, D);
+            if (NeedToBeMoved == MoveResult.CanMove) UpdatePosition(Direction, D);
 
-            if (D != PlayerController.Direction.NONE && !NeedToBeMoved)
+            if (D != PlayerController.Direction.NONE && NeedToBeMoved == MoveResult.CannotMove)
             {
                 // Do a bump into wall animation
                 UpdatePositionBump(Direction, D);
             }
         }
-        if (!WM.Mdl.IsRewinding && ResetBetweenLoops &&!WM.Mdl.IsGoingBackward) WM.AddRewindMove(this.gameObject, D);
+        if ( NeedToBeMoved == MoveResult.CanMove && !WM.Mdl.IsRewinding && ResetBetweenLoops &&!WM.Mdl.IsGoingBackward) WM.AddRewindMove(this.gameObject, D);
         return NeedToBeMoved;
     }
 
@@ -133,11 +140,13 @@ public class Movable : MonoBehaviour
         StartPosition = this.gameObject.transform.position;
         LastPosition = StartPosition;
         NewPosition = StartPosition;
+
+        AnimationTimer = new Timer(AnimationTime);
     }
 
     public bool CanMove()
     {
-        return !Freeze && (AnimationTimer.GetTime() == 0 || AnimationTimer.Ended());
+        return !Freeze && !AnimationTimer.Running() && (AnimationTimer.GetTime() == 0 || AnimationTimer.Ended());
     }
 
     void UpdateTimers()
@@ -149,8 +158,11 @@ public class Movable : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        AnimationTimer.SetEndTime(AnimationTime);
+        TailsSpawm.SetEndTime(AnimationTime / TailsMultiplier);
+
         UpdateTimers();
-        if (!AnimationTimer.Ended())
+        if (AnimationTimer.Running())
         {
             if (BumpAnimation)
             {

@@ -82,8 +82,9 @@ public class PlayerController : MonoBehaviour, IControllable , ISavable {
     /// It will always be called from WorldManager FixedUpdate
     /// Therefore it should be treated as a FixedUpdate function
     /// </summary>
-    public void ApplyPhysics(bool ReverseDirection = false)
+    public Movable.MoveResult ApplyPhysics(bool ReverseDirection = false)
     {
+        Movable.MoveResult Result = Movable.MoveResult.CannotMove;
         // We update the direction from the loop if it is loop controlled
         if (IM.CurrentMode == InputManager.Mode.REPLAY)
             Mdl.CurrentDirection = Mdl.TL.GetCurrent();
@@ -96,12 +97,17 @@ public class PlayerController : MonoBehaviour, IControllable , ISavable {
         // move
         Movable Mover = GetComponent<Movable>();
         if (ReverseDirection) Mdl.CurrentDirection = InverseDirection(Mdl.CurrentDirection);
-        if (Mover) Mover.Move(Mdl.CurrentDirection);
+        if (Mover)
+        {
+           Result = Mover.Move(Mdl.CurrentDirection);
+        }
         // Reset position once we updated the player
         // This way we expect the position to be None if the player is not
         // touching any button during a tick
-        Mdl.CurrentDirection = PlayerController.Direction.NONE;
+        if(Result != Movable.MoveResult.IsAnimating)
+            Mdl.CurrentDirection = PlayerController.Direction.NONE;
         Tails.Tick();
+        return Result;
     }
 
     // TODO refacto: do a real animation manager (also a real animation...)
@@ -140,7 +146,7 @@ public class PlayerController : MonoBehaviour, IControllable , ISavable {
 
     void IControllable.ProcessInputs(Save.InputSaver.InputSaverEntry Entry)
     {
-        if (Constraints.InputMode == 0)
+        if (Constants.InputMode == 0)
         {
             var Up = Entry.Inputs[DirectionInputs[(int)Direction.UP]].IsDown || Entry.isDpadUpPressed;
             var Down = Entry.Inputs[DirectionInputs[(int)Direction.DOWN]].IsDown || Entry.isDpadDownPressed;
