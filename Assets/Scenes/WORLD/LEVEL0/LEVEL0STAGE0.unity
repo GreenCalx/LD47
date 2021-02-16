@@ -713,6 +713,26 @@ Sprite:
   m_PhysicsShape: []
   m_Bones: []
   m_SpriteID: 
+--- !u!1 &1010815497 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8533916066985495852, guid: 1ed095b18ab63fd4482bae6724183a66,
+    type: 3}
+  m_PrefabInstance: {fileID: 8533916065978489438}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1010815498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1010815497}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 979bbb43bbc35a84285702d216709fcf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mat: {fileID: 2100000, guid: 5770422e9830c9446b4cc89ff6eb4982, type: 2}
+  color: {r: 1, g: 0, b: 0, a: 0}
 --- !u!1001 &1155966725
 PrefabInstance:
   m_ObjectHideFlags: 0
