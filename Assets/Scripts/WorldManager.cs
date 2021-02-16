@@ -221,6 +221,8 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
         IM.Attach(PC);
         IM.Attach(this);
 
+        Camera.main.GetComponent<PostFXRenderer>().StartAnimation(GO.transform.position);
+
         levelUI_GO = Instantiate(levelUI_GOref);
         levelUI_GO.GetComponent<UITimeline>().setModel(this);
         levelUI_GO.GetComponent<UITimeline>().setDisplayedTimeline( PC.Mdl.TL );
@@ -335,6 +337,8 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
                     CurrentPlayer.GetComponent<PlayerController>().IM.CurrentMode = InputManager.Mode.REPLAY;
                     IM.Attach(GO.GetComponent<PlayerController>());
                     IM.CurrentMode = InputManager.Mode.RECORD;
+
+                    Camera.main.GetComponent<PostFXRenderer>().StartAnimation(CurrentPlayer.transform.position);
                 }
 
                 // switch to new timeline
