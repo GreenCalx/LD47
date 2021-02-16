@@ -713,6 +713,25 @@ Sprite:
   m_PhysicsShape: []
   m_Bones: []
   m_SpriteID: 
+--- !u!1 &1007371064 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8533916066985495852, guid: 1ed095b18ab63fd4482bae6724183a66,
+    type: 3}
+  m_PrefabInstance: {fileID: 8533916065978489438}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1007371069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1007371064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef5ccd62b45c3674c9cb6a679287583b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StencilMat: {fileID: 2100000, guid: 3e0a5b8a994a7fa44a2afaeba4d42586, type: 2}
 --- !u!1001 &1155966725
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8923,6 +8942,11 @@ PrefabInstance:
       propertyPath: m_TileColorArray.Array.data[0].m_Data.a
       value: 0.0000000010333387
       objectReference: {fileID: 0}
+    - target: {fileID: 6551890503051153648, guid: de8c53a600c13c04bbd1db06e1cbb11b,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 1c9a4dad7b7225f4c8fffc77c1e50d9b, type: 2}
     - target: {fileID: 8055373033870238634, guid: de8c53a600c13c04bbd1db06e1cbb11b,
         type: 3}
       propertyPath: m_Layer
@@ -9177,6 +9201,16 @@ PrefabInstance:
     - target: {fileID: 8533916066985495850, guid: 1ed095b18ab63fd4482bae6724183a66,
         type: 3}
       propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8533916066985495850, guid: 1ed095b18ab63fd4482bae6724183a66,
+        type: 3}
+      propertyPath: m_TargetTexture
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8533916066985495850, guid: 1ed095b18ab63fd4482bae6724183a66,
+        type: 3}
+      propertyPath: m_RenderingPath
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8533916066985495851, guid: 1ed095b18ab63fd4482bae6724183a66,
