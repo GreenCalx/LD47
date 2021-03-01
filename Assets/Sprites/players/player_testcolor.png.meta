@@ -1,22 +1,13 @@
 fileFormatVersion: 2
-guid: aebef9db49fd68b4082063988c6cc1a1
+guid: 90167a7f6fa346c4aa1ba837189ee203
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -2340539222568233735
-    second: backward_tick_0
+      213: 2822859326333463432
+    second: player_testcolor_0
   - first:
-      213: -4725149707810261654
-    second: backward_tick_1
-  - first:
-      213: 7711870026115478687
-    second: backward_tick_2
-  - first:
-      213: 9026640366918175860
-    second: backward_tick_3
-  - first:
-      213: -8190812009169785748
-    second: backward_tick_4
+      213: -4510510140904004341
+    second: player_testcolor_1
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -79,7 +70,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -91,7 +82,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -103,7 +94,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -114,12 +105,12 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: backward_tick_0
+      name: player_testcolor_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 32
+        width: 16
         height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -128,19 +119,19 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9f493ff4afbb48fd0800000000000000
-      internalID: -2340539222568233735
+      spriteID: 88b2105e99fcc2720800000000000000
+      internalID: 2822859326333463432
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: backward_tick_1
+      name: player_testcolor_1
       rect:
         serializedVersion: 2
-        x: 32
+        x: 16
         y: 0
-        width: 32
+        width: 16
         height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -149,71 +140,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a65bd6b2065ec6eb0800000000000000
-      internalID: -4725149707810261654
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: backward_tick_2
-      rect:
-        serializedVersion: 2
-        x: 64
-        y: 0
-        width: 32
-        height: 16
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: f947894fde0160b60800000000000000
-      internalID: 7711870026115478687
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: backward_tick_3
-      rect:
-        serializedVersion: 2
-        x: 96
-        y: 0
-        width: 32
-        height: 16
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 47c0c59a691154d70800000000000000
-      internalID: 9026640366918175860
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: backward_tick_4
-      rect:
-        serializedVersion: 2
-        x: 128
-        y: 0
-        width: 32
-        height: 16
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: c6c6e6bdfd3645e80800000000000000
-      internalID: -8190812009169785748
+      spriteID: b05ae9face27761c0800000000000000
+      internalID: -4510510140904004341
       vertices: []
       indices: 
       edges: []

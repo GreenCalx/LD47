@@ -68,6 +68,7 @@ public interface IControllable
         Entry.Add("Restart");
         Entry.Add("DPad_Vertical", true);
         Entry.Add("DPad_Horizontal", true);
+        Entry.Add("SwitchTL");
 
         var SaverGO = GameObject.Find("Saver");
         if (SaverGO)

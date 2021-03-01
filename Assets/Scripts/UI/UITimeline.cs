@@ -16,12 +16,18 @@ public class UITimeline : MonoBehaviour
     private UITimelineInput[]       __time_units;
     private UILooperState           __ui_looper_state;
     public UITimelineModFrame       __ui_modframe;
+    public UITimelineSwitcher       __ui_tl_switcher;
+
+    public TimelineView             __tl_view;
+    public Timeline                 __displayedTimeline;
+
     private Animator                __timeline_animator;
 
     /// Model
     private WorldManager __WM;
 
     private int current_time = 0;
+    private int current_timeline_level = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -33,6 +39,10 @@ public class UITimeline : MonoBehaviour
 
         __ui_looper_state   = GetComponentInChildren<UILooperState>();
         __ui_modframe       = GetComponentInChildren<UITimelineModFrame>();
+        __ui_tl_switcher    = GetComponentInChildren<UITimelineSwitcher>();
+
+        __tl_view           = GetComponent<TimelineView>();
+
     }
 
     // Update is called once per frame
@@ -41,16 +51,15 @@ public class UITimeline : MonoBehaviour
         
     }
 
-    public void refresh(Timeline TL, InputManager.Mode Mode)
+    public void refresh(InputManager.Mode Mode)
     {
-        updateUI(TL);
+        updateUI();
 
-        if ((null==__ui_looper_state) || (null==__ui_modframe))
+        if ((null==__ui_looper_state) || (null==__ui_modframe) || (null==__ui_tl_switcher))
         {
             Debug.Log(" UITimeline.cs l:50 - Missing UI component in refresh. ABORTING refresh().");
             return;
         }
-
 
         if (Mode == InputManager.Mode.RECORD)
         {
@@ -67,7 +76,30 @@ public class UITimeline : MonoBehaviour
             __ui_looper_state.setToEmpty();
             __ui_modframe.setToRewind();
         }
+
+        // to see only current timeline
+        //__ui_tl_switcher.switchTimeline( TL.loop_level );
+
         //updateLooperState(playerController.L);
+    }
+
+    public int getDisplayedLoopLevel()
+    {
+        return __displayedTimeline.loop_level;
+    }
+
+    public void trySwitchTimeline(Timeline iTL)
+    {
+        __displayedTimeline = iTL;
+        __ui_tl_switcher.switchTimeline( __displayedTimeline.loop_level ); // proceed to switch
+        Debug.Log("Display TL " + iTL.loop_level);
+        //updateUI(); // notneed mosdt likely
+    }
+
+    public void setDisplayedTimeline(Timeline iTL)
+    {
+        __displayedTimeline = iTL;
+        Debug.Log("Display TL " + iTL.loop_level);
     }
 
     private void updateLooperState( Looper iLooper )
@@ -106,8 +138,10 @@ public class UITimeline : MonoBehaviour
     }
 
     // REDO ME
-    private void updateUI(Timeline iTL)
+    private void updateUI()
     {
+        Timeline active_tl = __displayedTimeline;
+
         // update time units sprites
         Transform current_tick_square_transform = null;
         int current_time_unit_index=0;
@@ -121,7 +155,7 @@ public class UITimeline : MonoBehaviour
 
         for (int i=0; i<__time_units.Length ;i++)
         {
-            bool square_is_active = iTL.getAt(i);
+            bool square_is_active = active_tl.getAt(i);
             
             if (!square_is_active)
             {
@@ -129,14 +163,14 @@ public class UITimeline : MonoBehaviour
                 __time_units[i].showDisabled();
             }
             else {
-                if ( i > iTL.getTickForTimeUnits(Constants.ShowNextInputsOnTimelineOnReplay && __WM.IM.CurrentMode == InputManager.Mode.REPLAY))
+                if ( i > active_tl.getTickForTimeUnits(Constants.ShowNextInputsOnTimelineOnReplay && __WM.IM.CurrentMode == InputManager.Mode.REPLAY))
                     __time_units[i].showEnabled();
-                else if (i < __WM.TL.last_tick)
-                    updateSquareInputImage( i, __WM.TL.Events[i]);
+                else if (i < active_tl.last_tick)
+                    updateSquareInputImage( i, active_tl.Events[i]);
             }
 
             // get current tick time unit square
-            if ( i == iTL.getTickForCursor() )
+            if ( i == active_tl.getTickForCursor() )
             {
                 if ( i < __time_units.Length )
                 {
@@ -150,7 +184,7 @@ public class UITimeline : MonoBehaviour
                     }
                 }
             }
-            else if ( i < iTL.getTickForCursor() && (i ==__time_units.Length-1) )
+            else if ( i < active_tl.getTickForCursor() && (i ==__time_units.Length-1) )
             {
                 // REWIND IS ON
             } else {
@@ -159,7 +193,7 @@ public class UITimeline : MonoBehaviour
         }
 
         // update timeline animator
-        update_time(iTL.getTickForCursor());
+        update_time(active_tl.getTickForCursor());
 
     }//! updateUI
 

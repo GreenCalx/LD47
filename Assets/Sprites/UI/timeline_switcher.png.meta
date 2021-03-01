@@ -1,22 +1,37 @@
 fileFormatVersion: 2
-guid: aebef9db49fd68b4082063988c6cc1a1
+guid: 379f426eefa2e06418072e0764b4b74a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -2340539222568233735
-    second: backward_tick_0
+      213: 2589961196679559354
+    second: timeline_switcher_0
   - first:
-      213: -4725149707810261654
-    second: backward_tick_1
+      213: 5299842844674290249
+    second: timeline_switcher_1
   - first:
-      213: 7711870026115478687
-    second: backward_tick_2
+      213: -8762216836008675398
+    second: timeline_switcher_2
   - first:
-      213: 9026640366918175860
-    second: backward_tick_3
+      213: -8803045561042808514
+    second: timeline_switcher_3
   - first:
-      213: -8190812009169785748
-    second: backward_tick_4
+      213: 5633782157441270700
+    second: timeline_switcher_4
+  - first:
+      213: -5425667232696396863
+    second: timeline_switcher_0
+  - first:
+      213: 7113636678369097043
+    second: timeline_switcher_1
+  - first:
+      213: 3318144534666007165
+    second: timeline_switcher_2
+  - first:
+      213: 685073113023062037
+    second: timeline_switcher_3
+  - first:
+      213: 5077740040433772196
+    second: timeline_switcher_4
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -60,7 +75,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 16
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -114,13 +129,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: backward_tick_0
+      name: timeline_switcher_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 32
-        height: 16
+        width: 16
+        height: 64
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,20 +143,41 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9f493ff4afbb48fd0800000000000000
-      internalID: -2340539222568233735
+      spriteID: 1c397a5f56824b4b0800000000000000
+      internalID: -5425667232696396863
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: backward_tick_1
+      name: timeline_switcher_1
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 0
+        width: 16
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 355316b8ed6b8b260800000000000000
+      internalID: 7113636678369097043
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: timeline_switcher_2
       rect:
         serializedVersion: 2
         x: 32
         y: 0
-        width: 32
-        height: 16
+        width: 16
+        height: 64
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -149,20 +185,41 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a65bd6b2065ec6eb0800000000000000
-      internalID: -4725149707810261654
+      spriteID: d72db2ebfda6c0e20800000000000000
+      internalID: 3318144534666007165
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: backward_tick_2
+      name: timeline_switcher_3
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 0
+        width: 16
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 51029eadd5ed18900800000000000000
+      internalID: 685073113023062037
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: timeline_switcher_4
       rect:
         serializedVersion: 2
         x: 64
         y: 0
-        width: 32
-        height: 16
+        width: 16
+        height: 64
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -170,50 +227,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f947894fde0160b60800000000000000
-      internalID: 7711870026115478687
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: backward_tick_3
-      rect:
-        serializedVersion: 2
-        x: 96
-        y: 0
-        width: 32
-        height: 16
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 47c0c59a691154d70800000000000000
-      internalID: 9026640366918175860
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: backward_tick_4
-      rect:
-        serializedVersion: 2
-        x: 128
-        y: 0
-        width: 32
-        height: 16
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: c6c6e6bdfd3645e80800000000000000
-      internalID: -8190812009169785748
+      spriteID: 4a625dbe9a1c77640800000000000000
+      internalID: 5077740040433772196
       vertices: []
       indices: 
       edges: []

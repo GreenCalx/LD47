@@ -223,6 +223,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
 
         levelUI_GO = Instantiate(levelUI_GOref);
         levelUI_GO.GetComponent<UITimeline>().setModel(this);
+        levelUI_GO.GetComponent<UITimeline>().setDisplayedTimeline( PC.Mdl.TL );
 
         if (!MixerControl)
         {
@@ -309,11 +310,14 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
         var Down = Entry.Inputs["Down"].IsDown || Entry.isDpadDownPressed;
         var Right = Entry.Inputs["Right"].IsDown || Entry.isDpadRightPressed;
         var Left = Entry.Inputs["Left"].IsDown || Entry.isDpadLeftPressed;
+        var SwitchTL = Input.GetKeyDown("tab");
+
         if (IM.CurrentMode == InputManager.Mode.RECORD)
         {
             if (Up || Down || Right || Left)
             {
                 UpdatePlayers = true;
+                switch_timeline_to_last();
             }
         }
         else
@@ -332,6 +336,9 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
                     IM.Attach(GO.GetComponent<PlayerController>());
                     IM.CurrentMode = InputManager.Mode.RECORD;
                 }
+
+                // switch to new timeline
+                switch_timeline_to_last();
             }
         }
 
@@ -346,6 +353,15 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
             Mdl.BackwardTick = Mdl.BackwardTick && (IM.CurrentMode == InputManager.Mode.REPLAY || (TL.offset != Mdl.CurrentTick));
             Mdl.BackwardTick = Mdl.BackwardTick && (GetCurrentPlayer().GetComponent<Movable>().CanMove());
         }
+
+        // Timeline switch
+        //var SwitchTL = Entry.Inputs["SwitchTL"].IsDown;
+
+        if ( SwitchTL )
+        {
+            switch_timeline();
+        }
+
     }
 
     public PlayerController GetCurrentPlayer()
@@ -354,6 +370,24 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
             return Mdl.Players[Mdl.Players.Count - 1].GetComponent<PlayerController>();
         else
             return null;
+    }
+
+    private void switch_timeline()
+    {
+        UITimeline tl_ui        = levelUI_GO.GetComponent<UITimeline>();
+        int next_loop_level = tl_ui.getDisplayedLoopLevel() + 1;
+        if ( next_loop_level >= Mdl.Players.Count )
+            next_loop_level = 0;
+        GameObject selected_player_for_tl = Mdl.Players[next_loop_level];
+        Timeline tl_to_display = selected_player_for_tl.GetComponent<PlayerController>().Mdl.TL;
+        tl_ui.trySwitchTimeline( tl_to_display);
+    }
+
+    private void switch_timeline_to_last()
+    {
+        UITimeline tl_ui        = levelUI_GO.GetComponent<UITimeline>();
+        PlayerController last_pc = GetCurrentPlayer();
+        tl_ui.trySwitchTimeline( last_pc.Mdl.TL );
     }
 
     void RewindTimeline()
@@ -482,6 +516,6 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
             // modal mode
         }
         if ( !!levelUI_GO )
-            levelUI_GO.GetComponent<UITimeline>().refresh(TL, IM.CurrentMode);
+            levelUI_GO.GetComponent<UITimeline>().refresh(IM.CurrentMode);
     }
 }
