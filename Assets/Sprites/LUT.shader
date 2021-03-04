@@ -4,6 +4,10 @@
     {
       _MainTex("Texture", 2D) = "white" {}
       _Color("Color", Color) = (1, 1, 1, 1)
+        
+      _LUT_IN ("Texture", 2D) = "white" {} 
+      _LUT_OUT("Texture", 2D) = "white" {}
+
       _PlayerPosition("PlayerPosition", Vector) = (0.5,0.5,0.5,1)
       _AnimationTime("AnimationTime", Float) = 0
       _AnimationLength("AnimationLength", Float) = 0
@@ -56,9 +60,29 @@
             half _MaxRange;
             half _DistortionStrength;
 
+            sampler2D _LUT_IN;
+            sampler2D _LUT_OUT;
+            float4 _LUT_IN_TexelSize;
+            float4 _LUT_OUT_TexelSize;
+
+
+            float4 SwitchColor(float4 col) { 
+                int size = _LUT_IN_TexelSize.z;
+                [loop]
+                for (int i = 0; i < size; ++i) {
+                  float4 c = tex2D(_LUT_IN, i * _LUT_IN_TexelSize.x);
+                  if (col.x == c.x && col.y == c.y && col.z == c.z) {
+                    return tex2D(_LUT_OUT, i * _LUT_OUT_TexelSize.x);
+                  }
+                }
+                return col;
+            }
+
             fixed4 frag(v2f i) : SV_Target
             {
-                half percent = _AnimationTime / _AnimationLength;
+              half percent = _AnimationTime / _AnimationLength;
+              percent = percent + 0.2;
+              percent = (percent*percent*percent);
 
                half dist = distance(i.uv, _PlayerPosition);
                _Annulus = sqrt(percent * _Annulus);
@@ -69,17 +93,11 @@
                 if (dist > 0 && dist < 1)
                 {
                     dist = dist * dist;
-                    float4 col = tex2D(_MainTex, (i.uv + (0.01 * dist * normalize(i.uv - _PlayerPosition)) * _DistortionStrength)); //our uv, but shifted outwards (in local space)
-
-                    if (dist < 0.5) {
-                        fixed4 white = fixed4(1, 1, 1, 1);
-                        if (distance(col, white) < 0.5)
-                            col = _Color;
-                        return col;
-                    }
-                    else {
-                        return col;
-                    }
+                   // float4 col = tex2D(_MainTex, (i.uv + (0.01 * dist * normalize( _PlayerPosition - i.uv)) * _DistortionStrength)); //our uv, but shifted outwards (in local space)
+                    float2 uv =  (i.uv + (0.01 * dist * normalize( _PlayerPosition - i.uv)) * _DistortionStrength);
+                    float4 col = tex2D(_MainTex, uv);
+                    col = SwitchColor(col);
+                    return col;
                 }
                 else if (dist > 0)
                 {
@@ -87,10 +105,7 @@
                 }
                 else {
                     float4 col = tex2D(_MainTex, i.uv);
-                    fixed4 white = fixed4(1, 1, 1, 1);
-                    if (distance(col, white) < 0.5)
-                        col = _Color;
-                    return col;
+                    return SwitchColor(col);
                 }
 
 
