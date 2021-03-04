@@ -7,6 +7,8 @@ public class PostFXRenderer : MonoBehaviour
     public Material mat;
     public Color color;
 
+    public float CurrentTime = 0;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -16,12 +18,17 @@ public class PostFXRenderer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        CurrentTime += Time.deltaTime;
+
+        if(Input.GetKeyDown(KeyCode.N)) CurrentTime = 0;
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
         mat.SetColor("_Color", color);
+        mat.SetVector("_PlayerPosition",  GetComponent<Camera>().WorldToViewportPoint(new Vector3(2,2,0)));
+        mat.SetFloat("_AnimationTime", CurrentTime);
+    
         Graphics.Blit(source, destination, mat);
     }
 }
