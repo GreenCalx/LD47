@@ -149,6 +149,7 @@ MonoBehaviour:
   ui_input_none: {fileID: 21300000, guid: 931b235632f0f0649a9585229e9a908b, type: 3}
   __ui_modframe: {fileID: 0}
   __ui_tl_switcher: {fileID: 0}
+  __tl_view: {fileID: 0}
 --- !u!114 &8189049124858606660
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -612,9 +613,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3308da6ee3ab35459ad49fa2eee00ed, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  record_color: {r: 1, g: 1, b: 1, a: 1}
-  rewind_color: {r: 0.5411765, g: 0.4862745, b: 0.3019608, a: 1}
-  play_color: {r: 1, g: 1, b: 1, a: 1}
   alpha_damp: 0.5
 --- !u!1 &2116834732920994142
 GameObject:
@@ -2021,7 +2019,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 0d7ca4ce290892c40a7b792f117efacf, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e37ecc80d1d7ca043b64c988eaa90d4b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
