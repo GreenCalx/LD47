@@ -131,7 +131,19 @@ public class Timeline
 
     public PlayerController.Direction GetCurrent()
     {
-        return Events[last_tick];
+        if ( last_tick < Events.Length )
+            return Events[last_tick];
+        else
+            return PlayerController.Direction.NONE;
+    }
+
+    public PlayerController.Direction GetPrevious()
+    {
+        int previous_tick = last_tick - 1;
+        if ( previous_tick >= 0 )
+            return Events[previous_tick];
+        else
+            return PlayerController.Direction.NONE;
     }
 
     public void SetCurrent(PlayerController.Direction Dir)

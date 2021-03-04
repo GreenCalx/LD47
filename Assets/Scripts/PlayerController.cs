@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour, IControllable , ISavable {
     public class Model : IModel
     {
         public Direction CurrentDirection = Direction.NONE;
+        public bool FacingRight = true;
         [NonSerialized] private LayerMask wallmask;
         public Timeline TL;
     }
@@ -100,6 +101,7 @@ public class PlayerController : MonoBehaviour, IControllable , ISavable {
         if (Mover)
         {
            Result = Mover.Move(Mdl.CurrentDirection);
+           checkSpriteFlip();
         }
         // Reset position once we updated the player
         // This way we expect the position to be None if the player is not
@@ -157,7 +159,21 @@ public class PlayerController : MonoBehaviour, IControllable , ISavable {
             if (Down) Mdl.CurrentDirection = Direction.DOWN;
             if (Left) Mdl.CurrentDirection = Direction.LEFT;
             if (Right) Mdl.CurrentDirection = Direction.RIGHT;
+
         }
+    }
+
+    void checkSpriteFlip()
+    {
+        bool flip_detected = ( ( Mdl.TL.GetCurrent() == Direction.RIGHT ) && !Mdl.FacingRight );
+        flip_detected |= ( ( Mdl.TL.GetCurrent() == Direction.LEFT ) && Mdl.FacingRight );
+
+        if (!flip_detected)
+            return;
+
+        SpriteRenderer sprite = gameObject.GetComponentInChildren<SpriteRenderer>();
+        sprite.flipX    = !sprite.flipX;
+        Mdl.FacingRight = !Mdl.FacingRight;
     }
 
     void Update()

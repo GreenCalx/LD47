@@ -317,6 +317,8 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
             if (Up || Down || Right || Left)
             {
                 UpdatePlayers = true;
+
+                // switch to latest timeline when moving
                 switch_timeline_to_last();
             }
         }
@@ -337,7 +339,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
                     IM.CurrentMode = InputManager.Mode.RECORD;
                 }
 
-                // switch to new timeline
+                // switch to new timeline at break
                 switch_timeline_to_last();
             }
         }

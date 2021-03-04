@@ -9169,6 +9169,11 @@ PrefabInstance:
       propertyPath: lower_zoom_bound
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8533916066985495848, guid: 1ed095b18ab63fd4482bae6724183a66,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8533916066985495850, guid: 1ed095b18ab63fd4482bae6724183a66,
         type: 3}
       propertyPath: orthographic size
@@ -9239,5 +9244,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Main Camera
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 8533916066985495848, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
