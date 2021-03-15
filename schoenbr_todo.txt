@@ -1,0 +1,4 @@
+
+# TODO when all LUT color defined and accessibles
+1 Disabled squares from previous timeline should have a color corresponding to TL's LUT color.
+

@@ -3,7 +3,7 @@ using System;
 public static class LevelProgress
 {
 
-    public static readonly bool DEBUG_ACTIVATE_ALL = true;
+    public static readonly bool DEBUG_ACTIVATE_ALL = false;
 
     // Number of stages per Level
     public static readonly int[] n_stages_per_level = { 9, 10 };

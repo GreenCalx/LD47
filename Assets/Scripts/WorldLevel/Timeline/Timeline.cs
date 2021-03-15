@@ -95,6 +95,7 @@ public class Timeline
     // 1/T : play
     public PlayerController.Direction[] Events;
     private BitArray    __timeLine;
+    private bool        __is_previous;
     public int          last_tick;
     // offset is used to set timeline start to a given timeunit
     // used to avoid unwanted disabled time when getting a nested loop
@@ -205,6 +206,11 @@ public class Timeline
         return __timeLine;
     }
 
+    public bool isPrevious()
+    {
+        return __is_previous;
+    }
+
     public bool isTimelineOver()
     {
         timeline_finished = ( last_tick >= N_MEASURES*MEASURE_SIZE );
@@ -218,11 +224,18 @@ public class Timeline
         return false; // else OoB we do nothing
     }
 
+    // !! autoflag this TL as a previous TL ( used by UI )
     public Timeline getNestedTimeline()
     {
         var Result = new Timeline( loop_level+1, last_tick);
         System.Array.Copy(this.Events, Result.Events, last_tick);
         Result.Rewind = (Rewind);
+
+        // Notify this TL as a 'previous TL' as it is current gameplay.
+        // If we want to mark previous flag with more flexibility,
+        // set the flag explicitely with logic in WM.
+        __is_previous = true;
+
         return Result; 
     }
 

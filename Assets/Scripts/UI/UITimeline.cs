@@ -176,19 +176,22 @@ public class UITimeline : MonoBehaviour
                 {
                     current_tick_square_transform = __time_units[i].gameObject.transform;
                     current_time_unit_index = i;
-                    //__time_units[i].setSelect(true);
-                    if(Constants.ShowDefaultTileOnCursor && __WM.IM.CurrentMode==InputManager.Mode.RECORD) {
+
+                    if ( active_tl.isPrevious() ) 
+                    {
+                        updateSquareInputImage( i, active_tl.Events[i]);
+                    }
+                    else if(Constants.ShowDefaultTileOnCursor && __WM.IM.CurrentMode==InputManager.Mode.RECORD) 
+                    {
                         // case record show default
                         if(square_is_active)
                             __time_units[i].changeSprite(ui_input_none);
-                    }
+                    } 
                 }
             }
             else if ( i < active_tl.getTickForCursor() && (i ==__time_units.Length-1) )
             {
                 // REWIND IS ON
-            } else {
-               // __time_units[i].setSelect(false);
             }
         }
 
