@@ -14,6 +14,9 @@ static class Constants {
     // Global state
     static public float MoveAnimationTime = 0.2f;
     static public float RewindAnimationTime = 0.1f;
+
+    // Names
+    static public readonly string MAIN_CAMERA_NAME = "Main Camera";
 }
 
 [System.Serializable]

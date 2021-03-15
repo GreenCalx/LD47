@@ -43,6 +43,16 @@ public class UITimeline : MonoBehaviour
 
         __tl_view           = GetComponent<TimelineView>();
 
+        // Attach main camera to canvas
+        Canvas c = GetComponent<Canvas>();
+        GameObject go_cam = GameObject.Find(Constants.MAIN_CAMERA_NAME);
+        Camera cam = go_cam.GetComponent<Camera>();
+        if (!!c && !!cam)
+        {
+            c.worldCamera = cam;
+        } else {
+            Debug.LogError("missing camera on ui.");
+        }
     }
 
     // Update is called once per frame
