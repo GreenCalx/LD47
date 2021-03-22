@@ -139,6 +139,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
     public Timeline TL = null;
 
     private bool IsWaitingForAnimation = false;
+    private bool __switchTLToLast = false;
     private int SavedIdx = 0;
     /// <summary>
     /// This function will create the prefab of player
@@ -324,7 +325,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
                 UpdatePlayers = true;
 
                 // switch to latest timeline when moving
-                switch_timeline_to_last();
+                __switchTLToLast = true;
             }
         }
         else
@@ -347,7 +348,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
                 }
 
                 // switch to new timeline at break
-                switch_timeline_to_last();
+                __switchTLToLast = true;
             }
         }
 
@@ -397,6 +398,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
         UITimeline tl_ui        = levelUI_GO.GetComponent<UITimeline>();
         PlayerController last_pc = GetCurrentPlayer();
         tl_ui.trySwitchTimeline( last_pc.Mdl.TL );
+        __switchTLToLast = false;
     }
 
     void RewindTimeline()
@@ -524,6 +526,10 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
         {
             // modal mode
         }
+
+        if (__switchTLToLast)
+            switch_timeline_to_last();
+
         if ( !!levelUI_GO )
             levelUI_GO.GetComponent<UITimeline>().refresh(IM.CurrentMode);
     }

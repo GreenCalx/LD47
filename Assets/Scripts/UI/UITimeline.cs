@@ -169,7 +169,6 @@ public class UITimeline : MonoBehaviour
             
             if (!square_is_active)
             {
-                //__time_units[i].changeSprite( disabled_time_unit );
                 __time_units[i].showDisabled();
             }
             else {
@@ -180,18 +179,18 @@ public class UITimeline : MonoBehaviour
             }
 
             // get current tick time unit square
-            if ( i == active_tl.getTickForCursor() )
+            if ( active_tl.isPrevious() ) 
+            {
+                updateSquareInputImage( i, active_tl.Events[i]);
+            }
+            else if ( i == active_tl.getTickForCursor() )
             {
                 if ( i < __time_units.Length )
                 {
                     current_tick_square_transform = __time_units[i].gameObject.transform;
                     current_time_unit_index = i;
 
-                    if ( active_tl.isPrevious() ) 
-                    {
-                        updateSquareInputImage( i, active_tl.Events[i]);
-                    }
-                    else if(Constants.ShowDefaultTileOnCursor && __WM.IM.CurrentMode==InputManager.Mode.RECORD) 
+                    if(Constants.ShowDefaultTileOnCursor && __WM.IM.CurrentMode==InputManager.Mode.RECORD) 
                     {
                         // case record show default
                         if(square_is_active)
@@ -203,7 +202,7 @@ public class UITimeline : MonoBehaviour
             {
                 // REWIND IS ON
             }
-        }
+        }//! for time units
 
         // update timeline animator
         update_time(active_tl.getTickForCursor());
