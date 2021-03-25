@@ -1,4 +1,23 @@
+STAGE
 
 # TODO when all LUT color defined and accessibles
 1 Disabled squares from previous timeline should have a color corresponding to TL's LUT color.
+
+2. TL fullanim
+
+3. TL LUT color for energy fill ?
+
+---------------------
+WORLD
+
+1. UI when level selected [WIP]
+	name and max number of movez to completion
+2. ReDo talk bubble abov pnj
+3. Space to play stage's recorded replay 
+
+--------------------
+MISC
+
+1. Option menu on title screen
+
 

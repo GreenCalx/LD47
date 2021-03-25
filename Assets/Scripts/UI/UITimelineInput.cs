@@ -14,7 +14,7 @@ public class UITimelineInput : MonoBehaviour
     // never occures?
     private Sprite __cache; // TODO : Weird cache to do mb its not good at all for memory check me
 
-    private Color __base_color;
+    public Color __base_color;
     public Color  __disabled_color;
 
     // Start is called before the first frame update
@@ -29,6 +29,14 @@ public class UITimelineInput : MonoBehaviour
 
     }
 
+    public void hide()
+    {
+        if (!!__img)
+        {
+            __img.color = new Color(1, 1, 1, 0);
+        }
+    }
+
     public void showDisabled()
     {
         if (!!__img)
@@ -36,7 +44,7 @@ public class UITimelineInput : MonoBehaviour
             __img.sprite = __disabled;
             __img.color = __disabled_color;
         }
-    }
+    }  
 
     public void showEnabled()
     {
@@ -44,6 +52,7 @@ public class UITimelineInput : MonoBehaviour
         {
             if (__img.sprite == __disabled)
                 __img.sprite = __cache;
+            __img.color = __base_color;
         }
     }
 
