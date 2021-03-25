@@ -150,11 +150,11 @@ public class UITimeline : MonoBehaviour
     // REDO ME
     private void updateUI()
     {
-        Timeline active_tl = __displayedTimeline;
-
-        // update time units sprites
+        Timeline active_tl  = __displayedTimeline;
+        bool is_previous_tl = active_tl.isPrevious();
+        
+        // to update time units sprites
         Transform current_tick_square_transform = null;
-        int current_time_unit_index=0;
 
         if (null==__time_units)
         {
@@ -166,42 +166,38 @@ public class UITimeline : MonoBehaviour
         for (int i=0; i<__time_units.Length ;i++)
         {
             bool square_is_active = active_tl.getAt(i);
-            
+            UITimelineInput curr_unit =__time_units[i];
+
+            // show enabled or disabled for curr unit
             if (!square_is_active)
             {
                 __time_units[i].showDisabled();
-            }
-            else {
-                if ( i > active_tl.getTickForTimeUnits(Constants.ShowNextInputsOnTimelineOnReplay && __WM.IM.CurrentMode == InputManager.Mode.REPLAY))
-                    __time_units[i].showEnabled();
-                else if (i < active_tl.last_tick)
-                    updateSquareInputImage( i, active_tl.Events[i]);
+                continue;
             }
 
-            // get current tick time unit square
-            if ( active_tl.isPrevious() ) 
-            {
-                updateSquareInputImage( i, active_tl.Events[i]);
-            }
-            else if ( i == active_tl.getTickForCursor() )
-            {
-                if ( i < __time_units.Length )
-                {
-                    current_tick_square_transform = __time_units[i].gameObject.transform;
-                    current_time_unit_index = i;
+            __time_units[i].showEnabled();
 
-                    if(Constants.ShowDefaultTileOnCursor && __WM.IM.CurrentMode==InputManager.Mode.RECORD) 
-                    {
-                        // case record show default
-                        if(square_is_active)
-                            __time_units[i].changeSprite(ui_input_none);
-                    } 
-                }
-            }
-            else if ( i < active_tl.getTickForCursor() && (i ==__time_units.Length-1) )
-            {
-                // REWIND IS ON
-            }
+            updateSquareInputImage( i, active_tl.Events[i]);
+
+
+            // RECORD exclusive logic for current timeline
+             if ( __WM.IM.CurrentMode==InputManager.Mode.RECORD && !is_previous_tl )
+             {
+                // Hide forward squares 
+                 if ( i > active_tl.getTickForTimeUnits() )
+                 {
+                     curr_unit.hide();
+                 } 
+                // Show none as next input at the last_tick position
+                 else if ( i == active_tl.getTickForCursor() )
+                 {
+                     if ( Constants.ShowDefaultTileOnCursor )
+                         __time_units[i].changeSprite(ui_input_none);
+                 }
+             }
+
+
+
         }//! for time units
 
         // update timeline animator
