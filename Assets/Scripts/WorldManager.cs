@@ -237,7 +237,8 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
             if (Mixer) MixerControl = Mixer.GetComponent<MasterMixerControl>();
         }
 
-        Mdl.AutoRewindTick = new Timer(Constants.RewindAnimationTime);
+        Mdl.AutoReplayTick.SetEndTime(Constants.RewindAnimationTime);
+        Mdl.AutoRewindTick.SetEndTime(Constants.RewindAnimationTime);
         Movable.AnimationTime = Constants.MoveAnimationTime;
     }
 
