@@ -45,13 +45,20 @@ public class UITimeline : MonoBehaviour
 
         // Attach main camera to canvas
         Canvas c = GetComponent<Canvas>();
-        GameObject go_cam = GameObject.Find(Constants.MAIN_CAMERA_NAME);
-        Camera cam = go_cam.GetComponent<Camera>();
-        if (!!c && !!cam)
-        {
-            c.worldCamera = cam;
-        } else {
-            Debug.LogError("missing camera on ui.");
+        if ( !c ) return;
+        if (!gameObject.transform.parent) return;
+
+
+        int hardloopcount = 0;
+        Transform current = gameObject.transform.parent;
+        while (current != null && ++hardloopcount < 10) {
+            Camera cam = current.gameObject.GetComponentInChildren<Camera>();
+            if (!!c && !!cam)
+            {
+                c.worldCamera = cam;
+            }   
+            current = current.transform.parent;
+            Debug.Log(current);
         }
     }
 

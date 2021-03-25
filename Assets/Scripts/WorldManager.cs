@@ -120,7 +120,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
         public bool ForwardTick = false;
         public bool BackwardTick = false;
 
-        public Vector2 StartPosition; //. First player will appear at this position
+        public GameObject StartTile;
     }
     IModel ISavable.GetModel()
     {
@@ -149,7 +149,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
     /// <returns></returns>
     public GameObject AddPlayer(Vector2 StartPosition)
     {
-        var GO = Instantiate(PlayerPrefab, StartPosition, Quaternion.identity);
+        var GO = Instantiate(PlayerPrefab, StartPosition, Quaternion.identity, this.gameObject.transform);
         if (GO)
         {
             // prefab is deactivated on spectree as it is used only as prefab
@@ -220,14 +220,14 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
     // Start is called before the first frame update
     void Start()
     {
-        var GO = AddPlayer(Mdl.StartPosition);
+        var GO = AddPlayer( Mdl.StartTile.transform.position );
         var PC = GO.GetComponent<PlayerController>();
         IM.Attach(PC);
         IM.Attach(this);
 
         Camera.main.GetComponent<PostFXRenderer>().StartAnimation(GO.transform.position);
 
-        levelUI_GO = Instantiate(levelUI_GOref);
+        levelUI_GO = Instantiate(levelUI_GOref, this.gameObject.transform);
         levelUI_GO.GetComponent<UITimeline>().setModel(this);
         levelUI_GO.GetComponent<UITimeline>().setDisplayedTimeline( PC.Mdl.TL );
 
