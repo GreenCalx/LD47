@@ -1,0 +1,84 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
+public class UITitleScreen : MonoBehaviour
+{
+    
+    public Color selected_color;
+    public Color unselected_color;
+    public string scene_to_load;
+
+    private Text[] __selectables;
+
+    private int __select_index;
+    private int __max_index;
+
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        __selectables =  GetComponentsInChildren<Text>();
+        __select_index = 0;
+        __max_index = __selectables.Length - 1;
+    }
+
+
+    // Update is called once per frame
+    void Update()
+    {
+        var right   = Input.GetButtonDown("Right")   ;
+        var left    = Input.GetButtonDown("Left")    ;
+        var enter   = Input.GetButtonDown("Submit");
+
+
+        if (left)
+            __select_index = ( __select_index <= 0 ) ? 
+                                __max_index : 
+                                __select_index - 1;
+        if ( right ) 
+            __select_index = ( __select_index >= __max_index ) ? 
+                                0 : 
+                                __select_index + 1;
+        
+        if ( enter )
+            doAction();
+        
+        refreshUI();
+    }
+
+    private void refreshUI()
+    {
+        for ( int i = 0; i < __selectables.Length ; i++ )
+        {
+            if ( i == __select_index )
+                __selectables[i].color = selected_color;
+            else
+                __selectables[i].color = unselected_color;
+        }
+    }
+
+    private void doAction()
+    {
+        switch (__select_index)
+        {
+            case 0:
+                Debug.Log("ACTION START GAME");
+                loadGame();
+                break;
+            case 1:
+                Debug.Log("ACTION DISP OPTIONS");
+                break;
+            default:
+                break;
+        }
+        return;
+    }
+
+    private void loadGame()
+    {
+        SceneManager.LoadScene( scene_to_load, LoadSceneMode.Single);
+    }
+}
