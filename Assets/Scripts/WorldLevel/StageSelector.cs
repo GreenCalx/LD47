@@ -11,7 +11,7 @@ public class StageSelector : MonoBehaviour
     [HideInInspector]
     public LConnector selected_lconn;
     
-    private int level_id;
+    public int level_id;
     private bool is_init = false;
 
     // Start is called before the first frame update
