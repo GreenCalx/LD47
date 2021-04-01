@@ -4,8 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 public class UIWorld : MonoBehaviour
 {
+
     private StageSelector __stage_selector_ref;
     private UIStageName __stage_name_frame;
+
+    private UIReplayFrame __replayFrame;
 
     // Start is called before the first frame update
     void Start()
@@ -17,12 +20,22 @@ public class UIWorld : MonoBehaviour
         __stage_name_frame = GetComponentInChildren<UIStageName>();
         if (!!__stage_name_frame)
             Debug.Log("STAGE NAME FRAME REF OK");
+
+        __replayFrame = GetComponentInChildren<UIReplayFrame>();
+        if (!!__replayFrame)
+            Debug.Log("REPLAY FRAME REF OK");
     }
 
     // Update is called once per frame
     void Update()
     {
         refreshUI();
+        //updateReplayFrame();
+    }
+
+    public void updateReplayFrame( Sprite iSprite )
+    {
+        __replayFrame.setImage(iSprite);
     }
 
     private void refreshUI()
@@ -37,7 +50,7 @@ public class UIWorld : MonoBehaviour
             int level_id = __stage_selector_ref.level_id;
             string stage_name = StageCatalog.getStageName( level_id, stage_id);
             __stage_name_frame.setName( stage_id, stage_name);
-        }
+        }   
     }
 
 }
