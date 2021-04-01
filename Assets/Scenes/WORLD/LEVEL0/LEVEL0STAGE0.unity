@@ -905,6 +905,12 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1253646931 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2590609107286898141, guid: ea70bd5ce61c2b546a6a4ea31988042c,
+    type: 3}
+  m_PrefabInstance: {fileID: 39494715}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1420190190
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1107,6 +1113,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 8602325133816503, guid: a0d3f78e2975e454b98d1dcd4547bd28,
         type: 3}
+    - target: {fileID: 893246269087679359, guid: c83a65c7c8e8b1248beb94dd7164f8be,
+        type: 3}
+      propertyPath: Mdl.StartTile
+      value: 
+      objectReference: {fileID: 1253646931}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c83a65c7c8e8b1248beb94dd7164f8be, type: 3}
 --- !u!114 &1556098187
