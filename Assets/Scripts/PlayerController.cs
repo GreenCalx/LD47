@@ -148,6 +148,7 @@ public class PlayerController : MonoBehaviour, IControllable , ISavable {
 
     void IControllable.ProcessInputs(Save.InputSaver.InputSaverEntry Entry)
     {
+        Debug.Log("ProcessInputs : PlayerController");
         if (Constants.InputMode == 0)
         {
             var Up = Entry.Inputs[DirectionInputs[(int)Direction.UP]].IsDown || Entry.isDpadUpPressed;
