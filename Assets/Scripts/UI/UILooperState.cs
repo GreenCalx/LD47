@@ -3,35 +3,42 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(Image))]
 public class UILooperState : MonoBehaviour
 {
-    public Sprite record_img;
-    public Sprite replay_img;
-    private Image  __img;
+    public readonly string RECORD_MOD_LABEL = "RECORD";
+    public readonly string REPLAY_MOD_LABEL = "REPLAY";
+    public readonly string REWIND_MOD_LABEL = "REWIND";
+
+    private Text  __text;
 
     // Start is called before the first frame update
     void Start()
     {
-        __img = GetComponent<Image>();
-        __img.enabled = true;
+        __text = GetComponentInChildren<Text>();
+        setToRecording();
     }
 
     public void setToRecording()
     {
-        __img.sprite = record_img;
-        __img.enabled = true;
+        if (!!__text)
+            __text.text = RECORD_MOD_LABEL;
     }
     public void setToReplay()
     {
-        __img.sprite = replay_img;
-        __img.enabled = true;
+        if (!!__text)
+            __text.text = REPLAY_MOD_LABEL;
     }
 
     public void setToEmpty()
     {
-        __img.sprite = null;
-        __img.enabled = false;
+        if (!!__text)
+            __text.text = "";
+    }
+
+    public void setToRewind()
+    {
+        if (!!__text)
+            __text.text = REWIND_MOD_LABEL;
     }
 
 }
