@@ -33,7 +33,7 @@ public class UIWorld : MonoBehaviour
         //updateReplayFrame();
     }
 
-    public void updateReplayFrame( Sprite iSprite )
+    public void updateReplayFrame( Texture iSprite )
     {
         __replayFrame.setImage(iSprite);
     }

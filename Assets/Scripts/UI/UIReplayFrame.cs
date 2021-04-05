@@ -6,12 +6,12 @@ using UnityEngine.UI;
 public class UIReplayFrame : MonoBehaviour
 {
 
-    private Image __image;
+    private RawImage __image;
 
     // Start is called before the first frame update
     void Start()
     {
-        __image = GetComponent<Image>();
+        __image = GetComponent<RawImage>();
     }
 
     // Update is called once per frame
@@ -20,9 +20,9 @@ public class UIReplayFrame : MonoBehaviour
         
     }
 
-    public void setImage( Sprite iSprite )
+    public void setImage( Texture iSprite )
     {
         if(!!__image)
-            __image.sprite = iSprite;
+            __image.texture = iSprite;
     }
 }
