@@ -53,14 +53,14 @@ public class UIWorld : MonoBehaviour
                 RT.localPosition = Vector3.zero;
                 RT.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 640);
                 RT.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 480);
-                GameObject.Find("Level0").GetComponentInChildren<InputManager>().Activate();
+               // GameObject.Find("Level0").GetComponentInChildren<InputManager>().Activate();
                 isFullscreen = true;
             } else {
                 RectTransform RT = __replayFrame.GetComponent<RectTransform>();
                 RT.localPosition = Position;
                 RT.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Size.x);
                 RT.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Size.y);
-                GameObject.Find("Level0").GetComponentInChildren<InputManager>().DeActivate();
+               // GameObject.Find("Level0").GetComponentInChildren<InputManager>().DeActivate();
                 isFullscreen = false;
             }
         }

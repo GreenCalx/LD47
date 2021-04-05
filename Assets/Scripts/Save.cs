@@ -262,12 +262,33 @@ public class Save : MonoBehaviour
         public class Frame
         {
             public GameObject_Save[] SceneGameObjects;
+            [NonSerialized]
+            public GameObject parent;
+
+            public void setParent(GameObject parent)
+            {
+                this.parent = parent;
+            }
+
+            public void GetGameObjects(GameObject root, List<GameObject> Result)
+            {
+                GameObject currentObject = root;
+                int c = root.transform.childCount;
+                for (int idx =0; idx < c; ++idx)
+                {
+                    currentObject = root.transform.GetChild(idx).gameObject; 
+                    Result.Add(currentObject);
+                    GetGameObjects(currentObject, Result);
+                }
+            }
+
             public void Init()
             {
                 // NOTe toffa: we need to copy gameobject or else they will update once stored
                 // as they are stored by ref and not value
-                var SceneGameObjectsTemp = GameObject.FindObjectsOfType<GameObject>();
-                SceneGameObjects = new GameObject_Save[SceneGameObjectsTemp.Length];
+                List<GameObject> SceneGameObjectsTemp = new List<GameObject>();
+                GetGameObjects(parent, SceneGameObjectsTemp);
+                SceneGameObjects = new GameObject_Save[SceneGameObjectsTemp.Count];
                 int idx = 0;
                 foreach(GameObject go in SceneGameObjectsTemp)
                 {
@@ -279,7 +300,8 @@ public class Save : MonoBehaviour
             {
                 // NOTe toffa: we need to copy gameobject or else they will update once stored
                 // as they are stored by ref and not value
-                var SceneGameObjectsTemp = GameObject.FindObjectsOfType<GameObject>();
+                List<GameObject> SceneGameObjectsTemp = new List<GameObject>();
+                GetGameObjects(parent, SceneGameObjectsTemp);
                 int idx = 0;
                 foreach(GameObject go in SceneGameObjectsTemp)
                 {
@@ -401,6 +423,12 @@ public class Save : MonoBehaviour
                 InputsFrame.Add(Entry);
             }
         }
+
+        public void setParent(GameObject parent)
+        {
+            FirstFrame.setParent(parent);
+            EndFrame.setParent(parent);
+        }
     }
 
     bool IsRecording = false;
@@ -412,6 +440,12 @@ public class Save : MonoBehaviour
     bool FrameLock = false;
     public string FileName = "test";
     InputSaver IS = new InputSaver();
+
+    public void Start()
+    {
+        IS.setParent(this.gameObject.transform.parent.gameObject);
+    }
+
     public InputSaver.InputSaverEntry Tick(InputSaver.InputSaverEntry Entry)
     {
         if (IsReplaying)
@@ -507,6 +541,7 @@ public class Save : MonoBehaviour
                     file.Close();
 
                     IS = new InputSaver();
+                    IS.setParent(this.gameObject.transform.parent.gameObject);
                 }
             }
         }
@@ -548,6 +583,7 @@ public class Save : MonoBehaviour
                 file.Close();
 
                 IS = new InputSaver();
+                IS.setParent(this.gameObject.transform.parent.gameObject);
             }
         }
 
@@ -560,6 +596,7 @@ public class Save : MonoBehaviour
     void CompareEndFrames()
     {
         InputSaver.Frame CurrentEndFrame = new InputSaver.Frame();
+        CurrentEndFrame.setParent(this.gameObject.transform.parent.gameObject);
         CurrentEndFrame.Init();
 
         if (CurrentEndFrame.Equals(IS.EndFrame))
@@ -570,7 +607,7 @@ public class Save : MonoBehaviour
         {
             Debug.Log("[ERROR]   TEST KO");
         }
-        IsReplaying = false;
+        //IsReplaying = false;
     }
 
     bool Load(String s)
@@ -594,6 +631,7 @@ public class Save : MonoBehaviour
         using (FileStream stream = new FileStream(Application.persistentDataPath + "/" + FileName + ".save", FileMode.Open, FileAccess.Read))
         {
             IS = BF.Deserialize(stream) as InputSaver;
+            IS.setParent(this.gameObject.transform.parent.gameObject);
             stream.Close();
         }
         return true;
