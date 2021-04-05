@@ -11,6 +11,14 @@ using System.Runtime.Serialization;
 [RequireComponent(typeof(Movable))]
 [RequireComponent(typeof(BoxCollider2D))]
 public class PlayerController : MonoBehaviour, IControllable , ISavable {
+
+    /// NOTE (MTN5) : we need a default constructor to be able to save this object
+    public PlayerController()
+    {
+        this.Mdl = new Model();
+    }
+
+
     /// <summary>
     /// Directions related variables
     /// </summary>
@@ -33,7 +41,7 @@ public class PlayerController : MonoBehaviour, IControllable , ISavable {
         public Direction CurrentDirection = Direction.NONE;
         public bool FacingRight = true;
         [NonSerialized] private LayerMask wallmask;
-        public Timeline TL;
+        [NonSerialized] public Timeline TL;
     }
     IModel ISavable.GetModel()
     {

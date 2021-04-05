@@ -21,7 +21,7 @@ public interface IControllable
 
     private bool _Lock = false;
     private List<IControllable> _DeferRemove = new List<IControllable>();
-    private bool _Activated = false;
+    public bool _Activated = true;
 
     public void Activate() { _Activated = true; }
     public void DeActivate() { _Activated = false; }

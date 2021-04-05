@@ -100,6 +100,10 @@ public class Timer {
 }
 
 public class WorldManager : MonoBehaviour, IControllable, ISavable {
+    public WorldManager()
+    {
+        this.Mdl = new Model();
+    }
     // will be saved aka invariant
     [System.Serializable]
     public class Model : IModel
@@ -120,7 +124,6 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
         public bool ForwardTick = false;
         public bool BackwardTick = false;
 
-        public GameObject StartTile;
     }
     IModel ISavable.GetModel()
     {
@@ -131,6 +134,8 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
     public GameObject PlayerPrefab;
     public GameObject levelUI_GOref;
     private GameObject levelUI_GO;
+    public GameObject StartTile;
+
 
     public InputManager IM;
     public MasterMixerControl MixerControl;
@@ -220,7 +225,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
     // Start is called before the first frame update
     void Start()
     {
-        var GO = AddPlayer( Mdl.StartTile.transform.position );
+        var GO = AddPlayer( StartTile.transform.position );
         var PC = GO.GetComponent<PlayerController>();
         IM.Attach(PC);
         IM.Attach(this);

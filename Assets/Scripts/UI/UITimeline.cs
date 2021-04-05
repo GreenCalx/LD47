@@ -119,17 +119,6 @@ public class UITimeline : MonoBehaviour
         Debug.Log("Display TL " + iTL.loop_level);
     }
 
-    private void updateLooperState( Looper iLooper )
-    {
-        if ( __ui_looper_state == null )
-            return;
-        if ( iLooper.Data.IsRecording )
-            __ui_looper_state.setToRecording();
-        else if ( iLooper.Data.IsRunning )
-            __ui_looper_state.setToReplay();
-        else
-            __ui_looper_state.setToEmpty();
-    }
 
     public void setModel(WorldManager WM)
     {

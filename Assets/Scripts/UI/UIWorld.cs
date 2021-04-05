@@ -28,11 +28,13 @@ public class UIWorld : MonoBehaviour
 
         __replayFrame = GetComponentInChildren<UIReplayFrame>();
         if (!!__replayFrame)
+        {
             Debug.Log("REPLAY FRAME REF OK");
 
-        RectTransform RT = __replayFrame.GetComponent<RectTransform>();
-        Size = RT.sizeDelta;
-        Position = RT.localPosition;
+            RectTransform RT = __replayFrame.GetComponent<RectTransform>();
+            Size = RT.sizeDelta;
+            Position = RT.localPosition;
+        }
     }
 
     // Update is called once per frame
@@ -41,6 +43,7 @@ public class UIWorld : MonoBehaviour
         refreshUI();
 
         // TODO(mtn5): remove me, use input manager directly in stage selector
+        if (!__replayFrame) return;
         if(Input.GetKeyDown(KeyCode.Tab))
         {
             // switch between full screen and small window for current level
