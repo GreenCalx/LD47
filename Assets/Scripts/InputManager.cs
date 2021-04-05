@@ -16,11 +16,15 @@ public interface IControllable
     private float _LastDpadAxisHorizontal = 0;
     private float _LastDpadAxisVertical = 0;
 
-    public enum Mode { PLAYER, TIMELINE, REPLAY, RECORD };
-    public Mode CurrentMode = Mode.RECORD;
+    public enum Mode { PLAYER, TIMELINE, REPLAY, RECORD, DEACTIVATED };
+    public Mode CurrentMode = Mode.DEACTIVATED;
 
     private bool _Lock = false;
     private List<IControllable> _DeferRemove = new List<IControllable>();
+    private bool _Activated = false;
+
+    public void Activate() { _Activated = true; }
+    public void DeActivate() { _Activated = false; }
 
     public void Attach(IControllable iControllable)
     {
@@ -56,6 +60,7 @@ public interface IControllable
 
     void Update()
     {
+        if (!_Activated) return;
         // NOTE(toffa): Saver stuff test
         Save.InputSaver.InputSaverEntry Entry = new Save.InputSaver.InputSaverEntry();
         Entry.Add("Up");
