@@ -19,85 +19,6 @@ static class Constants {
     static public readonly string MAIN_CAMERA_NAME = "Main Camera";
 }
 
-[System.Serializable]
-public class Timer {
-    private float _CurrentTime = 0;
-    private float _EndTime;
-    private bool _AutoRestart = false;
-    private bool _Running = false;
-    private bool _Ended = false;
-
-    public Timer( float Time )
-    {
-        _EndTime = Time;
-    }
-
-    private void Start()
-    {
-        _CurrentTime = 0;
-    }
-
-    public void Update(float Time)
-    {
-        if (_Running)
-        {
-            _CurrentTime += Time;
-            if(_CurrentTime >= _EndTime)
-            {
-                _Ended = true;
-                _Running = false;
-            }
-        }
-    }
-
-    public void Run()
-    {
-        _Running = true;
-        _Ended = false;
-    }
-
-    public void Pause()
-    {
-        _Running = false;
-    }
-
-    public void Reset()
-    {
-        _Running = false;
-        _Ended = false;
-        _CurrentTime = 0;
-    }
-
-    public void Restart()
-    {
-        Reset();
-        Run();
-    }
-
-    public bool Ended()
-    {
-        return (!_Running && _Ended);
-    }
-    
-    public bool Running()
-    {
-        return _Running;
-    }
-
-    public float GetTime()
-    {
-        return _CurrentTime;
-    }
-    public float Length()
-    {
-        return _EndTime;
-    }
-    public void SetEndTime(float Time)
-    {
-        _EndTime = Time;
-        if (_EndTime <= _CurrentTime) Reset();
-    }
-}
 
 public class WorldManager : MonoBehaviour, IControllable, ISavable {
     public WorldManager()
@@ -401,7 +322,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
 
     private void switch_timeline_to_last()
     {
-        UITimeline tl_ui        = levelUI_GO.GetComponent<UITimeline>();
+        UITimeline tl_ui         = levelUI_GO.GetComponent<UITimeline>();
         PlayerController last_pc = GetCurrentPlayer();
         tl_ui.trySwitchTimeline( last_pc.Mdl.TL );
         __switchTLToLast = false;

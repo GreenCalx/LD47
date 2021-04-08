@@ -146,7 +146,7 @@ public class Movable : MonoBehaviour
 
     public bool CanMove()
     {
-        return !Freeze && !AnimationTimer.Running() && (AnimationTimer.GetTime() == 0 || AnimationTimer.Ended());
+        return !Freeze && !AnimationTimer.IsRunning();
     }
 
     void UpdateTimers()
@@ -162,7 +162,7 @@ public class Movable : MonoBehaviour
         TailsSpawm.SetEndTime(AnimationTime / TailsMultiplier);
 
         UpdateTimers();
-        if (AnimationTimer.Running())
+        if (AnimationTimer.IsRunning())
         {
             if (BumpAnimation)
             {

@@ -131,6 +131,7 @@ public class PlayerController : MonoBehaviour, IControllable , ISavable {
         // it will be enabled again once the animation is done
         GetComponent<BoxCollider2D>().enabled = false;
         startingScale = transform.localScale.x;
+        animationtime.SetEndTime(1f);
         animationtime.Restart();
     }
     void EndAnimation()
@@ -156,7 +157,6 @@ public class PlayerController : MonoBehaviour, IControllable , ISavable {
 
     void IControllable.ProcessInputs(Save.InputSaver.InputSaverEntry Entry)
     {
-        Debug.Log("ProcessInputs : PlayerController");
         if (Constants.InputMode == 0)
         {
             var Up = Entry.Inputs[DirectionInputs[(int)Direction.UP]].IsDown || Entry.isDpadUpPressed;
