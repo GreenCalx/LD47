@@ -683,7 +683,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
-  m_SortingLayerID: 0
+  m_SortingLayerID: 1643845085
   m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!224 &1745545848
@@ -722,6 +722,8 @@ MonoBehaviour:
   selected_color: {r: 1, g: 1, b: 1, a: 1}
   unselected_color: {r: 1, g: 1, b: 1, a: 0.2627451}
   scene_to_load: World0
+  UIOptions: {fileID: 1990820918781450609, guid: b211f4147ad3a114683087897db1c4b6,
+    type: 3}
 --- !u!1 &1966023520
 GameObject:
   m_ObjectHideFlags: 0

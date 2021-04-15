@@ -3,7 +3,7 @@ using System;
 public static class LevelProgress
 {
 
-    public static readonly bool DEBUG_ACTIVATE_ALL = true;
+    public static bool DEBUG_ACTIVATE_ALL = false;
 
     // Number of stages per Level
     public static readonly int[] n_stages_per_level = { 9, 10 };
@@ -20,9 +20,27 @@ public static class LevelProgress
 
         if ( DEBUG_ACTIVATE_ALL )
         {
-            for (int i = 0; i < arrLevel0.Length; i++ )
-                arrLevel0[i] = true;
+            unlockAll();
         }
+    }
+
+    // only level 0 right now
+    public static void unlockAll()
+    {
+        for (int i = 0; i < arrLevel0.Length; i++ )
+            arrLevel0[i] = true;
+    }
+
+    public static void loadSave()
+    {
+        // todo ; in the meantime it resets all...
+        resetStageProgress();
+    }
+
+    public static void resetStageProgress()
+    {
+        arrLevel0 = new bool[n_stages_per_level[0]];
+        arrLevel1 = new bool[n_stages_per_level[1]];
     }
 
     public static void completeStage( int levelID, int stageID)
