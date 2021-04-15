@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8533916066985495850}
   - component: {fileID: 7948679055537135247}
   - component: {fileID: 8533916066985495853}
-  - component: {fileID: 8533916066985495848}
+  - component: {fileID: 1010815498}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -61,7 +61,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 7.597002
+  orthographic size: 6.30432
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -89,12 +89,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a160d838ff8b4b4693ac20007e008c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_AssetsPPU: 100
+  m_AssetsPPU: 32
   m_RefResolutionX: 640
   m_RefResolutionY: 480
   m_UpscaleRT: 0
   m_PixelSnapping: 0
-  m_CropFrameX: 0
+  m_CropFrameX: 1
   m_CropFrameY: 0
   m_StretchFill: 0
 --- !u!81 &8533916066985495853
@@ -105,7 +105,7 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8533916066985495852}
   m_Enabled: 1
---- !u!114 &8533916066985495848
+--- !u!114 &1010815498
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -114,16 +114,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 8533916066985495852}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ac7a55a335e88984fa040a08a7fc3d48, type: 3}
+  m_Script: {fileID: 11500000, guid: 979bbb43bbc35a84285702d216709fcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  zoom_speed: 1
-  upper_zoom_bound: 8
-  lower_zoom_bound: 1
-  zoom_smooth_speed: 2
-  camera_upper_xbound: 0.7
-  camera_upper_ybound: 0.7
-  camera_lower_xbound: 0.3
-  camera_lower_ybound: 0.3
-  camera_follow_lerp_step: 0.01
-  camera_center_lerp_step: 2
+  mat: {fileID: 2100000, guid: 5770422e9830c9446b4cc89ff6eb4982, type: 2}
+  color: {r: 1, g: 0, b: 0, a: 0}
+  CurrentTime: 0
+  _position: {x: 0, y: 0}
