@@ -65,7 +65,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _AnimationLength: 1
-    - _AnimationTime: 12.235651
+    - _AnimationTime: 264.73468
     - _Annulus: 0.05
     - _BumpScale: 1
     - _Cutoff: 0.5
@@ -88,4 +88,4 @@ Material:
     m_Colors:
     - _Color: {r: 1, g: 0, b: 0, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _PlayerPosition: {r: 0.196875, g: 0.19375, b: 10, a: 0}
+    - _PlayerPosition: {r: 0.29970002, g: 0.34353334, b: 9.03125, a: 0}

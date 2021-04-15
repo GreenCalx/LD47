@@ -57,6 +57,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
     private GameObject levelUI_GO;
     public GameObject StartTile;
     public Camera CurrentCamera;
+    public StageSelector CurrentStageSelector;
 
 
     public InputManager IM;
@@ -244,7 +245,14 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
         var Down = Entry.Inputs["Down"].IsDown || Entry.isDpadDownPressed;
         var Right = Entry.Inputs["Right"].IsDown || Entry.isDpadRightPressed;
         var Left = Entry.Inputs["Left"].IsDown || Entry.isDpadLeftPressed;
-        var SwitchTL = Input.GetKeyDown("tab");
+        var SwitchTL =  Entry.Inputs["SwitchTL"].IsDown;
+
+        var SwitchToWorld = Entry.Inputs["Cancel"].IsDown;
+        if(SwitchToWorld)
+        {
+            CurrentStageSelector.UI.switchWorldToFullScreen();
+            CurrentStageSelector.IM.Activate();
+        }
 
         if (IM.CurrentMode == InputManager.Mode.RECORD)
         {

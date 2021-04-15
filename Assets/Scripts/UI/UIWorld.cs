@@ -42,28 +42,7 @@ public class UIWorld : MonoBehaviour
     {
         refreshUI();
 
-        // TODO(mtn5): remove me, use input manager directly in stage selector
-        if (!__replayFrame) return;
-        if(Input.GetKeyDown(KeyCode.Tab))
-        {
-            // switch between full screen and small window for current level
-            if (!isFullscreen)
-            {
-                RectTransform RT = __replayFrame.GetComponent<RectTransform>();
-                RT.localPosition = Vector3.zero;
-                RT.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 640);
-                RT.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 480);
-               // GameObject.Find("Level0").GetComponentInChildren<InputManager>().Activate();
-                isFullscreen = true;
-            } else {
-                RectTransform RT = __replayFrame.GetComponent<RectTransform>();
-                RT.localPosition = Position;
-                RT.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Size.x);
-                RT.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Size.y);
-               // GameObject.Find("Level0").GetComponentInChildren<InputManager>().DeActivate();
-                isFullscreen = false;
-            }
-        }
+        //if (!__replayFrame) return;
         //updateReplayFrame();
     }
 
@@ -85,6 +64,52 @@ public class UIWorld : MonoBehaviour
             string stage_name = StageCatalog.getStageName( level_id, stage_id);
             __stage_name_frame.setName( stage_id, stage_name);
         }   
+    }
+
+    public void switchLevelToFullScreen()
+    {
+        // switch between full screen and small window for current level
+        if (!isFullscreen)
+        {
+            RectTransform RT = __replayFrame.GetComponent<RectTransform>();
+            RT.localPosition = Vector3.zero;
+            RT.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 640);
+            RT.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 480);
+            // GameObject.Find("Level0").GetComponentInChildren<InputManager>().Activate();
+            isFullscreen = true;
+        }
+        else
+        {
+            RectTransform RT = __replayFrame.GetComponent<RectTransform>();
+            RT.localPosition = Position;
+            RT.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Size.x);
+            RT.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Size.y);
+            // GameObject.Find("Level0").GetComponentInChildren<InputManager>().DeActivate();
+            isFullscreen = false;
+        }
+    }
+
+    public void switchWorldToFullScreen()
+    {
+        // switch between full screen and small window for current level
+        if (!isFullscreen)
+        {
+            RectTransform RT = __replayFrame.GetComponent<RectTransform>();
+            RT.localPosition = Vector3.zero;
+            RT.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 640);
+            RT.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 480);
+            // GameObject.Find("Level0").GetComponentInChildren<InputManager>().Activate();
+            isFullscreen = true;
+        }
+        else
+        {
+            RectTransform RT = __replayFrame.GetComponent<RectTransform>();
+            RT.localPosition = Position;
+            RT.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Size.x);
+            RT.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Size.y);
+            // GameObject.Find("Level0").GetComponentInChildren<InputManager>().DeActivate();
+            isFullscreen = false;
+        }
     }
 
 }

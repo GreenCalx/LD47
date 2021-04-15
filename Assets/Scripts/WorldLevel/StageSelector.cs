@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StageSelector : MonoBehaviour
+public class StageSelector : MonoBehaviour, IControllable
 {
     [HideInInspector]
     public Stage selected_stage;
@@ -10,14 +10,19 @@ public class StageSelector : MonoBehaviour
     public POI selected_poi;
     [HideInInspector]
     public LConnector selected_lconn;
-    
+
+    public InputManager IM;
+    public UIWorld UI;
+
+    private POI neighbor;
+
     public int level_id;
     private bool is_init = false;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        IM.Attach(this as IControllable);
     }
 
     public void init( int iLevelID, Stage iStartingStage )
@@ -44,15 +49,56 @@ public class StageSelector : MonoBehaviour
         if (!is_init)
             return;
 
-        // TODO CONTROLLER CTRL
-        var up      = Input.GetButtonDown("Up")      ;
-        var down    = Input.GetButtonDown("Down")    ;
-        var right   = Input.GetButtonDown("Right")   ;
-        var left    = Input.GetButtonDown("Left")    ;
-        var enter   = Input.GetButtonDown("Submit");
-        if( up || down || right ||left )
+        if (neighbor != null)
         {
-            POI neighbor = null;
+            if (neighbor is Stage)
+            {
+                Stage neighbor_stage = (Stage)neighbor;
+                if (neighbor_stage.isUnlocked())
+                {
+                    selected_stage?.UnLoad();
+                    selected_stage = neighbor_stage;
+                    selected_poi = neighbor;
+                    moveTo(neighbor.gameObject.transform);
+                }
+                else
+                {
+                    // play SFX or send feedback that stage is currently locked.
+                    Debug.Log("Targeted neighbor stage is locked. Complete current stage before moving on.");
+                }
+            }
+            else if (neighbor is LConnector)
+            {
+                // check selected stage is done
+                if (selected_stage.isDone() || selected_stage.isStartingStage)
+                {
+                    selected_poi = neighbor;
+                    selected_stage = null;
+                    selected_lconn = (LConnector)neighbor;
+                    moveTo(neighbor.gameObject.transform);
+                }
+            }
+            neighbor = null;
+        }
+    }//! Update
+
+    public void moveTo( Transform iDestination )
+    {
+        gameObject.transform.position = iDestination.position;
+    }
+
+    public void ProcessInputs(Save.InputSaver.InputSaverEntry Entry)
+    {
+        if (!is_init) return;
+
+        var up      = Entry.Inputs["Up"].IsDown;
+        var down    = Entry.Inputs["Down"].IsDown;
+        var right = Entry.Inputs["Right"].IsDown;
+        var left    = Entry.Inputs["Left"].IsDown;
+        var space  = Entry.Inputs["Submit"].IsDown;
+        var tab = Entry.Inputs["SwitchTL"].IsDown;
+        if (up || down || right || left)
+        {
             if (up)
                 neighbor = selected_poi.tryNeighbor(POI.DIRECTIONS.UP);
             else if (down)
@@ -61,40 +107,8 @@ public class StageSelector : MonoBehaviour
                 neighbor = selected_poi.tryNeighbor(POI.DIRECTIONS.LEFT);
             else if (right)
                 neighbor = selected_poi.tryNeighbor(POI.DIRECTIONS.RIGHT);
-            
-            if ( neighbor!=null )
-            {
-                if ( neighbor is Stage )
-                {
-                    Stage neighbor_stage = (Stage)neighbor;
-                    if ( neighbor_stage.isUnlocked() )
-                    {
-                        selected_stage?.UnLoad();
-                        selected_stage = neighbor_stage;
-                        selected_poi = neighbor;
-                        moveTo( neighbor.gameObject.transform );
-                    } else {
-                        // play SFX or send feedback that stage is currently locked.
-                        Debug.Log("Targeted neighbor stage is locked. Complete current stage before moving on.");
-                    }
-                } else if ( neighbor is LConnector )
-                {
-                    // check selected stage is done
-                    if ( selected_stage.isDone() || selected_stage.isStartingStage  )
-                    {
-                        selected_poi = neighbor;
-                        selected_stage = null;
-                        selected_lconn = (LConnector)neighbor;
-                        moveTo( neighbor.gameObject.transform );
-                    }
-
-                }
-
-                    
-
-            }
         }
-        else if ( enter )
+        else if (space)
         {
             if (!!selected_stage)
             {
@@ -111,12 +125,11 @@ public class StageSelector : MonoBehaviour
             else
                 Debug.Log("FAILED TO LOAD LEVEL SCENE. NO SELECTED STAGE.");
         }
-
-    }//! Update
-
-    public void moveTo( Transform iDestination )
-    {
-        gameObject.transform.position = iDestination.position;
+        else if (tab)
+        {
+            // Get UIWorld and make the scene full screen
+            UI.switchLevelToFullScreen();
+            IM.DeActivate();
+        }
     }
-
 }
