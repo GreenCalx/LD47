@@ -69,6 +69,7 @@ public class StageSelector : MonoBehaviour
                     Stage neighbor_stage = (Stage)neighbor;
                     if ( neighbor_stage.isUnlocked() )
                     {
+                        selected_stage?.UnLoad();
                         selected_stage = neighbor_stage;
                         selected_poi = neighbor;
                         moveTo( neighbor.gameObject.transform );

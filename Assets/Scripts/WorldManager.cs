@@ -56,6 +56,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
     public GameObject levelUI_GOref;
     private GameObject levelUI_GO;
     public GameObject StartTile;
+    public Camera CurrentCamera;
 
 
     public InputManager IM;
@@ -151,7 +152,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
         IM.Attach(PC);
         IM.Attach(this);
 
-        Camera.main.GetComponent<PostFXRenderer>().StartAnimation(GO.transform.position);
+        CurrentCamera?.GetComponent<PostFXRenderer>().StartAnimation(GO.transform.position);
 
         levelUI_GO = Instantiate(levelUI_GOref, this.gameObject.transform);
         levelUI_GO.GetComponent<UITimeline>().setModel(this);

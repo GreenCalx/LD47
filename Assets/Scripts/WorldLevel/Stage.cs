@@ -18,6 +18,8 @@ public class Stage : POI
     private const string LEVEL_NAME_PREFIX = "LEVEL";
     [SerializeField] public int level_to_load;
     [SerializeField] public int stage_to_load;
+    public GameObject stage_to_load_GO;
+    private GameObject stage_loaded_GO;
 
     [HideInInspector]
     public int id;
@@ -68,9 +70,17 @@ public class Stage : POI
     {
         if (__completion_status == COMPLETION.LOCKED)
             return;
-        string scene_to_load = LEVEL_NAME_PREFIX + level_to_load + STAGE_NAME_PREFIX + stage_to_load;
-        //string scene_to_load = LEVEL_NAME_PREFIX + stage_to_load;
-        SceneManager.LoadScene( scene_to_load, LoadSceneMode.Single);
+        // NOTE(mtn5): This is old code used before refactoring of leveles into gameobject
+        // TODO(mtn5): Delete this code if it is not needed
+        //string scene_to_load = LEVEL_NAME_PREFIX + level_to_load + STAGE_NAME_PREFIX + stage_to_load;
+        ////string scene_to_load = LEVEL_NAME_PREFIX + stage_to_load;
+        //SceneManager.LoadScene( scene_to_load, LoadSceneMode.Single);
+        stage_loaded_GO = GameObject.Instantiate(stage_to_load_GO);
+    }
+
+    public void UnLoad()
+    {
+        GameObject.DestroyImmediate(stage_loaded_GO);
     }
 
     public void updateCompletion( Level.WORLD_POI iStagePOI )
