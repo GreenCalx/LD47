@@ -10,7 +10,8 @@ using System.Runtime.Serialization;
 using System.Reflection;
 
 [Serializable]
-public abstract class IModel {
+public abstract class IModel
+{
     public void CopyData(IModel Dest)
     {
         var Props = GetType().GetFields();
@@ -31,7 +32,7 @@ public abstract class IModel {
         var Props = GetType().GetFields();
         foreach (FieldInfo property in Props)
         {
-            if(property.IsDefined(typeof(SerializableAttribute)))
+            if (property.IsDefined(typeof(SerializableAttribute)))
                 if (!property.GetValue(this).Equals(property.GetValue(In)))
                     return false;
         }
@@ -49,7 +50,8 @@ public interface ISavable
 // those are the only two where we specifically have to create surrogate object to be
 // able to save their state
 [Serializable]
-public class Transform_Save {
+public class Transform_Save
+{
     Vector3 position;
     Vector3 localPosition;
     Quaternion localRotation;
@@ -71,7 +73,7 @@ public class Transform_Save {
         childs = new GameObject_Save[childCount];
         for (int i = 0; i < T.childCount; ++i)
         {
-           childs[i] = new GameObject_Save(T.GetChild(i).gameObject);
+            childs[i] = new GameObject_Save(T.GetChild(i).gameObject);
         };
     }
 
@@ -119,7 +121,7 @@ public class GameObject_Save
     {
         name = GO.name;
         id = GO.GetInstanceID();
-        transform = new Transform_Save(GO.transform) ;
+        transform = new Transform_Save(GO.transform);
 
         var Components_go = GO.GetComponents<MonoBehaviour>();
         foreach (var Component in Components_go)
@@ -139,7 +141,7 @@ public class GameObject_Save
         transform.GetTransform(GO.transform, CreateChilds);
 
         var Components_go = GO.GetComponents<MonoBehaviour>();
-        for (int i = 0, j=0; i < Components_go.Length; ++i)
+        for (int i = 0, j = 0; i < Components_go.Length; ++i)
         {
             if (Components_go[i] is ISavable)
             {
@@ -152,13 +154,13 @@ public class GameObject_Save
     public override bool Equals(object obj)
     {
         GameObject_Save In = obj as GameObject_Save;
-        if(In != null)
+        if (In != null)
         {
             bool Result = In.name == this.name &&
                 In.transform.Equals(transform) && Components.Count == In.Components.Count;
-            if(Result)
+            if (Result)
             {
-                for(int i = 0; i < Components.Count; ++i)
+                for (int i = 0; i < Components.Count; ++i)
                 {
                     if (!Components[i].Equals(In.Components[i])) return false;
                 }
@@ -274,9 +276,9 @@ public class Save : MonoBehaviour
             {
                 GameObject currentObject = root;
                 int c = root.transform.childCount;
-                for (int idx =0; idx < c; ++idx)
+                for (int idx = 0; idx < c; ++idx)
                 {
-                    currentObject = root.transform.GetChild(idx).gameObject; 
+                    currentObject = root.transform.GetChild(idx).gameObject;
                     Result.Add(currentObject);
                     GetGameObjects(currentObject, Result);
                 }
@@ -290,7 +292,7 @@ public class Save : MonoBehaviour
                 GetGameObjects(parent, SceneGameObjectsTemp);
                 SceneGameObjects = new GameObject_Save[SceneGameObjectsTemp.Count];
                 int idx = 0;
-                foreach(GameObject go in SceneGameObjectsTemp)
+                foreach (GameObject go in SceneGameObjectsTemp)
                 {
                     SceneGameObjects[idx] = new GameObject_Save(go);
                     idx++;
@@ -303,7 +305,7 @@ public class Save : MonoBehaviour
                 List<GameObject> SceneGameObjectsTemp = new List<GameObject>();
                 GetGameObjects(parent, SceneGameObjectsTemp);
                 int idx = 0;
-                foreach(GameObject go in SceneGameObjectsTemp)
+                foreach (GameObject go in SceneGameObjectsTemp)
                 {
                     SceneGameObjects[idx].GetGameObject(go, false);
                     idx++;
@@ -314,9 +316,9 @@ public class Save : MonoBehaviour
                 Frame In = obj as Frame;
                 if (In != null && In.SceneGameObjects.Length != SceneGameObjects.Length) return false;
 
-                for(int i = 0; i < SceneGameObjects.Length;++i)
+                for (int i = 0; i < SceneGameObjects.Length; ++i)
                 {
-                    if (!In.SceneGameObjects[i].Equals( SceneGameObjects[i]))
+                    if (!In.SceneGameObjects[i].Equals(SceneGameObjects[i]))
                     {
                         return false;
                     }
@@ -400,20 +402,8 @@ public class Save : MonoBehaviour
         public List<InputSaverEntry> InputsFrame = new List<InputSaverEntry>();
         public Frame FirstFrame = new Frame();
         public Frame EndFrame = new Frame();
-        public void Record()
+        public void Record(InputSaverEntry Entry)
         {
-            InputSaverEntry Entry = new InputSaverEntry();
-            Entry.Add("Up");
-            Entry.Add("Down");
-            Entry.Add("Right");
-            Entry.Add("Left");
-            Entry.Add("Break");
-            Entry.Add("BackTick");
-            Entry.Add("Tick");
-            Entry.Add("Restart");
-            Entry.Add("DPad_Vertical", true);
-            Entry.Add("DPad_Horizontal", true);
-
             if (InputsFrame.Count > 0 && Entry.Equals(InputsFrame[InputsFrame.Count - 1]))
             {
                 InputsFrame[InputsFrame.Count - 1].NumberOfFramesIsSame += 1;
@@ -438,19 +428,27 @@ public class Save : MonoBehaviour
     int CurrentReplayedCount = 0;
     int CurrentIdx = 0;
     bool FrameLock = false;
-    public string FileName = "test";
+    public string FileName = "";
     InputSaver IS = new InputSaver();
+    InputManager IM;
 
     public void Start()
     {
-        IS.setParent(this.gameObject.transform.parent.gameObject);
+        IS.setParent(this.gameObject.transform.parent.transform.parent.gameObject);
+
+        String Path = Application.persistentDataPath + "/" + FileName + ".save";
+        if (this.Load(Path))
+        {
+            IS.FirstFrame.Apply();
+            IsReplaying = true;
+        }
+
     }
 
     public InputSaver.InputSaverEntry Tick(InputSaver.InputSaverEntry Entry)
     {
         if (IsReplaying)
         {
-
             if (FrameLock) return IS.InputsFrame[CurrentIdx];
             if (CurrentIdx < IS.InputsFrame.Count)
             {
@@ -482,7 +480,11 @@ public class Save : MonoBehaviour
                 }
             }
         }
-        else return Entry;
+        else if (IsRecording)
+        {
+            IS.Record(Entry);
+        }
+        return (Entry);
     }
 
     // Update is called once per frame
@@ -492,13 +494,9 @@ public class Save : MonoBehaviour
         bool StopSave = Input.GetKeyDown(KeyCode.M);
         bool StartSave = Input.GetKeyDown(KeyCode.L);
         bool Load = Input.GetKeyDown(KeyCode.K);
-        if (Load)
-        {
-            if (this.Load(Path))
-            {
+        if (Load && this.Load(Path)) { 
                 IS.FirstFrame.Apply();
                 IsReplaying = true;
-            }
         }
         else
         {
@@ -510,39 +508,7 @@ public class Save : MonoBehaviour
             if (StopSave)
             {
                 IsRecording = false;
-                IS.EndFrame.Init();
-            }
-
-            if (IsRecording)
-            {
-                IS.Record();
-            }
-            else
-            {
-                if (!IsSerializing && !IsReplaying && IS.InputsFrame.Count != 0)
-                {
-                    BinaryFormatter BF = new BinaryFormatter();
-                    SurrogateSelector ss = new SurrogateSelector();
-                    ss.AddSurrogate(typeof(Vector3),
-                                     new StreamingContext(StreamingContextStates.All),
-                                      new Vector3SerializationSurrogate());
-                    ss.AddSurrogate(typeof(Quaternion),
-                                    new StreamingContext(StreamingContextStates.All),
-                                    new QuaternionSerializationSurrogate());
-                    ss.AddSurrogate(typeof(Color),
-                        new StreamingContext(StreamingContextStates.All),
-                        new ColorSerializationSurrogate());
-                    BF.SurrogateSelector = ss;
-
-                    FileStream file = File.Create(Path);
-                    IsSerializing = true;
-                    BF.Serialize(file, IS);
-                    IsSerializing = false;
-                    file.Close();
-
-                    IS = new InputSaver();
-                    IS.setParent(this.gameObject.transform.parent.gameObject);
-                }
+                EndLevel();
             }
         }
     }
@@ -583,20 +549,22 @@ public class Save : MonoBehaviour
                 file.Close();
 
                 IS = new InputSaver();
-                IS.setParent(this.gameObject.transform.parent.gameObject);
+                IS.setParent(this.gameObject.transform.parent.transform.parent.gameObject);
             }
         }
 
+#if false
         if (IsReplaying)
         {
             CompareEndFrames();
         }
+#endif
     }
 
     void CompareEndFrames()
     {
         InputSaver.Frame CurrentEndFrame = new InputSaver.Frame();
-        CurrentEndFrame.setParent(this.gameObject.transform.parent.gameObject);
+        CurrentEndFrame.setParent(this.gameObject.transform.parent.transform.parent.gameObject);
         CurrentEndFrame.Init();
 
         if (CurrentEndFrame.Equals(IS.EndFrame))
@@ -631,9 +599,22 @@ public class Save : MonoBehaviour
         using (FileStream stream = new FileStream(Application.persistentDataPath + "/" + FileName + ".save", FileMode.Open, FileAccess.Read))
         {
             IS = BF.Deserialize(stream) as InputSaver;
-            IS.setParent(this.gameObject.transform.parent.gameObject);
+            IS.setParent(this.gameObject.transform.parent.transform.parent.gameObject);
             stream.Close();
         }
         return true;
+    }
+
+    // TODO(Toffa): This needs to pause the Saver and start to record again probably?
+    // do we need to save multiple files?
+    // what happens when we repeat the level? it deletes the old save? it start again and erase only the remaining inputs (diff mayube?)?
+    // IMPORTANT (Toffa) : Anyway... Right now it only gives back the Input to the player, but I guess it will not do anaything to the saver yet
+    // This is called directly inside InputManager, this is really ugly PLEASE FIX
+    public void Stop()
+    {
+        IsRecording = false;
+        IsReplaying = false;
+        IsSerializing = false;
+        IsLooping = false;
     }
 }

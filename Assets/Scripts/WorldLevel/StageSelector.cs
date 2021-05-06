@@ -127,8 +127,6 @@ public class StageSelector : MonoBehaviour, IControllable
                     neighbor = selected_poi.tryNeighbor(POI.DIRECTIONS.LEFT);
                 else if (right)
                     neighbor = selected_poi.tryNeighbor(POI.DIRECTIONS.RIGHT);
-
-
             }
         }
        

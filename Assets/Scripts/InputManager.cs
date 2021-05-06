@@ -23,7 +23,9 @@ public class InputManager : MonoBehaviour
     private List<IControllable> _DeferRemove = new List<IControllable>();
     public bool _Activated = true;
 
-    public void Activate() { _Activated = true; }
+    public Save Saver;
+
+    public void Activate() { _Activated = true; Saver.Stop(); }
     public void DeActivate() { _Activated = false; }
 
     public void Attach(IControllable iControllable)
@@ -77,12 +79,7 @@ public class InputManager : MonoBehaviour
         Entry.Add("Cancel");
         Entry.Add("Submit");
 
-        var Saver = gameObject.transform.parent?.GetComponentInChildren<Save>();
-        if (Saver)
-        {
-            Entry = Saver.Tick(Entry);
-        }
-
+        if(Saver) Entry = Saver.Tick(Entry);
 
         Entry.isDpadDownPressed = Entry.Inputs["DPad_Vertical"].AxisValue == 1 && _LastDpadAxisVertical != 1;
         Entry.isDpadUpPressed = Entry.Inputs["DPad_Vertical"].AxisValue == -1 && _LastDpadAxisVertical != -1;
