@@ -254,6 +254,13 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
             CurrentStageSelector.IM.Activate();
         }
 
+        var ResetWorld = Entry.Inputs["Restart"].IsDown;
+        if ( ResetWorld )
+        {
+            // TODO (mtn5): Add reset behavior again
+            // oit was broken after coming from Scene based to GameObject based design :(
+        }
+
         if (IM.CurrentMode == InputManager.Mode.RECORD)
         {
             if (Up || Down || Right || Left)

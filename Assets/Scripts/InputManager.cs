@@ -10,9 +10,9 @@ public interface IControllable
     void ProcessInputs(Save.InputSaver.InputSaverEntry Entry);
 }
 
-    public class InputManager : MonoBehaviour
-    {
-    private List<IControllable>_Controllees = new List<IControllable>();
+public class InputManager : MonoBehaviour
+{
+    private List<IControllable> _Controllees = new List<IControllable>();
     private float _LastDpadAxisHorizontal = 0;
     private float _LastDpadAxisVertical = 0;
 
@@ -28,13 +28,13 @@ public interface IControllable
 
     public void Attach(IControllable iControllable)
     {
-        if(!_Controllees.Contains(iControllable))
+        if (!_Controllees.Contains(iControllable))
         {
             _Controllees.Add(iControllable);
         }
     }
 
-    public void Detach (IControllable iControllable)
+    public void Detach(IControllable iControllable)
     {
         if (!_Lock)
             _Controllees.Remove(iControllable);
@@ -77,14 +77,10 @@ public interface IControllable
         Entry.Add("Cancel");
         Entry.Add("Submit");
 
-        var SaverGO = GameObject.Find("Saver");
-        if (SaverGO)
+        var Saver = gameObject.transform.parent?.GetComponentInChildren<Save>();
+        if (Saver)
         {
-            var Saver = SaverGO.GetComponent<Save>();
-            if (Saver)
-            {
-                Entry = Saver.Tick(Entry);
-            }
+            Entry = Saver.Tick(Entry);
         }
 
 
@@ -104,7 +100,7 @@ public interface IControllable
         // of newly attached object in this frame and not the next one
         var EndIdx = _Controllees.Count;
         Lock();
-        for(int i = 0; i < _Controllees.Count; ++i)
+        for (int i = 0; i < _Controllees.Count; ++i)
         {
             _Controllees[i].ProcessInputs(Entry);
         }
