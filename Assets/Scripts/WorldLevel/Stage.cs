@@ -136,4 +136,9 @@ public class Stage : POI
             }
         }
     }
+
+    public GameObject get_loaded_stage()
+    {
+        return stage_loaded_GO;
+    }
 }

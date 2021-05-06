@@ -66,6 +66,9 @@ public class UIWorld : MonoBehaviour
         }   
     }
 
+     // This name is shitty...
+     // It will actually switch to fullscreen or back to screened mode
+     // and not only make it fullscreen...
     public void switchLevelToFullScreen()
     {
         // switch between full screen and small window for current level

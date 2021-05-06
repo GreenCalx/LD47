@@ -25,21 +25,24 @@ public class StageSelector : MonoBehaviour, IControllable
         IM.Attach(this as IControllable);
     }
 
-    public void init( int iLevelID, Stage iStartingStage )
+    public void init(int iLevelID, Stage iStartingStage)
     {
-        selected_stage  = iStartingStage;
-        selected_poi    = iStartingStage;
-        level_id        = iLevelID;
-        selected_lconn  = null;
+        selected_stage = iStartingStage;
+        selected_poi = iStartingStage;
+        level_id = iLevelID;
+        selected_lconn = null;
+        
+        selected_stage.Load();
+
         is_init = true;
     }
 
-    public void init( int iLevelID, LConnector iStartingLevelConnector )
+    public void init(int iLevelID, LConnector iStartingLevelConnector)
     {
-        selected_lconn  = iStartingLevelConnector;
-        selected_poi    = iStartingLevelConnector;
-        selected_stage  = null;
-        level_id        = iLevelID;
+        selected_lconn = iStartingLevelConnector;
+        selected_poi = iStartingLevelConnector;
+        selected_stage = null;
+        level_id = iLevelID;
         is_init = true;
     }
 
@@ -60,6 +63,23 @@ public class StageSelector : MonoBehaviour, IControllable
                     selected_stage = neighbor_stage;
                     selected_poi = neighbor;
                     moveTo(neighbor.gameObject.transform);
+
+                    if (!!selected_stage)
+                    {
+                        InterSceneCache.stage_from = selected_stage.id;
+                        InterSceneCache.world_from = level_id;
+                        selected_stage.Load();
+                    }
+                    else if (!!selected_poi && !!selected_lconn)
+                    {
+                        InterSceneCache.world_from = level_id;
+                        InterSceneCache.stage_from = InterSceneCache.UNDEFINED;
+                        selected_lconn.Load();
+                    }
+                    else
+                        Debug.Log("FAILED TO LOAD LEVEL SCENE. NO SELECTED STAGE.");
+
+
                 }
                 else
                 {
@@ -82,7 +102,7 @@ public class StageSelector : MonoBehaviour, IControllable
         }
     }//! Update
 
-    public void moveTo( Transform iDestination )
+    public void moveTo(Transform iDestination)
     {
         gameObject.transform.position = iDestination.position;
     }
@@ -91,45 +111,43 @@ public class StageSelector : MonoBehaviour, IControllable
     {
         if (!is_init) return;
 
-        var up      = Entry.Inputs["Up"].IsDown;
-        var down    = Entry.Inputs["Down"].IsDown;
-        var right = Entry.Inputs["Right"].IsDown;
-        var left    = Entry.Inputs["Left"].IsDown;
-        var space  = Entry.Inputs["Submit"].IsDown;
-        var tab = Entry.Inputs["SwitchTL"].IsDown;
-        if (up || down || right || left)
+        if (IM.CurrentMode != InputManager.Mode.DEACTIVATED)
         {
-            if (up)
-                neighbor = selected_poi.tryNeighbor(POI.DIRECTIONS.UP);
-            else if (down)
-                neighbor = selected_poi.tryNeighbor(POI.DIRECTIONS.DOWN);
-            else if (left)
-                neighbor = selected_poi.tryNeighbor(POI.DIRECTIONS.LEFT);
-            else if (right)
-                neighbor = selected_poi.tryNeighbor(POI.DIRECTIONS.RIGHT);
-        }
-        else if (space)
-        {
-            if (!!selected_stage)
+            var up = Entry.Inputs["Up"].IsDown;
+            var down = Entry.Inputs["Down"].IsDown;
+            var right = Entry.Inputs["Right"].IsDown;
+            var left = Entry.Inputs["Left"].IsDown;
+            if (up || down || right || left)
             {
-                InterSceneCache.stage_from = selected_stage.id;
-                InterSceneCache.world_from = level_id;
-                selected_stage.Load();
+                if (up)
+                    neighbor = selected_poi.tryNeighbor(POI.DIRECTIONS.UP);
+                else if (down)
+                    neighbor = selected_poi.tryNeighbor(POI.DIRECTIONS.DOWN);
+                else if (left)
+                    neighbor = selected_poi.tryNeighbor(POI.DIRECTIONS.LEFT);
+                else if (right)
+                    neighbor = selected_poi.tryNeighbor(POI.DIRECTIONS.RIGHT);
+
+
             }
-            else if (!!selected_poi && !!selected_lconn)
-            {
-                InterSceneCache.world_from = level_id;
-                InterSceneCache.stage_from = InterSceneCache.UNDEFINED;
-                selected_lconn.Load();
-            }
-            else
-                Debug.Log("FAILED TO LOAD LEVEL SCENE. NO SELECTED STAGE.");
         }
-        else if (tab)
+       
+        var space = Entry.Inputs["Submit"].IsDown;
+        if (space)
         {
             // Get UIWorld and make the scene full screen
             UI.switchLevelToFullScreen();
-            IM.DeActivate();
+
+            if (IM.CurrentMode != InputManager.Mode.DEACTIVATED)
+            {
+                IM.CurrentMode = InputManager.Mode.DEACTIVATED;
+                selected_stage.get_loaded_stage()?.GetComponentInChildren<InputManager>()?.Activate();
+            }
+            else
+            {
+                IM.CurrentMode = InputManager.Mode.PLAYER;
+                selected_stage.get_loaded_stage()?.GetComponentInChildren<InputManager>()?.DeActivate();
+            }
         }
     }
 }
