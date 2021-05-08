@@ -153,7 +153,8 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
         IM.Attach(PC);
         IM.Attach(this);
 
-        CurrentCamera?.GetComponent<PostFXRenderer>().StartAnimation(GO.transform.position);
+        // NOTE(Toffa): We dont need to start the animation as we want to start white
+        //CurrentCamera?.GetComponent<PostFXRenderer>().StartAnimation(GO.transform.position);
 
         levelUI_GO = Instantiate(levelUI_GOref, this.gameObject.transform);
         levelUI_GO.GetComponent<UITimeline>().setModel(this);
@@ -287,7 +288,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
                     IM.Attach(GO.GetComponent<PlayerController>());
                     IM.CurrentMode = InputManager.Mode.RECORD;
 
-                    Camera.main.GetComponent<PostFXRenderer>().StartAnimation(CurrentPlayer.transform.position);
+                    CurrentCamera?.GetComponent<PostFXRenderer>()?.StartAnimation(CurrentPlayer.transform.position);
                 }
 
                 // switch to new timeline at break

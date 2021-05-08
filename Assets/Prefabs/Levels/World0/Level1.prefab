@@ -5389,6 +5389,26 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 7579226307322786121}
     m_Modifications:
+    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
+      propertyPath: LutOUTColors.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
+      propertyPath: LutOUTColors.Array.data[0].a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
+      propertyPath: LutOUTColors.Array.data[0].b
+      value: 0.16007113
+      objectReference: {fileID: 0}
+    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
+      propertyPath: LutOUTColors.Array.data[0].g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
+      propertyPath: LutOUTColors.Array.data[0].r
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7948679055537135247, guid: 1ed095b18ab63fd4482bae6724183a66,
         type: 3}
       propertyPath: m_AssetsPPU
