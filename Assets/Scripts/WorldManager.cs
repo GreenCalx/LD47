@@ -334,7 +334,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
             next_loop_level = 0;
 
 
-        //CurrentCamera?.GetComponent<PostFXRenderer>()?.StartAnimation(Vector2.zero, Mathf.Min(0, Mdl.Players.Count - 2), Mathf.Min(0,Mdl.Players.Count - 1));
+        CurrentCamera?.GetComponent<PostFXRenderer>()?.StartAnimation(Vector2.zero, Mathf.Max(0, tl_ui.getDisplayedLoopLevel()), Mathf.Max(0,next_loop_level));
 
         GameObject selected_player_for_tl = Mdl.Players[next_loop_level];
         Timeline tl_to_display = selected_player_for_tl.GetComponent<PlayerController>().Mdl.TL;

@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 8533916066985495851}
   - component: {fileID: 8533916066985495850}
   - component: {fileID: 7948679055537135247}
-  - component: {fileID: 8533916066985495853}
   - component: {fileID: 1010815498}
   m_Layer: 0
   m_Name: Main Camera
@@ -97,14 +96,6 @@ MonoBehaviour:
   m_CropFrameX: 1
   m_CropFrameY: 0
   m_StretchFill: 0
---- !u!81 &8533916066985495853
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8533916066985495852}
-  m_Enabled: 1
 --- !u!114 &1010815498
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -114,15 +105,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 8533916066985495852}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 979bbb43bbc35a84285702d216709fcf, type: 3}
+  m_Script: {fileID: 11500000, guid: e64d48f1554b97749a6e938d207e507b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   mat: {fileID: 2100000, guid: 5770422e9830c9446b4cc89ff6eb4982, type: 2}
-  color: {r: 1, g: 0, b: 0, a: 0}
+  color: {r: 0, g: 0, b: 0, a: 0}
   LutINColors:
-  - {r: 0.83921576, g: 0.83921576, b: 0.83921576, a: 1}
-  LutOUTColors: []
-  LutIN: {fileID: 0}
-  LutOUT: {fileID: 0}
+  - {r: 0.7607844, g: 0.7607844, b: 0.7607844, a: 1}
+  - {r: 1, g: 1, b: 1, a: 1}
+  LutOUTColors:
+  - {r: 1, g: 0.5609674, b: 0, a: 1}
+  - {r: 1, g: 0.5609674, b: 0, a: 1}
+  - {r: 0, g: 1, b: 0.15369797, a: 1}
+  - {r: 0, g: 1, b: 0.15369797, a: 1}
+  - {r: 0, g: 0.17873573, b: 1, a: 1}
+  - {r: 0, g: 0.17873573, b: 1, a: 1}
+  - {r: 1, g: 0, b: 0.7741165, a: 1}
+  - {r: 1, g: 0, b: 0.7741165, a: 1}
   CurrentTime: 0
+  MaxTime: 2
   _position: {x: 0, y: 0}
+  IsAnimating: 0

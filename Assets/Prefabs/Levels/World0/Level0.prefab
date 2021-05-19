@@ -8160,17 +8160,17 @@ PrefabInstance:
     - target: {fileID: 5237018287268107387, guid: de8c53a600c13c04bbd1db06e1cbb11b,
         type: 3}
       propertyPath: m_TileColorArray.Array.data[0].m_Data.b
-      value: 0.4591396
+      value: 0.4344
       objectReference: {fileID: 0}
     - target: {fileID: 5237018287268107387, guid: de8c53a600c13c04bbd1db06e1cbb11b,
         type: 3}
       propertyPath: m_TileColorArray.Array.data[0].m_Data.g
-      value: 0.3883494
+      value: 0.40257916
       objectReference: {fileID: 0}
     - target: {fileID: 5237018287268107387, guid: de8c53a600c13c04bbd1db06e1cbb11b,
         type: 3}
       propertyPath: m_TileColorArray.Array.data[0].m_Data.r
-      value: 0.7548954
+      value: 0.76656294
       objectReference: {fileID: 0}
     - target: {fileID: 5237018287268107387, guid: de8c53a600c13c04bbd1db06e1cbb11b,
         type: 3}
@@ -8632,32 +8632,20 @@ PrefabInstance:
     m_TransformParent: {fileID: 83685787697557149}
     m_Modifications:
     - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutIN
-      value: 
-      objectReference: {fileID: 2800000, guid: 0a945d0e0dfa08844993672b31f18a6f, type: 3}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUT
-      value: 
-      objectReference: {fileID: 2800000, guid: 08943617c5236d54191eaaaefc9b7ed9, type: 3}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: _position.x
-      value: 64.359
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: _position.y
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutINColors.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.size
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutINColors.Array.data[1].a
+      propertyPath: color.a
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
+      propertyPath: LutINColors.Array.data[0].b
+      value: 0.83921576
+      objectReference: {fileID: 0}
+    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
+      propertyPath: LutINColors.Array.data[0].g
+      value: 0.83921576
+      objectReference: {fileID: 0}
+    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
+      propertyPath: LutINColors.Array.data[0].r
+      value: 0.83921576
       objectReference: {fileID: 0}
     - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
       propertyPath: LutINColors.Array.data[1].b
@@ -8669,138 +8657,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
       propertyPath: LutINColors.Array.data[1].r
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[0].a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[0].b
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[0].g
-      value: 0.5249616
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[0].r
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[1].a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[1].g
-      value: 0.5249616
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[1].r
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[2].a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[2].b
-      value: 0.13518643
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[2].g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[2].r
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[3].a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[3].b
-      value: 0.13518643
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[3].g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[4].a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[4].b
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[4].g
-      value: 0.0537467
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[5].a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[5].b
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[5].g
-      value: 0.0537467
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[6].a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[6].b
-      value: 0.79374886
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[6].g
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[6].r
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[7].a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[7].b
-      value: 0.79374886
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[7].r
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[8].a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[8].b
-      value: 0.79374886
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[8].r
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[9].a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[9].b
-      value: 0.79374886
-      objectReference: {fileID: 0}
-    - target: {fileID: 1010815498, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
-      propertyPath: LutOUTColors.Array.data[9].r
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8533916066985495851, guid: 1ed095b18ab63fd4482bae6724183a66,
@@ -8863,8 +8719,7 @@ PrefabInstance:
       propertyPath: m_Name
       value: Main Camera
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 8533916066985495853, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1ed095b18ab63fd4482bae6724183a66, type: 3}
 --- !u!4 &83685786888667216 stripped
 Transform:

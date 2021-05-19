@@ -21,6 +21,7 @@ public class PostFXRenderer : MonoBehaviour
     public Vector2 _position;
 
     public bool IsAnimating = false;
+    public bool PostFirstFrame = false;
 
     // Start is called before the first frame update
     void Start()
@@ -47,9 +48,10 @@ public class PostFXRenderer : MonoBehaviour
         // TODO(toffa): COMMON ON DUDE PLEASE DO SOMETHING BETTER
         if (position != Vector2.zero)
         {
-            //CurrentTime = 0;
+            CurrentTime = 0;
         }
         IsAnimating = true;
+        PostFirstFrame = false;
         int Size = LutINColors.Length;
 
         LutOUTPost = new Texture2D(Size, 1, TextureFormat.RGB24, false, false);
@@ -70,14 +72,14 @@ public class PostFXRenderer : MonoBehaviour
     void Update()
     {
         CurrentTime += Time.deltaTime;
-        if (CurrentTime > MaxTime) IsAnimating = false;
-        if(Input.GetKeyDown(KeyCode.N)) CurrentTime = 0;
+        if (CurrentTime > MaxTime && PostFirstFrame) IsAnimating = false;
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
         if (IsAnimating)
         {
+            if (!PostFirstFrame) PostFirstFrame = true;
             mat.SetColor("_Color", color);
             mat.SetVector("_PlayerPosition", GetComponent<Camera>().WorldToViewportPoint(_position));
             mat.SetFloat("_AnimationTime", CurrentTime);
