@@ -288,7 +288,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
                     IM.Attach(GO.GetComponent<PlayerController>());
                     IM.CurrentMode = InputManager.Mode.RECORD;
 
-                    CurrentCamera?.GetComponent<PostFXRenderer>()?.StartAnimation(CurrentPlayer.transform.position);
+                    CurrentCamera?.GetComponent<PostFXRenderer>()?.StartAnimation(CurrentPlayer.transform.position, Mdl.Players.Count-2, Mdl.Players.Count-1);
                 }
 
                 // switch to new timeline at break
@@ -332,6 +332,10 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
         int next_loop_level = tl_ui.getDisplayedLoopLevel() + 1;
         if ( next_loop_level >= Mdl.Players.Count )
             next_loop_level = 0;
+
+
+        //CurrentCamera?.GetComponent<PostFXRenderer>()?.StartAnimation(Vector2.zero, Mathf.Min(0, Mdl.Players.Count - 2), Mathf.Min(0,Mdl.Players.Count - 1));
+
         GameObject selected_player_for_tl = Mdl.Players[next_loop_level];
         Timeline tl_to_display = selected_player_for_tl.GetComponent<PlayerController>().Mdl.TL;
         tl_ui.trySwitchTimeline( tl_to_display);

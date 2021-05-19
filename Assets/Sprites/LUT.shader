@@ -6,7 +6,8 @@
       _Color("Color", Color) = (1, 1, 1, 1)
         
       _LUT_IN ("Texture", 2D) = "white" {} 
-      _LUT_OUT("Texture", 2D) = "white" {}
+      _LUT_OUT_PRERIPPLE("Texture", 2D) = "white" {}
+      _LUT_OUT_POSTRIPPLE("Texture", 2D) = "white" {}
 
       _PlayerPosition("PlayerPosition", Vector) = (0.5,0.5,0.5,1)
       _AnimationTime("AnimationTime", Float) = 0
@@ -61,18 +62,31 @@
             half _DistortionStrength;
 
             sampler2D _LUT_IN;
-            sampler2D _LUT_OUT;
+            sampler2D _LUT_OUT_PRERIPPLE;
+            sampler2D _LUT_OUT_POSTRIPPLE;
             float4 _LUT_IN_TexelSize;
-            float4 _LUT_OUT_TexelSize;
+            float4 _LUT_OUT_PRERIPPLE_TexelSize;
+            float4 _LUT_OUT_POSTRIPPLE_TexelSize;
 
-
-            float4 SwitchColor(float4 col) { 
+            float4 SwitchColorPost(float4 col) { 
                 int size = _LUT_IN_TexelSize.z;
                 [loop]
                 for (int i = 0; i < size; ++i) {
                   float4 c = tex2D(_LUT_IN, i * _LUT_IN_TexelSize.x);
                   if (col.x == c.x && col.y == c.y && col.z == c.z) {
-                    return tex2D(_LUT_OUT, i * _LUT_OUT_TexelSize.x);
+                    return tex2D(_LUT_OUT_POSTRIPPLE, i * _LUT_OUT_POSTRIPPLE_TexelSize.x);
+                  }
+                }
+                return col;
+            }
+
+            float4 SwitchColorPre(float4 col) { 
+                int size = _LUT_IN_TexelSize.z;
+                [loop]
+                for (int i = 0; i < size; ++i) {
+                  float4 c = tex2D(_LUT_IN, i * _LUT_IN_TexelSize.x);
+                  if (col.x == c.x && col.y == c.y && col.z == c.z) {
+                    return tex2D(_LUT_OUT_PRERIPPLE, i * _LUT_OUT_PRERIPPLE_TexelSize.x);
                   }
                 }
                 return col;
@@ -96,16 +110,17 @@
                    // float4 col = tex2D(_MainTex, (i.uv + (0.01 * dist * normalize( _PlayerPosition - i.uv)) * _DistortionStrength)); //our uv, but shifted outwards (in local space)
                     float2 uv =  (i.uv + (0.01 * dist * normalize( _PlayerPosition - i.uv)) * _DistortionStrength);
                     float4 col = tex2D(_MainTex, uv);
-                    col = SwitchColor(col);
+                    col = SwitchColorPost(col);
                     return col;
                 }
                 else if (dist > 0)
                 {
-                    return tex2D(_MainTex, i.uv);
+                    float4 col = tex2D(_MainTex, i.uv);
+                  return SwitchColorPre(col);
                 }
                 else {
                     float4 col = tex2D(_MainTex, i.uv);
-                    return SwitchColor(col);
+                    return SwitchColorPost(col);
                 }
 
 

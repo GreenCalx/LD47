@@ -58,7 +58,6 @@ public class UITimeline : MonoBehaviour
                 c.worldCamera = cam;
             }   
             current = current.transform.parent;
-            Debug.Log(current);
         }
     }
 
@@ -109,14 +108,11 @@ public class UITimeline : MonoBehaviour
     {
         __displayedTimeline = iTL;
         __ui_tl_switcher.switchTimeline( __displayedTimeline.loop_level ); // proceed to switch
-        Debug.Log("Display TL " + iTL.loop_level);
-        //updateUI(); // notneed mosdt likely
     }
 
     public void setDisplayedTimeline(Timeline iTL)
     {
         __displayedTimeline = iTL;
-        Debug.Log("Display TL " + iTL.loop_level);
     }
 
 

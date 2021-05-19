@@ -19,18 +19,12 @@ public class UIWorld : MonoBehaviour
     void Start()
     {
         __stage_selector_ref = FindObjectOfType<StageSelector>();
-        if (!!__stage_selector_ref)
-            Debug.Log("STAGE SELECTOR REF OK");
 
         __stage_name_frame = GetComponentInChildren<UIStageName>();
-        if (!!__stage_name_frame)
-            Debug.Log("STAGE NAME FRAME REF OK");
 
         __replayFrame = GetComponentInChildren<UIReplayFrame>();
         if (!!__replayFrame)
         {
-            Debug.Log("REPLAY FRAME REF OK");
-
             RectTransform RT = __replayFrame.GetComponent<RectTransform>();
             Size = RT.sizeDelta;
             Position = RT.localPosition;

@@ -8,10 +8,12 @@ public class PostFXRenderer : MonoBehaviour
     public Color color;
 
     public Color[] LutINColors;
+    // This is a flattened array of TimelineSize * LUTINsize
     public Color[] LutOUTColors;
 
     private Texture2D LutIN;
-    private Texture2D LutOUT;
+    private Texture2D LutOUTPost;
+    private Texture2D LutOUTPre;
 
     public float CurrentTime = 0;
     public float MaxTime = 2;
@@ -23,24 +25,45 @@ public class PostFXRenderer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (LutINColors.Length != LutOUTColors.Length)
+        if (LutOUTColors.Length % LutINColors.Length != 0)
             Debug.LogError("[LUT] Missing colors !");
 
         LutIN = new Texture2D(LutINColors.Length, 1, TextureFormat.RGB24, false, false);
         LutIN.filterMode = FilterMode.Point;
         LutIN.SetPixels(LutINColors);
         LutIN.Apply();
-        LutOUT = new Texture2D(LutOUTColors.Length, 1, TextureFormat.RGB24, false, false);
-        LutOUT.filterMode = FilterMode.Point;
-        LutOUT.SetPixels(LutOUTColors);
-        LutOUT.Apply();
+
+        //Put lut in as first index in out array, I know... This is dumb...
+        Color[] Temp = new Color[LutOUTColors.Length + LutINColors.Length];
+        LutINColors.CopyTo(Temp, 0);
+        LutOUTColors.CopyTo(Temp, LutINColors.Length);
+        LutOUTColors = Temp;
     }
     
-    public void StartAnimation( Vector2 position )
+    public void StartAnimation( Vector2 position, int TimelineIn, int TimelineOut )
     {
         _position = position;
-        CurrentTime = 0;
+
+        // TODO(toffa): COMMON ON DUDE PLEASE DO SOMETHING BETTER
+        if (position != Vector2.zero)
+        {
+            //CurrentTime = 0;
+        }
         IsAnimating = true;
+        int Size = LutINColors.Length;
+
+        LutOUTPost = new Texture2D(Size, 1, TextureFormat.RGB24, false, false);
+        LutOUTPost.filterMode = FilterMode.Point;
+        Color[] Pixels = new Color[Size]; 
+        System.Array.Copy(LutOUTColors, TimelineOut*Size, Pixels, 0, Size);
+        LutOUTPost.SetPixels(Pixels);
+        LutOUTPost.Apply();
+
+        LutOUTPre = new Texture2D(Size, 1, TextureFormat.RGB24, false, false);
+        LutOUTPre.filterMode = FilterMode.Point;
+        System.Array.Copy(LutOUTColors, TimelineIn*Size, Pixels, 0, Size);
+        LutOUTPre.SetPixels(Pixels);
+        LutOUTPre.Apply();
     }
 
     // Update is called once per frame
@@ -59,7 +82,8 @@ public class PostFXRenderer : MonoBehaviour
             mat.SetVector("_PlayerPosition", GetComponent<Camera>().WorldToViewportPoint(_position));
             mat.SetFloat("_AnimationTime", CurrentTime);
             mat.SetTexture("_LUT_IN", LutIN);
-            mat.SetTexture("_LUT_OUT", LutOUT);
+            mat.SetTexture("_LUT_OUT_PRERIPPLE", LutOUTPre);
+            mat.SetTexture("_LUT_OUT_POSTRIPPLE", LutOUTPost);
             source.filterMode = FilterMode.Point;
         }
         else
