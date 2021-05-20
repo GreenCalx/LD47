@@ -105,23 +105,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 8533916066985495852}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e64d48f1554b97749a6e938d207e507b, type: 3}
+  m_Script: {fileID: 11500000, guid: c82b8bd239a961b4f9785709d05a7c9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   mat: {fileID: 2100000, guid: 5770422e9830c9446b4cc89ff6eb4982, type: 2}
-  color: {r: 0, g: 0, b: 0, a: 1}
+  color: {r: 0, g: 0, b: 0, a: 0}
   LutINColors:
   - {r: 0.83921576, g: 0.83921576, b: 0.83921576, a: 1}
   - {r: 1, g: 1, b: 1, a: 1}
   LutOUTColors:
-  - {r: 1, g: 0.5609674, b: 0, a: 1}
-  - {r: 1, g: 0.5609674, b: 0, a: 1}
-  - {r: 0, g: 1, b: 0.15369797, a: 1}
-  - {r: 0, g: 1, b: 0.15369797, a: 1}
-  - {r: 0, g: 0.17873573, b: 1, a: 1}
-  - {r: 0, g: 0.17873573, b: 1, a: 1}
-  - {r: 1, g: 0, b: 0.7741165, a: 1}
-  - {r: 1, g: 0, b: 0.7741165, a: 1}
+  - {r: 1, g: 0.3702328, b: 0, a: 1}
+  - {r: 1, g: 0.3702328, b: 0, a: 1}
+  - {r: 0, g: 1, b: 0.19503093, a: 1}
+  - {r: 0, g: 1, b: 0.17310214, a: 1}
+  - {r: 0, g: 0.16084719, b: 1, a: 1}
+  - {r: 0, g: 0.15447187, b: 1, a: 1}
+  - {r: 0.8473487, g: 0, b: 1, a: 1}
+  - {r: 1, g: 0, b: 0.95839024, a: 1}
   CurrentTime: 0
   MaxTime: 2
   _position: {x: 0, y: 0}
