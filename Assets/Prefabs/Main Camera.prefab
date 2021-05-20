@@ -109,9 +109,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat: {fileID: 2100000, guid: 5770422e9830c9446b4cc89ff6eb4982, type: 2}
-  color: {r: 0, g: 0, b: 0, a: 0}
+  color: {r: 0, g: 0, b: 0, a: 1}
   LutINColors:
-  - {r: 0.7607844, g: 0.7607844, b: 0.7607844, a: 1}
+  - {r: 0.83921576, g: 0.83921576, b: 0.83921576, a: 1}
   - {r: 1, g: 1, b: 1, a: 1}
   LutOUTColors:
   - {r: 1, g: 0.5609674, b: 0, a: 1}
@@ -126,3 +126,4 @@ MonoBehaviour:
   MaxTime: 2
   _position: {x: 0, y: 0}
   IsAnimating: 0
+  PostFirstFrame: 0
