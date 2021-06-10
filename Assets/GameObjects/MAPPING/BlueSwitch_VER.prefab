@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5875349310195475944}
   - component: {fileID: 4785430137997091458}
   m_Layer: 12
-  m_Name: BlueSwitch_Vertical
+  m_Name: BlueSwitch_VER
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -76,9 +76,9 @@ MonoBehaviour:
   - {fileID: 0}
   signalKey: 1
   isSwitched: 0
-  spriteSwitched: {fileID: 833117487846684436, guid: d5e186e3e3475ed479b21df6eaa5006b,
+  spriteSwitched: {fileID: -6432318414536940677, guid: 4e11435977d1d164fa8a650765617e3f,
     type: 3}
-  spriteNotSwitched: {fileID: -97919570764613084, guid: d5e186e3e3475ed479b21df6eaa5006b,
+  spriteNotSwitched: {fileID: -782465672300741024, guid: 4e11435977d1d164fa8a650765617e3f,
     type: 3}
   SwitchTick: -1
 --- !u!82 &4785430137997091458
@@ -224,6 +224,7 @@ SpriteRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
