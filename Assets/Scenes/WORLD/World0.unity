@@ -454,7 +454,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   level_to_load: 0
   stage_to_load: 2
-  stage_to_load_GO: {fileID: 0}
+  stage_to_load_GO: {fileID: 1440420890956295060, guid: 103a65ad276d0424bb19cb7bd7125e38,
+    type: 3}
   id: 0
   isStartingStage: 0
 --- !u!212 &131980966
@@ -638,7 +639,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   level_to_load: 0
   stage_to_load: 5
-  stage_to_load_GO: {fileID: 0}
+  stage_to_load_GO: {fileID: 4566795273740453812, guid: f72a2878530471341a978ddb98e85118,
+    type: 3}
   id: 0
   isStartingStage: 0
 --- !u!212 &221234247
@@ -983,7 +985,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   level_to_load: 0
   stage_to_load: 3
-  stage_to_load_GO: {fileID: 0}
+  stage_to_load_GO: {fileID: 4618151503289873335, guid: de01f2b2442576a4ea0933d1675e9dc6,
+    type: 3}
   id: 0
   isStartingStage: 0
 --- !u!212 &458866010
@@ -1248,7 +1251,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   level_to_load: 0
   stage_to_load: 6
-  stage_to_load_GO: {fileID: 0}
+  stage_to_load_GO: {fileID: 155406872727683043, guid: c32619699f42e8946b66e6bcdd95566b,
+    type: 3}
   id: 0
   isStartingStage: 0
 --- !u!212 &765624079
@@ -13367,7 +13371,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   level_to_load: 0
   stage_to_load: 4
-  stage_to_load_GO: {fileID: 0}
+  stage_to_load_GO: {fileID: 6413457596378718504, guid: 744133f68bd06224a886cbaf9c9363b5,
+    type: 3}
   id: 0
   isStartingStage: 0
 --- !u!212 &1783284681
@@ -13585,7 +13590,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   level_to_load: 0
   stage_to_load: 7
-  stage_to_load_GO: {fileID: 0}
+  stage_to_load_GO: {fileID: 4624623945710013485, guid: 3a54e4811dda62242918409e1b0dfad5,
+    type: 3}
   id: 0
   isStartingStage: 0
 --- !u!212 &2055567882
