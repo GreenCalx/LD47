@@ -6,24 +6,32 @@ using UnityEngine.Tilemaps;
 public struct Wire
 {
     public List<WireChunk> chunks;
-    public List<GameObject> targets;
     public Wire(WireChunk iRoot)
     {
         chunks = new List<WireChunk>(1);
         chunks.Add(iRoot);
+    }
 
-        targets = new List<GameObject>();
+    // TODO : I don't like the fact that we need this
+    public WireChunk getWChunkFromCoord( Vector3Int iGridCoord )
+    {
+        foreach( WireChunk wc in chunks)
+        {
+            if ( wc.coord == iGridCoord )
+                return wc;
+        }
+        return null;
     }
 
 }
 
-public struct WireChunk
+public class WireChunk
 {
     public List<Vector3Int> predecessors;
     public List<Vector3Int> successors;
     public Vector3Int coord;
     public bool hasImpulse;
-    public ActivableObject target;
+    public List<ActivableObject> targets;
 
     public WireChunk( Vector3Int iCoord )
     {
@@ -31,7 +39,12 @@ public struct WireChunk
         hasImpulse = false;
         predecessors = new List<Vector3Int>();
         successors = new List<Vector3Int>();
-        target = NULL;
+        targets = new List<ActivableObject>();
+    }
+
+    public void AddTargets( List<ActivableObject> iTargets )
+    {
+        targets.AddRange(iTargets);
     }
 }
 
@@ -116,6 +129,9 @@ public class ConnectorGraph : MonoBehaviour
 
     void findPath( ref Wire ioCurrWire, WireChunk iChunkToExpand )
     {
+        if ( iChunkToExpand == null )
+            return;
+
         // Find neighbors and set successors/predecessors
         foreach( Vector3Int path_chunk in iChunkToExpand.successors)
         {
@@ -138,24 +154,24 @@ public class ConnectorGraph : MonoBehaviour
         // recurse to explore path in deepness
         if ( iChunkToExpand.successors.Count > 0)
         {
-            foreach( WireChunk chunk_to_explore in iChunkToExpand.successors )
-                findPath(ioCurrWire, chunk_to_explore);
+            foreach( Vector3Int coord_chunk_to_explore in iChunkToExpand.successors )
+                findPath(ref ioCurrWire, ioCurrWire.getWChunkFromCoord(coord_chunk_to_explore) );
         } else {
             // try to find an activable target if no successors
-            if ( findActivableTarget(iChunkToExpand.coord) )
+            if ( findActivableTarget(iChunkToExpand) )
             {
-                Log.Debug(" Found an activable target for current wire path.");
-                ioCurrWire.targets.Add( iChunkToExpand.target );
+                Debug.Log(" Found an activable target for current wire path.");
+                //ioCurrWire.targets.Add( iChunkToExpand.target.gameObject );
             }
         }
     } //! findPath
 
-    public GameObject findActivableTarget( Vector3Int pos )
+    public bool findActivableTarget( WireChunk iChunk )
     {
-        Vector3Int up       = pos + new Vector3Int(0,1,0);
-        Vector3Int down     = pos + new Vector3Int(0,-1,0);
-        Vector3Int left     = pos + new Vector3Int(-1,0,0);
-        Vector3Int right    = pos + new Vector3Int(1,0,0);
+        Vector3Int up       = iChunk.coord + new Vector3Int(0,1,0);
+        Vector3Int down     = iChunk.coord + new Vector3Int(0,-1,0);
+        Vector3Int left     = iChunk.coord + new Vector3Int(-1,0,0);
+        Vector3Int right    = iChunk.coord + new Vector3Int(1,0,0);
 
         // switch to woorld coordinate
         Vector3 worldcoord_up = GL.CellToWorld(up);
@@ -172,25 +188,62 @@ public class ConnectorGraph : MonoBehaviour
         Vector2 right_center    = new Vector2( worldcoord_right.x, worldcoord_right.y);
         float radius = 1.0f;
 
-        Collider2D[] up_col, down_col, left_col, right_col;
-        int res_up = Physics2D.OverlapCircle( up_center, radius, up_col );
-        int res_down = Physics2D.OverlapCircle( down_center, radius, down_col);
-        int res_left = Physics2D.OverlapCircle( left_center, radius, left_col);
-        int res_right = Physics2D.OverlapCircle( right_center, radius, right_col);
+        ContactFilter2D filter = new ContactFilter2D();
+        filter.NoFilter();
 
+        List<Collider2D> up_col = new List<Collider2D>(5),
+                         down_col = new List<Collider2D>(5),
+                         left_col = new List<Collider2D>(5),
+                         right_col = new List<Collider2D>(5);
+        int res_up = Physics2D.OverlapCircle( up_center, radius, filter, up_col );
+        int res_down = Physics2D.OverlapCircle( down_center, radius, filter, down_col);
+        int res_left = Physics2D.OverlapCircle( left_center, radius, filter, left_col);
+        int res_right = Physics2D.OverlapCircle( right_center, radius, filter, right_col);
+
+        bool has_res = false;
         if ( res_up > 0)
-            Log.Debug(" Found result for UP");
+        {
+            Debug.Log(" Found result for UP");
+            iChunk.AddTargets( LookForActivables(up_col) );
+            has_res = true;
+        }
         if ( res_down > 0)
-            Log.Debug(" Found result for DOWN");
+        {
+            Debug.Log(" Found result for DOWN");   
+            iChunk.AddTargets( LookForActivables(down_col) );
+            has_res = true;
+        }
         if ( res_left > 0)
-            Log.Debug(" Found result for LEFT");
+        {
+            Debug.Log(" Found result for LEFT");
+            iChunk.AddTargets( LookForActivables(left_col) );
+            has_res = true;
+        }
         if ( res_right > 0)
-            Log.Debug(" Found result for RIGHT");
+        {
+           Debug.Log(" Found result for RIGHT");
+           iChunk.AddTargets( LookForActivables(right_col) );
+           has_res = true;
+        }
+
+        return has_res;
+    }
+
+    public List<ActivableObject> LookForActivables( List<Collider2D> iCols )
+    {
+        List<ActivableObject> activables = new List<ActivableObject>();
+        foreach( Collider2D col in iCols )
+        {
+            ActivableObject ao = col.gameObject.GetComponent<ActivableObject>();
+            if (!!ao)
+                activables.Add(ao);
+        }
+        return activables;
     }
 
     public List<Vector3Int> findNeighbors( Vector3Int pos )
     {
-        
+        Debug.Log("FNeih");
         List<Vector3Int> retval = new List<Vector3Int>(0);
 
         Vector3Int up       = pos + new Vector3Int(0,1,0);
