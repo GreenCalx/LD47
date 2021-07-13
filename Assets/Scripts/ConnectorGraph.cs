@@ -44,7 +44,12 @@ public class WireChunk
 
     public void AddTargets( List<ActivableObject> iTargets )
     {
-        targets.AddRange(iTargets);
+        foreach ( ActivableObject ao in iTargets )
+        {
+            if ( !targets.Contains(ao) )
+                targets.Add(ao);
+        }
+        //targets.AddRange(iTargets);
     }
 }
 
@@ -89,37 +94,18 @@ public class ConnectorGraph : MonoBehaviour
 
             // 1.1 Update wires with root
             WireChunk root_chunk = new WireChunk(start_pos);
-            wires.Add( new Wire(root_chunk) );
-            foreach( Vector3Int coord in neighbors )
-            { root_chunk.successors.Add(coord); }
+
 
             Wire wire = new Wire(root_chunk);
-
-            // 2. Assemble root paths
-            //List<List<Vector3Int>> wip_paths = new List<List<Vector3Int>>(0);
-            //foreach( Vector3Int coord in neighbors )
-            //{
-            //    List<Vector3Int> new_path = new List<Vector3Int>();
-            //    new_path.Add(start_pos);
-            //    new_path.Add(coord);
-            //    wip_paths.Add( new_path );
-            //}
-
- 
-            // 2.1 recurse until we meet an activable object
-            // (store each tile/coord in path)
-            //foreach( List<Vector3Int> path in wip_paths)
-            //{
-            //    findPath(path);
-            //}
-
-            // Build path for curr wire
-            findPath( ref wire, root_chunk );
-            // TODO... explore en profondeur0
-            
-
             // Add Wire
             wires.Add(wire);
+
+            // Build path for curr wire
+            for( int i = 0; i < wires.Count ; i++)
+            {
+                findPath( ref wire, root_chunk );
+            }
+                        
 
         }//! fe
 
@@ -133,9 +119,8 @@ public class ConnectorGraph : MonoBehaviour
             return;
 
         // Find neighbors and set successors/predecessors
-        foreach( Vector3Int path_chunk in iChunkToExpand.successors)
-        {
-            List<Vector3Int> neighbors = findNeighbors(path_chunk);
+        List<Vector3Int> neighbors = findNeighbors(iChunkToExpand.coord);
+
             foreach( Vector3Int neighbor in neighbors )
             {
                 if ( iChunkToExpand.predecessors.Contains(neighbor) )
@@ -147,9 +132,9 @@ public class ConnectorGraph : MonoBehaviour
                 }
                 iChunkToExpand.successors.Add(neighbor);
                 WireChunk new_chunk = new WireChunk( neighbor );
+                new_chunk.predecessors.Add(iChunkToExpand.coord);
                 ioCurrWire.chunks.Add(new_chunk);
             }
-        }
 
         // recurse to explore path in deepness
         if ( iChunkToExpand.successors.Count > 0)
@@ -200,33 +185,24 @@ public class ConnectorGraph : MonoBehaviour
         int res_left = Physics2D.OverlapCircle( left_center, radius, filter, left_col);
         int res_right = Physics2D.OverlapCircle( right_center, radius, filter, right_col);
 
-        bool has_res = false;
         if ( res_up > 0)
         {
-            Debug.Log(" Found result for UP");
             iChunk.AddTargets( LookForActivables(up_col) );
-            has_res = true;
         }
         if ( res_down > 0)
         {
-            Debug.Log(" Found result for DOWN");   
             iChunk.AddTargets( LookForActivables(down_col) );
-            has_res = true;
         }
         if ( res_left > 0)
         {
-            Debug.Log(" Found result for LEFT");
             iChunk.AddTargets( LookForActivables(left_col) );
-            has_res = true;
         }
         if ( res_right > 0)
         {
-           Debug.Log(" Found result for RIGHT");
            iChunk.AddTargets( LookForActivables(right_col) );
-           has_res = true;
         }
 
-        return has_res;
+        return iChunk.targets.Count > 0;
     }
 
     public List<ActivableObject> LookForActivables( List<Collider2D> iCols )
@@ -243,7 +219,6 @@ public class ConnectorGraph : MonoBehaviour
 
     public List<Vector3Int> findNeighbors( Vector3Int pos )
     {
-        Debug.Log("FNeih");
         List<Vector3Int> retval = new List<Vector3Int>(0);
 
         Vector3Int up       = pos + new Vector3Int(0,1,0);
@@ -255,15 +230,6 @@ public class ConnectorGraph : MonoBehaviour
         TileBase down_tile  = TL.GetTile(down);
         TileBase left_tile  = TL.GetTile(left);
         TileBase right_tile = TL.GetTile(right);
-
-        if (!!up_tile)
-            Debug.Log(" UP: " + up );
-        if (!!down_tile)
-            Debug.Log(" DOWN: " + down );
-        if (!!left_tile)
-            Debug.Log(" LEFT: " + left );
-        if (!!right_tile)
-            Debug.Log(" RIGHT: " + right );
 
         if (!!up_tile)
             retval.Add(up);
