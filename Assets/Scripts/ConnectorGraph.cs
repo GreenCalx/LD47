@@ -3,13 +3,38 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+/**
+* ATTACH THIS COMPONENT TO CONNECTION LAYER OF THE STAGE MAP
+* 
+* TODO : CALL UPDATE_WIRE() each tick in world
+*   retrieve curr loaded connector graph from stage_selector => stage => get_connector_graph() and call update_wires()
+*/
 public struct Wire
 {
+    public ActivatorObject emitter;
+    int pulse_speed;
     public List<WireChunk> chunks;
-    public Wire(WireChunk iRoot)
+
+    public WireChunk root_chunk;
+
+    public Wire(ActivatorObject iEmitter)
     {
         chunks = new List<WireChunk>(1);
-        chunks.Add(iRoot);
+
+        if ( iEmitter == null )
+        {
+            Debug.LogError("Missing Emitter in Wire.");
+            emitter = null;
+        }
+        emitter = iEmitter;
+        pulse_speed = emitter.pulse_speed;
+        root_chunk = null;
+    }
+
+    public void addRootChunk(Vector3Int iRootPosition)
+    {
+        root_chunk = new WireChunk(iRootPosition, this);
+        chunks.Add(root_chunk);
     }
 
     // TODO : I don't like the fact that we need this
@@ -23,6 +48,27 @@ public struct Wire
         return null;
     }
 
+    public void pulse()
+    {
+        if ( (pulse_speed <= 0) || (pulse_speed >= chunks.Count) )
+        {
+            // Instantaneous trigger
+            chunks[chunks.Count-1].hasImpulse = true;
+            return;
+        }
+        chunks[pulse_speed - 1].hasImpulse = true;
+    }
+
+    public void update_pulses()
+    {
+        foreach( WireChunk wc in chunks )
+        {
+            if (wc.hasImpulse)
+            {
+                wc.propagatePulse(pulse_speed);
+            }
+        }
+    }
 }
 
 public class WireChunk
@@ -33,8 +79,11 @@ public class WireChunk
     public bool hasImpulse;
     public List<ActivableObject> targets;
 
-    public WireChunk( Vector3Int iCoord )
+    public Wire wire;
+
+    public WireChunk( Vector3Int iCoord, Wire iWire )
     {
+        wire = iWire;
         coord = iCoord;
         hasImpulse = false;
         predecessors = new List<Vector3Int>();
@@ -50,6 +99,29 @@ public class WireChunk
                 targets.Add(ao);
         }
         //targets.AddRange(iTargets);
+    }
+
+    public void propagatePulse( int iPulseSpeed )
+    {
+        if ( iPulseSpeed == 0 )
+            return; // Stop propagation
+
+        if ( successors.Count == 0 )
+        {
+            foreach( ActivableObject target in targets)
+            {
+                target.activate();
+                this.hasImpulse = false;
+            }
+        } else {
+            foreach ( Vector3Int succ_coord in successors )
+            {
+                WireChunk wc = wire.getWChunkFromCoord(succ_coord);
+                wc.hasImpulse = true;
+                wc.propagatePulse( iPulseSpeed - 1 ); // decrement speed as we propagate
+                this.hasImpulse = false;
+            }
+        }
     }
 }
 
@@ -81,10 +153,23 @@ public class ConnectorGraph : MonoBehaviour
         
     }
 
+    public void update_wires()
+    {
+        foreach ( Wire w in wires )
+        {
+            w.update_pulses();
+        }
+    }
+
+
+
     void BuildGraph()
     {
         foreach( ActivatorObject ao in emitters )
         {
+            // Subscribe AO to this connector graph
+            ao.subscribeToGraph(this);
+
             // 0. Find tile on which emitter is
             Vector3Int start_pos = GL.WorldToCell( ao.transform.position );
             TileBase start_tile  = TL.GetTile(start_pos);
@@ -93,17 +178,16 @@ public class ConnectorGraph : MonoBehaviour
             List<Vector3Int> neighbors = findNeighbors(start_pos);
 
             // 1.1 Update wires with root
-            WireChunk root_chunk = new WireChunk(start_pos);
+            Wire wire = new Wire(ao);
+            wire.addRootChunk(start_pos);
 
-
-            Wire wire = new Wire(root_chunk);
             // Add Wire
             wires.Add(wire);
 
             // Build path for curr wire
             for( int i = 0; i < wires.Count ; i++)
             {
-                findPath( ref wire, root_chunk );
+                findPath( ref wire, wire.root_chunk );
             }
                         
 
@@ -131,7 +215,7 @@ public class ConnectorGraph : MonoBehaviour
                     continue;
                 }
                 iChunkToExpand.successors.Add(neighbor);
-                WireChunk new_chunk = new WireChunk( neighbor );
+                WireChunk new_chunk = new WireChunk( neighbor, ioCurrWire );
                 new_chunk.predecessors.Add(iChunkToExpand.coord);
                 ioCurrWire.chunks.Add(new_chunk);
             }
@@ -241,6 +325,15 @@ public class ConnectorGraph : MonoBehaviour
             retval.Add(right);
         
         return retval;
+    }
+
+    public void pulsateFrom( ActivatorObject iAO )
+    {
+        foreach ( Wire w in wires )
+        {
+            if (w.emitter == iAO)
+                w.pulse();
+        }
     }
 
 }

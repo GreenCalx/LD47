@@ -169,6 +169,9 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
         Mdl.AutoReplayTick.SetEndTime(Constants.RewindAnimationTime);
         Mdl.AutoRewindTick.SetEndTime(Constants.RewindAnimationTime);
         Movable.AnimationTime = Constants.MoveAnimationTime;
+
+        GameObject stage_selec_go = GameObject.Find("stage_selector");
+        CurrentStageSelector = stage_selec_go.GetComponent<StageSelector>();
     }
 
     public void AddRewindMove(GameObject go, PlayerController.Direction D)
@@ -457,6 +460,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
                 }
                 UpdatePlayers = true;
             }
+           update_stage_wires();
         }
         // move from player or else
         else
@@ -469,6 +473,7 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
                 IM.CurrentMode = InputManager.Mode.REPLAY;
                 Mdl.AutoRewindTick.Restart();
             }
+            update_stage_wires();
         }
         if (Constants.InputMode == 1)
         {
@@ -477,8 +482,19 @@ public class WorldManager : MonoBehaviour, IControllable, ISavable {
 
         if (__switchTLToLast)
             switch_timeline_to_last();
+        
 
         if ( !!levelUI_GO )
             levelUI_GO.GetComponent<UITimeline>().refresh(IM.CurrentMode);
+    }
+
+    // TODO : Remove this and swithc to tickable ITF
+    private void update_stage_wires()
+    {
+        if (!!CurrentStageSelector)
+        {
+            ConnectorGraph cg = CurrentStageSelector.selected_stage.get_connector_graph();
+            cg.update_wires();
+        }
     }
 }

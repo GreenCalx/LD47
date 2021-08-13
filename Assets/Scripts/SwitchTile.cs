@@ -17,8 +17,11 @@ public class SwitchTile : ActivatorObject
         {
             objectsOnSwitch.Add(other.gameObject);
 
+            /*
             foreach( ActivableObject ao in activableObjects )
                 ao.listen(signalKey, this, true);
+            */
+            sendPulse();
 
             GetComponentInChildren<AudioSource>().Play();
             isSwitched = true;

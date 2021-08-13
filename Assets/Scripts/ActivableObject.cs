@@ -31,6 +31,16 @@ public class ActivableObject : MonoBehaviour
 
     public virtual void trigger(bool signalType) {}
 
+    public void activate()
+    {
+        trigger(true);
+    }
+
+    public void deactivate()
+    {
+        trigger(false);
+    }
+
     public void listen(SIGNAL_KEYS iSigKey, ActivatorObject activator, bool signalType) 
     {
         if (signalType)
