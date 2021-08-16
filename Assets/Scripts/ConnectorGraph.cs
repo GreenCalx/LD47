@@ -11,8 +11,10 @@ using UnityEngine.Tilemaps;
 */
 public struct Wire
 {
+
     public ActivatorObject emitter;
     int pulse_speed;
+    bool is_infinite;
     public List<WireChunk> chunks;
 
     public WireChunk root_chunk;
@@ -29,6 +31,7 @@ public struct Wire
         emitter = iEmitter;
         pulse_speed = emitter.pulse_speed;
         root_chunk = null;
+        is_infinite = ( pulse_speed <= 0 ) ? true : false ;
     }
 
     public void addRootChunk(Vector3Int iRootPosition)
@@ -53,7 +56,9 @@ public struct Wire
         if ( (pulse_speed <= 0) || (pulse_speed >= chunks.Count) )
         {
             // Instantaneous trigger
-            chunks[chunks.Count-1].hasImpulse = true;
+            is_infinite = true;
+            // TODO INFINITE WIRE SHOULD TRIGGER/UNTRIGGER IMMEDIATLY
+            //chunks[chunks.Count-1].hasImpulse = true;
             return;
         }
         chunks[pulse_speed - 1].hasImpulse = true;
@@ -61,6 +66,28 @@ public struct Wire
 
     public void update_pulses()
     {
+        // inf wire
+        if (is_infinite)
+            return;
+
+        // Solve pulses
+        int n_chunks = chunks.Count;
+        int tail_chunks = n_chunks - pulse_speed;
+        bool should_activate = false;
+        for ( int i=n_chunks; i > tail_chunks ; i-- )
+        {
+            should_activate |= chunks[i].hasImpulse;
+        }
+        foreach (ActivableObject target in chunks[n_chunks-1].targets)
+        {
+            if (should_activate)
+                target.activate();
+            else
+                target.deactivate();
+        }
+
+
+        // propagation of pulses
         foreach( WireChunk wc in chunks )
         {
             if (wc.hasImpulse)
@@ -108,11 +135,12 @@ public class WireChunk
 
         if ( successors.Count == 0 )
         {
-            foreach( ActivableObject target in targets)
+            /*foreach( ActivableObject target in targets)
             {
                 target.activate();
                 this.hasImpulse = false;
-            }
+            }*/
+            this.hasImpulse = false;
         } else {
             foreach ( Vector3Int succ_coord in successors )
             {
