@@ -332,6 +332,8 @@ MonoBehaviour:
   activables:
   - {fileID: 0}
   signalKey: 1
+  pulse_speed: -1
+  is_active: 0
   sprite_on: {fileID: 7937025411160153722, guid: 6640df0b804554e4097b0760265a21cc,
     type: 3}
   sprite_off: {fileID: 6382593641217309797, guid: 6640df0b804554e4097b0760265a21cc,

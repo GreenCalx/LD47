@@ -48,9 +48,11 @@ public class SwitchTile : ActivatorObject
     {
         if (isSwitched)
         {
+            /*
             foreach (ActivableObject ao in activableObjects)
                 ao.listen(signalKey, this, false);
-
+*/
+            pulsate(false);
             isSwitched = false;
 
             SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
