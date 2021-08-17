@@ -14,8 +14,11 @@ public class ButtonTile : ActivatorObject
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        /*
         foreach( ActivableObject ao in activableObjects )
             ao.listen(signalKey, this, true);
+        */
+        pulsate(true);
 
         sound_on.Play();
 
@@ -27,13 +30,18 @@ public class ButtonTile : ActivatorObject
     private void OnTriggerStay2D(Collider2D other)
     {
         // button doesn't change
+        pulsate(true);
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
+        /*
         foreach( ActivableObject ao in activableObjects )
             ao.listen(signalKey, this, false);
-
+        */
+        // we just don't send a pulse now
+        pulsate(false);
+        
         sound_off.Play();
 
         SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();

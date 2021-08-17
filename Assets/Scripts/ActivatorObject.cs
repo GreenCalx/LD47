@@ -4,9 +4,16 @@ using UnityEngine;
 
 public class ActivatorObject : MonoBehaviour
 {
+    // OLD ATTR TO CLEAN UP
     public GameObject[] activables;
     public SIGNAL_KEYS signalKey;
     protected List<ActivableObject> activableObjects;
+
+    // NEW ATTR
+    protected ConnectorGraph CG;
+    public int pulse_speed = 2; // 99/(0..-inf) = Infinite ; 1 = 1 tile/tick ; n = n tiles / tick
+    public bool is_active = false;
+
 
     // Start is called before the first frame update
     protected virtual void Start()
@@ -20,6 +27,8 @@ public class ActivatorObject : MonoBehaviour
                 activableObjects.Add(activableObject);
             }
         }
+
+        is_active = false;
     }
     
 
@@ -27,5 +36,15 @@ public class ActivatorObject : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void pulsate(bool iState) // 0 for no pulse , 1 for pulse
+    {
+        CG.pulsateFrom(this, iState);
+    }
+
+    public void subscribeToGraph( ConnectorGraph iCG)
+    {
+        CG = iCG;
     }
 }

@@ -141,4 +141,9 @@ public class Stage : POI
     {
         return stage_loaded_GO;
     }
+
+    public ConnectorGraph get_connector_graph()
+    {
+        return stage_loaded_GO.GetComponentInChildren<ConnectorGraph>();
+    }
 }
