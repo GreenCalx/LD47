@@ -9,9 +9,11 @@ public class ActivatorObject : MonoBehaviour
     public SIGNAL_KEYS signalKey;
     protected List<ActivableObject> activableObjects;
 
-    // NEW ATTr
+    // NEW ATTR
     protected ConnectorGraph CG;
-    public int pulse_speed = 2; // 99 = Infinite ; 1 = 1 tile/tick ; n = n tiles / tick
+    public int pulse_speed = 2; // 99/(0..-inf) = Infinite ; 1 = 1 tile/tick ; n = n tiles / tick
+    public bool is_active = false;
+
 
     // Start is called before the first frame update
     protected virtual void Start()
@@ -25,6 +27,8 @@ public class ActivatorObject : MonoBehaviour
                 activableObjects.Add(activableObject);
             }
         }
+
+        is_active = false;
     }
     
 
@@ -34,9 +38,9 @@ public class ActivatorObject : MonoBehaviour
         
     }
 
-    public void sendPulse()
+    public void pulsate(bool iState) // 0 for no pulse , 1 for pulse
     {
-        CG.pulsateFrom(this);
+        CG.pulsateFrom(this, iState);
     }
 
     public void subscribeToGraph( ConnectorGraph iCG)

@@ -51,14 +51,32 @@ public struct Wire
         return null;
     }
 
-    public void pulse()
+    public List<ActivableObject> getWireTargets()
     {
-        if ( (pulse_speed <= 0) || (pulse_speed >= chunks.Count) )
+        List<ActivableObject> retval = new List<ActivableObject>();
+        foreach (WireChunk wc in chunks)
+        {
+            if (wc.targets.Count > 0)
+                retval.AddRange(wc.targets);
+        }
+        return retval;
+    }
+
+    public void pulse(bool iState)
+    {
+        if ( is_infinite || (pulse_speed <= 0) || (pulse_speed >= chunks.Count) )
         {
             // Instantaneous trigger
             is_infinite = true;
-            // TODO INFINITE WIRE SHOULD TRIGGER/UNTRIGGER IMMEDIATLY
-            //chunks[chunks.Count-1].hasImpulse = true;
+            List<ActivableObject> aos = getWireTargets();
+            foreach (ActivableObject target in aos )
+            {
+                if (iState)
+                    target.activate();
+                else
+                    target.deactivate();
+            }
+                
             return;
         }
         chunks[pulse_speed - 1].hasImpulse = true;
@@ -355,12 +373,12 @@ public class ConnectorGraph : MonoBehaviour
         return retval;
     }
 
-    public void pulsateFrom( ActivatorObject iAO )
+    public void pulsateFrom( ActivatorObject iAO, bool iState )
     {
         foreach ( Wire w in wires )
         {
             if (w.emitter == iAO)
-                w.pulse();
+                w.pulse(iState);
         }
     }
 
