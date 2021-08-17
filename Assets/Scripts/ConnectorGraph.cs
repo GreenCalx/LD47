@@ -92,11 +92,12 @@ public struct Wire
         int n_chunks = chunks.Count;
         int tail_chunks = n_chunks - pulse_speed;
         bool should_activate = false;
-        for ( int i=n_chunks; i > tail_chunks ; i-- )
+        for ( int i=n_chunks-1; i >= tail_chunks ; i-- )
         {
             should_activate |= chunks[i].hasImpulse;
         }
-        foreach (ActivableObject target in chunks[n_chunks-1].targets)
+        List<ActivableObject> aos = getWireTargets();
+        foreach (ActivableObject target in aos)
         {
             if (should_activate)
                 target.activate();
