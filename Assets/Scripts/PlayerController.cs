@@ -10,15 +10,12 @@ using System.Runtime.Serialization;
 
 [RequireComponent(typeof(Movable))]
 [RequireComponent(typeof(BoxCollider2D))]
-public class PlayerController : MonoBehaviour, IControllable , ISavable {
-
+public class PlayerController : TickBased, IControllable , ISavable {
     /// NOTE (MTN5) : we need a default constructor to be able to save this object
     public PlayerController()
     {
         this.Mdl = new Model();
     }
-
-
     /// <summary>
     /// Directions related variables
     /// </summary>
@@ -27,14 +24,16 @@ public class PlayerController : MonoBehaviour, IControllable , ISavable {
     static public readonly Vector2[] Directionf = { new Vector2(0, 1), new Vector2(0, -1), new Vector2(1, 0), new Vector2(-1, 0) };
     static public Direction InverseDirection(Direction D)
     {
-        if (D == PlayerController.Direction.UP) D = PlayerController.Direction.DOWN;
-        else if (D == PlayerController.Direction.DOWN) D = PlayerController.Direction.UP;
+        if      (D == PlayerController.Direction.UP)    D = PlayerController.Direction.DOWN;
+        else if (D == PlayerController.Direction.DOWN)  D = PlayerController.Direction.UP;
         else if (D == PlayerController.Direction.RIGHT) D = PlayerController.Direction.LEFT;
-        else if (D == PlayerController.Direction.LEFT) D = PlayerController.Direction.RIGHT;
+        else if (D == PlayerController.Direction.LEFT)  D = PlayerController.Direction.RIGHT;
 
         return D;
     }
-
+    /// <summary>
+    /// Savable model boilerplate.
+    /// </summary>
     [System.Serializable]
     public class Model : IModel
     {
@@ -86,12 +85,17 @@ public class PlayerController : MonoBehaviour, IControllable , ISavable {
         StartAnimation();
     }
 
+    public override void OnTick()
+    {
+        Move(Mdl.TL.isReversed);
+    }
+
     /// <summary>
     /// This will apply physics to the object
     /// It will always be called from WorldManager FixedUpdate
     /// Therefore it should be treated as a FixedUpdate function
     /// </summary>
-    public Movable.MoveResult ApplyPhysics(bool ReverseDirection = false)
+    public Movable.MoveResult Move(bool ReverseDirection = false)
     {
         Movable.MoveResult Result = Movable.MoveResult.CannotMove;
         // We update the direction from the loop if it is loop controlled
@@ -99,9 +103,12 @@ public class PlayerController : MonoBehaviour, IControllable , ISavable {
             Mdl.CurrentDirection = Mdl.TL.GetCurrent();
         if (IM.CurrentMode == InputManager.Mode.RECORD)
         {
-            if (!Mdl.TL.getAt(Mdl.TL.last_tick))
-                Mdl.CurrentDirection = Direction.NONE;
-            Mdl.TL.SetCurrent(Mdl.CurrentDirection);
+            // NOTE toffa : Regardloess of the timeline value it will be advanced by a move
+            // therefore we need to check last_tick minus one to know if it was possible to have moved
+            // kinda weird but hey \o/
+            if (!Mdl.TL.getAt(Mdl.TL.last_tick -1)) Mdl.CurrentDirection = Direction.NONE;
+            if (Mdl.TL.isReversed) Mdl.CurrentDirection = Mdl.TL.GetCurrent();
+            else Mdl.TL.SetCurrent(Mdl.CurrentDirection);
         }
         // move
         Movable Mover = GetComponent<Movable>();
@@ -168,7 +175,6 @@ public class PlayerController : MonoBehaviour, IControllable , ISavable {
             if (Down) Mdl.CurrentDirection = Direction.DOWN;
             if (Left) Mdl.CurrentDirection = Direction.LEFT;
             if (Right) Mdl.CurrentDirection = Direction.RIGHT;
-
         }
     }
 

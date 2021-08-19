@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Timeline 
 {
+
     // for rewind just record everything
     // This is a shitty design as it is not easy to print the current timeline value while rewinding for instance
     // the problem is that is can be hard to have something work well in reverse wioth physics and shit
@@ -29,7 +30,6 @@ public class Timeline
         {
             if (CurrentTick < 0 || CurrentTick >= GameObjects.Count)
             {
-                Debug.Log("ERROR: Tick");
                 return -1;
             }
 
@@ -56,7 +56,6 @@ public class Timeline
         {
             if (Tick < 0)
             {
-                Debug.Log("PROBLEMOOOO");
                 return;
             }
             // for backward implementation we need to remove the last recoirded tick
@@ -110,6 +109,8 @@ public class Timeline
     // MEASURE_SIZE : THEORIC LAST CHILD  with 0 moves left
     public int loop_level;
 
+    public bool isReversed = false;
+
     public Timeline( int iLoopLevel )
     {
         offset = 0;
@@ -132,7 +133,9 @@ public class Timeline
 
     public PlayerController.Direction GetCurrent()
     {
-        if ( last_tick < Events.Length )
+        if (!isReversed && last_tick - 1 < Events.Length && last_tick != 0)
+            return Events[last_tick - 1];
+        else if (isReversed && last_tick < Events.Length)
             return Events[last_tick];
         else
             return PlayerController.Direction.NONE;
@@ -140,16 +143,19 @@ public class Timeline
 
     public PlayerController.Direction GetPrevious()
     {
-        int previous_tick = last_tick - 1;
-        if ( previous_tick >= 0 )
+        int previous_tick = last_tick - 2;
+        if (!isReversed && previous_tick >= 0)
             return Events[previous_tick];
+        else if (isReversed && last_tick + 1 < Events.Length)
+            return Events[last_tick + 1];
         else
             return PlayerController.Direction.NONE;
     }
 
     public void SetCurrent(PlayerController.Direction Dir)
     {
-        Events[last_tick] = Dir;
+        var current = isReversed ? last_tick : last_tick - 1;
+        Events[current] = Dir;
     }
 
     public void reset( int iLoopLevel, int iLastTick )
@@ -160,7 +166,7 @@ public class Timeline
         init();
     }
 
-    public int getTickForCursor()
+    public int getCursor()
     {
         return last_tick;
     }
@@ -173,9 +179,19 @@ public class Timeline
             return last_tick;
     }
 
-    public void setCurrentTick(int iCurrentTick)
+    public void setCursor(int iCurrentTick)
     {
         last_tick = iCurrentTick;
+    }
+
+    public void increment()
+    {
+        var dummy = isReversed ? --last_tick : ++last_tick;
+    }
+
+    public void decrement()
+    {
+        var dummy = isReversed ? ++last_tick : --last_tick;
     }
 
     public void reset()
@@ -213,8 +229,13 @@ public class Timeline
 
     public bool isTimelineOver()
     {
-        timeline_finished = ( last_tick >= N_MEASURES*MEASURE_SIZE );
+        timeline_finished = isReversed ? (last_tick < 0) : ( last_tick >= N_MEASURES*MEASURE_SIZE );
         return timeline_finished;
+    }
+
+    public bool isTimelineAtBeginning()
+    {
+        return last_tick == 0;
     }
 
     public bool getAt( int iTimeIndex )

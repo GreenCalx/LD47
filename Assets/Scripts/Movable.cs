@@ -13,7 +13,6 @@ public class Movable : MonoBehaviour
 
     [SerializeField] public LayerMask wallmask;
     [SerializeField] public LayerMask movablemask;
-    public float Speed = 1f;
 
     public bool ResetBetweenLoops = true;
 
@@ -107,14 +106,13 @@ public class Movable : MonoBehaviour
                 UpdatePositionBump(Direction, D);
             }
         }
-        if ( NeedToBeMoved == MoveResult.CanMove && !WM.Mdl.IsRewinding && ResetBetweenLoops &&!WM.Mdl.IsGoingBackward) WM.AddRewindMove(this.gameObject, D);
         return NeedToBeMoved;
     }
 
     void UpdatePositionBump(Vector2 Direction, PlayerController.Direction D)
     {
         LastPosition = this.gameObject.transform.position;
-        NewPosition = LastPosition + new Vector2(Speed * Direction.x, Speed * Direction.y);
+        NewPosition = LastPosition + new Vector2(Direction.x,Direction.y);
 
         AnimationTimer.Restart();
         TailsSpawm.Restart();
@@ -125,8 +123,8 @@ public class Movable : MonoBehaviour
     {
         LastPosition = this.gameObject.transform.position;
 
-        this.gameObject.transform.position += new Vector3(Speed * Direction.x,
-                                            Speed * Direction.y,
+        this.gameObject.transform.position += new Vector3(Direction.x,
+                                           Direction.y,
                                             0);
 
         NewPosition = this.gameObject.transform.position;
@@ -193,12 +191,6 @@ public class Movable : MonoBehaviour
         {
             BumpAnimation = false;
             SR.transform.localPosition = Vector2.zero;
-            if (WM.Mdl.CurrentTick == 0 && ResetBetweenLoops && !WM.Mdl.IsRewinding)
-            {
-                this.gameObject.transform.position = StartPosition;
-                SR.transform.localPosition = Vector2.zero;
-            }
         }
-
     }
 }

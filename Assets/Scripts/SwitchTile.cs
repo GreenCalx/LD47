@@ -17,6 +17,10 @@ public class SwitchTile : ActivatorObject
         {
             objectsOnSwitch.Add(other.gameObject);
 
+            // register object to get called on tick
+            // TODO toffa: make this work in case it is another object than player that trigger
+            GameObject.Find("GameLoop").GetComponent<WorldManager>().AddListener(other.gameObject.GetComponent<PlayerController>() as ITickObserver, this);
+
             /*
             foreach( ActivableObject ao in activableObjects )
                 ao.listen(signalKey, this, true);
@@ -25,7 +29,7 @@ public class SwitchTile : ActivatorObject
 
             GetComponentInChildren<AudioSource>().Play();
             isSwitched = true;
-            SwitchTick = GameObject.Find("GameLoop").GetComponent<WorldManager>().Mdl.CurrentTick;
+            SwitchTick = GameObject.Find("GameLoop").GetComponent<WorldManager>().TL.last_tick;
             SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
             if (!!sr)
                 sr.sprite = spriteSwitched;
@@ -40,7 +44,7 @@ public class SwitchTile : ActivatorObject
 
     public void TryReset()
     {
-        int Tick = GameObject.Find("GameLoop").GetComponent<WorldManager>().Mdl.CurrentTick;
+        int Tick = GameObject.Find("GameLoop").GetComponent<WorldManager>().TL.last_tick;
         if (Tick < SwitchTick) Reset();
     }
 

@@ -143,6 +143,7 @@ public class UITimeline : MonoBehaviour
     private void updateUI()
     {
         Timeline active_tl  = __displayedTimeline;
+        if (active_tl == null) return;
         bool is_previous_tl = active_tl.isPrevious();
         
         // to update time units sprites
@@ -181,7 +182,7 @@ public class UITimeline : MonoBehaviour
                      curr_unit.hide();
                  } 
                 // Show none as next input at the last_tick position
-                 else if ( i == active_tl.getTickForCursor() )
+                 else if ( i == active_tl.getCursor() )
                  {
                      if ( Constants.ShowDefaultTileOnCursor )
                          __time_units[i].changeSprite(ui_input_none);
@@ -193,7 +194,7 @@ public class UITimeline : MonoBehaviour
         }//! for time units
 
         // update timeline animator
-        update_time(active_tl.getTickForCursor());
+        update_time(active_tl.getCursor());
 
     }//! updateUI
 
