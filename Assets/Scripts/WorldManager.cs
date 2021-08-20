@@ -105,7 +105,7 @@ public class WorldManager : TickClock, IControllable, ISavable {
     public InputManager IM;
     public MasterMixerControl MixerControl;
 
-    public Timeline TL = new Timeline(0);
+    public PlayerTimeline TL = new PlayerTimeline(0);
     public bool needTick = false;
     /// <summary>
     /// Add a new player to the list of current players in the wolrld.
@@ -130,7 +130,7 @@ public class WorldManager : TickClock, IControllable, ISavable {
         // Create the new timeline. It will not be done the first time as it will be null
         // copy previous player variables inside new one
         if (Mdl.Players.Count != 0) {
-            TL = TL?.getNestedTimeline();
+            TL = TL?.GetNestedTimeline();
             NewPlayer.GetComponent<Movable>().StartPosition = PreviousPlayer.GetComponent<Movable>().StartPosition;
             // For now new players are randomly colored
             var SpriteRender = NewPlayer.GetComponentInChildren<SpriteRenderer>();
@@ -143,6 +143,7 @@ public class WorldManager : TickClock, IControllable, ISavable {
             }
         } 
         NewPlayer.Mdl.TL = TL;
+        TL.SetPlayer(NewPlayer);
         Mdl.Players.Add(NewPlayer);
         AddListener(GetCurrentPlayer() as ITickObserver);
         return NewPlayer;
@@ -179,14 +180,15 @@ public class WorldManager : TickClock, IControllable, ISavable {
     public override void Tick()
     {
         needTick = true;
-        TL.increment();
-        UpdateTimeLines();
+        UpdateTimelines();
     }
 
     void FixedUpdate()
     {
         if (!needTick) return;
 
+        FixedUpdateTimelines();
+#if false
         if (!Mdl.IsGoingBackward)
         {
             foreach (ITickObserver Obs in _Listeners)
@@ -208,6 +210,7 @@ public class WorldManager : TickClock, IControllable, ISavable {
             }
             _Listeners.Reverse();
         }
+#endif
 
         needTick = false;
     }
@@ -252,15 +255,15 @@ public class WorldManager : TickClock, IControllable, ISavable {
             || (Entry.Inputs["Tick"].Down && Mdl.AutoReplayTick.Ended());
         if (ForwardTick)
         {
-            TL.isReversed = false;
+            TL.Reverse(false);
             Mdl.AutoReplayTick.Restart();
             Tick();
         }
 
-        bool BackwardTick = Entry.Inputs["BackTick"].IsDown && !needTick && TL.getCursor() != 0;
+        bool BackwardTick = Entry.Inputs["BackTick"].IsDown && !needTick && TL.IsTimelineAtBeginning();
         if( BackwardTick)
         {
-            TL.isReversed = true;
+            TL.Reverse(true);
             Tick();
         }
 
@@ -309,7 +312,7 @@ public class WorldManager : TickClock, IControllable, ISavable {
         CurrentCamera?.GetComponent<PostFXRenderer>()?.StartAnimation(Vector2.zero, Mathf.Max(0, tl_ui.getDisplayedLoopLevel()), Mathf.Max(0,next_loop_level));
 
         var selected_player_for_tl = Mdl.Players[next_loop_level];
-        Timeline tl_to_display = selected_player_for_tl.GetComponent<PlayerController>().Mdl.TL;
+        ITimeline tl_to_display = selected_player_for_tl.GetComponent<PlayerController>().Mdl.TL;
         tl_ui.trySwitchTimeline( tl_to_display);
     }
 
@@ -337,30 +340,39 @@ public class WorldManager : TickClock, IControllable, ISavable {
     {
         if (!CanTick()) return;
         
-        if(TL.isTimelineAtBeginning())
+        if(TL.IsTimelineAtBeginning())
         {
             needTick = false;
             Mdl.IsRewinding = false;
             return;
         }
 
-        TL.isReversed = true;
         Tick();
     }
 
-    void UpdateTimeLines()
+    void UpdateTimelines()
     {
-        UpdateTimeLines(TL.last_tick);
-    }
-
-    void UpdateTimeLines(int iTick)
-    {
+        var Reverse = Mdl.IsGoingBackward || Mdl.IsRewinding;
+        if (Reverse) Mdl.Players.Reverse();
         foreach(PlayerController PC in Mdl.Players)
         {
-            var lTL = PC.GetComponent<PlayerController>().Mdl.TL;
-            lTL.setCursor(iTick);
-            lTL.isReversed = TL.isReversed;
+            // NOTE toffa: for now all timelines are reversed at the same time
+            PC.Mdl.TL.Reverse(Reverse);
+            PC.Mdl.TL.Increment();
+            PC.Mdl.TL.GetCursorValue().Apply(Mdl.IsGoingBackward);
         }
+        if (Reverse) Mdl.Players.Reverse();
+    }
+    
+    void FixedUpdateTimelines()
+    {
+        var Reverse = Mdl.IsGoingBackward || Mdl.IsRewinding;
+        if (Reverse) Mdl.Players.Reverse();
+        foreach(PlayerController PC in Mdl.Players)
+        {
+            PC.Mdl.TL.GetCursorValue().ApplyPhysics(Reverse);
+        }
+        if (Reverse) Mdl.Players.Reverse();
     }
 
     void UpdateTimers()
@@ -374,8 +386,13 @@ public class WorldManager : TickClock, IControllable, ISavable {
         UpdateTimers();
 
         if (Mdl.IsRewinding) RewindTimeline();
-        else if (TL.isTimelineOver())
+        else if (TL.IsTimelineAtEnd())
         {
+            // NOTE toffa: we need to set the needtick variable to false because the last tick to cause
+            // for the increment en hance the end of the timeline has set it to true and it can lead to some
+            // weird behaviors. Even this is probably not a good solution and needTick should not be set
+            // to true if trying to tick outside of the timeline boundaries.
+            needTick = false;
             Mdl.IsRewinding = true;
             IM.CurrentMode = InputManager.Mode.REPLAY;
         }

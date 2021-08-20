@@ -2,104 +2,144 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Timeline 
+public interface ITimelineValue
 {
+    void Apply(bool Reversed = false);
+    void ApplyPhysics(bool Reversed = false);
+}
 
-    // for rewind just record everything
-    // This is a shitty design as it is not easy to print the current timeline value while rewinding for instance
-    // the problem is that is can be hard to have something work well in reverse wioth physics and shit
-    public class Recorder
+public interface ITimeline
+{
+    void SetCursor(int CursorIdx);
+    int  GetCursorIndex();
+    ITimelineValue GetCursorValue();
+    ITimelineValue GetCursorValue(int CursorIdx);
+    void Increment();
+    void Decrement();
+    bool IsTimelineAtEnd();
+    bool IsTimelineAtBeginning();
+    bool IsCursorValuable(int CursorIndexToCheck);
+    bool IsCursorValuable();
+}
+
+public class Timeline<T> : ITimeline, ITickObserver where T : new()
+{
+    protected int _Size = -1;
+    protected int _Cursor = -1;
+
+    protected BitArray _TimelineValuable;
+    protected T[] _CursorValues;
+
+    public bool IsReversed = false;
+
+    protected ITickController Ctl = null;
+
+    void ITickObserver.OnTick()
     {
-        public void Record(int Tick, GameObject Go, PlayerController.Direction D)
-        {
-            // We are using a while loop because it is possible to 'leap' a tick
-            // and have to add 2 ticks instead of one
-            while (GameObjects.Count - 1 < Tick)
-            {
-                GameObjects.Add(new List<GameObject>());
-                Directions.Add(new List<PlayerController.Direction>());
-            }
+        GetCursorValue().ApplyPhysics();
+    }
 
-            GameObjects[Tick].Add(Go);
-            Directions[Tick].Add(D);
-        }
+    void ITickObserver.SetControler(ITickController Ctl)
+    {
+        this.Ctl = Ctl;
+    }
 
-        // return -1 for success and failure, yes I know...
-        // return index in case of waiting for animation
-        public int Tick(int CurrentTick, int StartingIdx = 0)
-        {
-            if (CurrentTick < 0 || CurrentTick >= GameObjects.Count)
-            {
-                return -1;
-            }
+    virtual protected void Init() {
+        _TimelineValuable = new BitArray(_Size, true);
+        _CursorValues = new T[_Size];
+        for (int i = 0; i < _Size; ++i) _CursorValues[i] = new T();
+    }
 
-            var TickGameObjects = GameObjects[CurrentTick];
-            var TickDirections = Directions[CurrentTick];
+    public Timeline()
+    {
 
-            for (int i = StartingIdx; i < TickGameObjects.Count; ++i)
-            {
-                var GO = TickGameObjects[i];
-                var D = TickDirections[i];
-                var Mover = GO.GetComponent<Movable>();
-                if (Mover)
-                {
-                   Movable.MoveResult Result = Mover.Move(PlayerController.InverseDirection(D), false);
-                    if (Result == Movable.MoveResult.IsAnimating)
-                        return i;
-                }
-            }
-            return -1;
-        }
+    }
 
-        // bool REmove: wether we just want to empty the tick, or completely remove it
-        public void DeleteRecord(int Tick, bool Remove)
-        {
-            if (Tick < 0)
-            {
-                return;
-            }
-            // for backward implementation we need to remove the last recoirded tick
-            if (GameObjects.Count -1 >= Tick)
-            {
-                if (Remove)
-                {
-                    GameObjects.RemoveAt(Tick);
-                    Directions.RemoveAt(Tick);
-                }
-                else
-                {
-                    GameObjects[Tick] = new List<GameObject>();
-                    Directions[Tick] = new List<PlayerController.Direction>();
-                }
-            }
+    public Timeline(int Size)
+    {
+        _Size = Size;
+        Init();
+    }
 
-        }
+    public Timeline(int Size, int Cursor)
+    {
+        _Size = Size;
+        _Cursor = Cursor;
+        Init();
+    }
 
-        public bool IsEmpty()
-        {
-            return GameObjects.Count == 0;
-        }
+    public void SetCursor(int CursorIdx)
+    {
+        if (!CheckIndexIsValid(CursorIdx)) return;
+        _Cursor = CursorIdx;
+    }
 
-        public List<List<GameObject>> GameObjects = new List<List<GameObject>>();
-        public List<List<PlayerController.Direction>> Directions = new List<List<PlayerController.Direction>>();
+    public int GetCursorIndex()
+    {
+        if (!CheckIndexIsValid(_Cursor)) return 0;
+        return _Cursor;
+    }
+
+    public ITimelineValue GetCursorValue()
+    {
+        return _CursorValues[GetCursorIndex()] as ITimelineValue;
+    }
+
+    public ITimelineValue GetCursorValue( int CursorIdx )
+    {
+        if (!CheckIndexIsValid(CursorIdx)) return null;
+        return _CursorValues[CursorIdx] as ITimelineValue;
     }
 
 
-    public Recorder Rewind = new Recorder();
+    public void Reverse(bool Value)
+    {
+        IsReversed = Value;
+    }
 
+    public void Increment()
+    {
+        // Do not check boundaries value here as we want it to go past it
+       _Cursor = IsReversed ? _Cursor-1 : _Cursor+1;
+    }
+
+    public void Decrement()
+    {
+        // Do not check boundaries value here as we want it to go past it
+       _Cursor = IsReversed ? _Cursor+1 : _Cursor-1;
+    }
+
+    public bool IsTimelineAtEnd()
+    {
+        return _Cursor >= _Size;
+    }
+
+    public bool IsTimelineAtBeginning()
+    {
+        return _Cursor == -1;
+    }
+
+    private bool CheckIndexIsValid(int CursorIndexToCheck)
+    {
+        return (CursorIndexToCheck < _Size) && (CursorIndexToCheck >= 0);
+    }
+
+    public bool IsCursorValuable( int CursorIndexToCheck )
+    {
+        if (!CheckIndexIsValid(CursorIndexToCheck)) return false;
+        return _TimelineValuable[CursorIndexToCheck];
+    }
+
+    public bool IsCursorValuable()
+    {
+        return IsCursorValuable(GetCursorIndex());
+    }
+}
+
+public class PlayerTimeline : Timeline<PlayerTimelineValue>
+{
     private const int N_MEASURES    = 5;
     private const int MEASURE_SIZE  = 5;
-
-    // 0/F : silence
-    // 1/T : play
-    public PlayerController.Direction[] Events;
-    private BitArray    __timeLine;
-    private bool        __is_previous;
-    public int          last_tick;
-    // offset is used to set timeline start to a given timeunit
-    // used to avoid unwanted disabled time when getting a nested loop
-    public int offset;
-    public  bool        timeline_finished;
 
     // Loop Level
     // 0 : INITIAL LOOP
@@ -107,157 +147,77 @@ public class Timeline
     // ..
     // MEASURE_SIZE-1 : LAST CHILD with 1 move per measure
     // MEASURE_SIZE : THEORIC LAST CHILD  with 0 moves left
-    public int loop_level;
+    private int _LoopLevel = 0;
+    // offset is used to set timeline start to a given timeunit
+    // used to avoid unwanted disabled time when getting a nested loop
+    private int _Offset = 0;
 
-    public bool isReversed = false;
 
-    public Timeline( int iLoopLevel )
+    private bool _IsPrevious = false;
+    public bool IsPrevious()
     {
-        offset = 0;
-        Events = new PlayerController.Direction[N_MEASURES * MEASURE_SIZE];
-        reset(iLoopLevel);
+        return _IsPrevious;
     }
 
-    public Timeline( int iLoopLevel, int iLastTick )
+
+    public PlayerTimeline(int LoopLevel) : base(N_MEASURES * MEASURE_SIZE)
     {
-        offset      = iLastTick;
-        last_tick   = iLastTick;
-        Events = new PlayerController.Direction[N_MEASURES * MEASURE_SIZE];
-        reset(iLoopLevel, iLastTick);
     }
 
-    public void reset( int iLoopLevel )
+    public PlayerTimeline(int LoopLevel, int CursorIdx) : base(N_MEASURES * MEASURE_SIZE, CursorIdx)
     {
-        reset(iLoopLevel, 0);
+        _LoopLevel = LoopLevel;
     }
 
-    public PlayerController.Direction GetCurrent()
+    protected override void Init()
     {
-        if (!isReversed && last_tick - 1 < Events.Length && last_tick != 0)
-            return Events[last_tick - 1];
-        else if (isReversed && last_tick < Events.Length)
-            return Events[last_tick];
-        else
-            return PlayerController.Direction.NONE;
+        base.Init();
+        if (_LoopLevel == 0) return;
+        for ( int i=_Offset; i < _TimelineValuable.Count; ++i)
+        {
+            //remap to 1 - MEASURE_SIZE to avoid 0
+            int idx = (i - (((int)(i / MEASURE_SIZE)) * MEASURE_SIZE)) +1;
+            for(int j = MEASURE_SIZE - (_LoopLevel-1); j <= MEASURE_SIZE; ++j)
+            {
+                if( (idx)%j==0) { _TimelineValuable[i] = false; }
+            }
+        }//! for i
     }
 
-    public PlayerController.Direction GetPrevious()
+    public void SetPlayer(PlayerController PC)
     {
-        int previous_tick = last_tick - 2;
-        if (!isReversed && previous_tick >= 0)
-            return Events[previous_tick];
-        else if (isReversed && last_tick + 1 < Events.Length)
-            return Events[last_tick + 1];
-        else
-            return PlayerController.Direction.NONE;
+        foreach(PlayerTimelineValue V in _CursorValues)
+        {
+            V._Player = PC;
+        }
     }
 
-    public void SetCurrent(PlayerController.Direction Dir)
+
+    // !! autoflag this TL as a previous TL ( used by UI )
+    public PlayerTimeline GetNestedTimeline()
     {
-        var current = isReversed ? last_tick : last_tick - 1;
-        Events[current] = Dir;
+        var Result = new PlayerTimeline( _LoopLevel+1, _Cursor);
+
+        System.Array.Copy(this._CursorValues, Result._CursorValues, _Cursor);
+        // Notify this TL as a 'previous TL' as it is current gameplay.
+        // If we want to mark previous flag with more flexibility,
+        // set the flag explicitely with logic in WM.
+        _IsPrevious = true;
+
+        return Result; 
     }
 
-    public void reset( int iLoopLevel, int iLastTick )
-    {
-        last_tick = iLastTick;
-        timeline_finished = false;
-        loop_level = iLoopLevel;
-        init();
-    }
-
-    public int getCursor()
-    {
-        return last_tick;
-    }
-
+    // Toffa : Really needed still?
     public int getTickForTimeUnits( bool Saturate = false)
     {
         if (Constants.ShowNextInputsOnTimelineOnReplay && Saturate)
             return 25;
         else
-            return last_tick;
+            return _Cursor+1;
     }
 
-    public void setCursor(int iCurrentTick)
+    public int GetLevel()
     {
-        last_tick = iCurrentTick;
+        return _LoopLevel;
     }
-
-    public void increment()
-    {
-        var dummy = isReversed ? --last_tick : ++last_tick;
-    }
-
-    public void decrement()
-    {
-        var dummy = isReversed ? ++last_tick : --last_tick;
-    }
-
-    public void reset()
-    {
-        reset(loop_level);
-    }
-
-    public void init()
-    {
-        __timeLine = new BitArray( N_MEASURES * MEASURE_SIZE, true);
-        if (loop_level == 0) return;
-        for ( int i=offset; i < __timeLine.Count; ++i)
-        {
-            //remap to 1 - MEASURE_SIZE to avoid 0
-            int idx = (i - (((int)(i / MEASURE_SIZE)) * MEASURE_SIZE)) +1;
-            for(int j = MEASURE_SIZE - (loop_level-1); j <= MEASURE_SIZE; ++j)
-            {
-                if( (idx)%j==0)
-                {
-                    __timeLine[i] = false;
-                }
-            }
-        }//! for i
-    }//! init
-
-    public BitArray getTimeline()
-    {
-        return __timeLine;
-    }
-
-    public bool isPrevious()
-    {
-        return __is_previous;
-    }
-
-    public bool isTimelineOver()
-    {
-        timeline_finished = isReversed ? (last_tick < 0) : ( last_tick >= N_MEASURES*MEASURE_SIZE );
-        return timeline_finished;
-    }
-
-    public bool isTimelineAtBeginning()
-    {
-        return last_tick == 0;
-    }
-
-    public bool getAt( int iTimeIndex )
-    {
-        if ( (iTimeIndex<__timeLine.Count) && (iTimeIndex>=0) )
-            return __timeLine[iTimeIndex];
-        return false; // else OoB we do nothing
-    }
-
-    // !! autoflag this TL as a previous TL ( used by UI )
-    public Timeline getNestedTimeline()
-    {
-        var Result = new Timeline( loop_level+1, last_tick);
-        System.Array.Copy(this.Events, Result.Events, last_tick);
-        Result.Rewind = (Rewind);
-
-        // Notify this TL as a 'previous TL' as it is current gameplay.
-        // If we want to mark previous flag with more flexibility,
-        // set the flag explicitely with logic in WM.
-        __is_previous = true;
-
-        return Result; 
-    }
-
 }

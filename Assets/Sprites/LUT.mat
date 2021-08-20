@@ -50,5 +50,5 @@ Material:
     - _UseUIAlphaClip: 0
     m_Colors:
     - _Color: {r: 0, g: 0, b: 0, a: 0}
-    - _PlayerPosition: {r: -2.61875, g: 0.34166664, b: 1, a: 0}
+    - _PlayerPosition: {r: 0.3000002, g: 0.3333333, b: 1, a: 0}
   m_BuildTextureStacks: []

@@ -8,6 +8,22 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Runtime.Serialization;
 
+public class PlayerTimelineValue : ITimelineValue
+{
+    public PlayerController _Player = null;
+    public PlayerController.Direction _PlayerDirection = PlayerController.Direction.NONE;
+
+    void ITimelineValue.Apply(bool Reversed)
+    {
+        // Nothing to do outside of physics
+    }
+
+    void ITimelineValue.ApplyPhysics(bool Reversed)
+    {
+        _Player.Move(Reversed);
+    }
+}
+
 [RequireComponent(typeof(Movable))]
 [RequireComponent(typeof(BoxCollider2D))]
 public class PlayerController : TickBased, IControllable , ISavable {
@@ -40,7 +56,7 @@ public class PlayerController : TickBased, IControllable , ISavable {
         public Direction CurrentDirection = Direction.NONE;
         public bool FacingRight = true;
         [NonSerialized] private LayerMask wallmask;
-        [NonSerialized] public Timeline TL;
+        [NonSerialized] public PlayerTimeline TL;
     }
     IModel ISavable.GetModel()
     {
@@ -87,7 +103,7 @@ public class PlayerController : TickBased, IControllable , ISavable {
 
     public override void OnTick()
     {
-        Move(Mdl.TL.isReversed);
+       (Mdl.TL.GetCursorValue() as ITimelineValue).ApplyPhysics(Mdl.TL.IsReversed);
     }
 
     /// <summary>
@@ -100,15 +116,15 @@ public class PlayerController : TickBased, IControllable , ISavable {
         Movable.MoveResult Result = Movable.MoveResult.CannotMove;
         // We update the direction from the loop if it is loop controlled
         if (IM.CurrentMode == InputManager.Mode.REPLAY)
-            Mdl.CurrentDirection = Mdl.TL.GetCurrent();
+            Mdl.CurrentDirection = (Mdl.TL.GetCursorValue() as PlayerTimelineValue)._PlayerDirection;
         if (IM.CurrentMode == InputManager.Mode.RECORD)
         {
             // NOTE toffa : Regardloess of the timeline value it will be advanced by a move
             // therefore we need to check last_tick minus one to know if it was possible to have moved
             // kinda weird but hey \o/
-            if (!Mdl.TL.getAt(Mdl.TL.last_tick -1)) Mdl.CurrentDirection = Direction.NONE;
-            if (Mdl.TL.isReversed) Mdl.CurrentDirection = Mdl.TL.GetCurrent();
-            else Mdl.TL.SetCurrent(Mdl.CurrentDirection);
+            if (!Mdl.TL.IsCursorValuable()) Mdl.CurrentDirection = Direction.NONE;
+            if (Mdl.TL.IsReversed) Mdl.CurrentDirection = (Mdl.TL.GetCursorValue() as PlayerTimelineValue)._PlayerDirection;
+            else (Mdl.TL.GetCursorValue() as PlayerTimelineValue)._PlayerDirection = Mdl.CurrentDirection;
         }
         // move
         Movable Mover = GetComponent<Movable>();
@@ -180,8 +196,8 @@ public class PlayerController : TickBased, IControllable , ISavable {
 
     void checkSpriteFlip()
     {
-        bool flip_detected = ( ( Mdl.TL.GetCurrent() == Direction.RIGHT ) && !Mdl.FacingRight );
-        flip_detected |= ( ( Mdl.TL.GetCurrent() == Direction.LEFT ) && Mdl.FacingRight );
+        bool flip_detected = ( ( (Mdl.TL.GetCursorValue() as PlayerTimelineValue)._PlayerDirection == Direction.RIGHT ) && !Mdl.FacingRight );
+        flip_detected |= ( ( (Mdl.TL.GetCursorValue() as PlayerTimelineValue)._PlayerDirection == Direction.LEFT ) && Mdl.FacingRight );
 
         if (!flip_detected)
             return;

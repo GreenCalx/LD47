@@ -29,7 +29,7 @@ public class SwitchTile : ActivatorObject
 
             GetComponentInChildren<AudioSource>().Play();
             isSwitched = true;
-            SwitchTick = GameObject.Find("GameLoop").GetComponent<WorldManager>().TL.last_tick;
+            SwitchTick = GameObject.Find("GameLoop").GetComponent<WorldManager>().TL.GetCursorIndex();
             SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
             if (!!sr)
                 sr.sprite = spriteSwitched;
@@ -44,7 +44,7 @@ public class SwitchTile : ActivatorObject
 
     public void TryReset()
     {
-        int Tick = GameObject.Find("GameLoop").GetComponent<WorldManager>().TL.last_tick;
+        int Tick = GameObject.Find("GameLoop").GetComponent<WorldManager>().TL.GetCursorIndex();
         if (Tick < SwitchTick) Reset();
     }
 

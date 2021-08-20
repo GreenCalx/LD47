@@ -2,28 +2,30 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class TimelineView : MonoBehaviour
 {
-    public class TimelineComparer : IEqualityComparer<Timeline>
+    public class TimelineComparer : IEqualityComparer<ITimeline>
     {
-        public bool Equals(Timeline x, Timeline y)
+        public bool Equals(ITimeline x, ITimeline y)
         {
-            return x.loop_level == y.loop_level;
+            
+            return (x as PlayerTimeline).GetLevel() == (y as PlayerTimeline).GetLevel();
         }
     
-        public int GetHashCode(Timeline obj)
+        public int GetHashCode(ITimeline obj)
         {
-            return obj.loop_level.GetHashCode();
+            return (obj as PlayerTimeline).GetLevel().GetHashCode();
         }
     }
 
-    private Timeline __displayedTimeline;
-    private HashSet<Timeline> __lTL;
+    private ITimeline __displayedTimeline;
+    private HashSet<ITimeline> __lTL;
 
     // Start is called before the first frame update
     void Start()
     {
-        __lTL = new HashSet<Timeline>( new TimelineComparer() );
+        __lTL = new HashSet<ITimeline>( new TimelineComparer() );
     }
 
     // Update is called once per frame
@@ -32,13 +34,13 @@ public class TimelineView : MonoBehaviour
         
     }
 
-    public Timeline getDisplayedTimeline()
+    public ITimeline getDisplayedTimeline()
     {
         return __displayedTimeline;
     }
 
 
-    public void updateTimeline(Timeline iTL)
+    public void updateTimeline(ITimeline iTL)
     {
         if ( !__lTL.Contains(iTL) )
             __lTL.Add(iTL);

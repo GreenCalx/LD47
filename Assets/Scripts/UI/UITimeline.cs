@@ -19,7 +19,7 @@ public class UITimeline : MonoBehaviour
     public UITimelineSwitcher       __ui_tl_switcher;
 
     public TimelineView             __tl_view;
-    public Timeline                 __displayedTimeline;
+    public ITimeline                 __displayedTimeline;
 
     private Animator                __timeline_animator;
 
@@ -101,16 +101,16 @@ public class UITimeline : MonoBehaviour
 
     public int getDisplayedLoopLevel()
     {
-        return __displayedTimeline.loop_level;
+        return (__displayedTimeline as PlayerTimeline).GetLevel();
     }
 
-    public void trySwitchTimeline(Timeline iTL)
+    public void trySwitchTimeline(ITimeline iTL)
     {
         __displayedTimeline = iTL;
-        __ui_tl_switcher.switchTimeline( __displayedTimeline.loop_level ); // proceed to switch
+        __ui_tl_switcher.switchTimeline( (__displayedTimeline as PlayerTimeline).GetLevel() ); // proceed to switch
     }
 
-    public void setDisplayedTimeline(Timeline iTL)
+    public void setDisplayedTimeline(ITimeline iTL)
     {
         __displayedTimeline = iTL;
     }
@@ -142,9 +142,9 @@ public class UITimeline : MonoBehaviour
     // REDO ME
     private void updateUI()
     {
-        Timeline active_tl  = __displayedTimeline;
+        ITimeline active_tl  = __displayedTimeline;
         if (active_tl == null) return;
-        bool is_previous_tl = active_tl.isPrevious();
+        bool is_previous_tl = (active_tl as PlayerTimeline).IsPrevious();
         
         // to update time units sprites
         Transform current_tick_square_transform = null;
@@ -158,7 +158,7 @@ public class UITimeline : MonoBehaviour
 
         for (int i=0; i<__time_units.Length ;i++)
         {
-            bool square_is_active = active_tl.getAt(i);
+            bool square_is_active = active_tl.IsCursorValuable(i);
             UITimelineInput curr_unit =__time_units[i];
 
             // show enabled or disabled for curr unit
@@ -170,31 +170,26 @@ public class UITimeline : MonoBehaviour
 
             __time_units[i].showEnabled();
 
-            updateSquareInputImage( i, active_tl.Events[i]);
-
+            updateSquareInputImage( i, (active_tl.GetCursorValue(i) as PlayerTimelineValue)._PlayerDirection);
 
             // RECORD exclusive logic for current timeline
              if ( __WM.IM.CurrentMode==InputManager.Mode.RECORD && !is_previous_tl )
              {
                 // Hide forward squares 
-                 if ( i > active_tl.getTickForTimeUnits() )
+                 if ( i > (active_tl as PlayerTimeline).getTickForTimeUnits() )
                  {
                      curr_unit.hide();
                  } 
                 // Show none as next input at the last_tick position
-                 else if ( i == active_tl.getCursor() )
+                 else if ( i == active_tl.GetCursorIndex()+1 )
                  {
                      if ( Constants.ShowDefaultTileOnCursor )
                          __time_units[i].changeSprite(ui_input_none);
                  }
              }
-
-
-
         }//! for time units
-
         // update timeline animator
-        update_time(active_tl.getCursor());
+        update_time(active_tl.GetCursorIndex()+1);
 
     }//! updateUI
 
