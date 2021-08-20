@@ -255,15 +255,15 @@ public class WorldManager : TickClock, IControllable, ISavable {
             || (Entry.Inputs["Tick"].Down && Mdl.AutoReplayTick.Ended());
         if (ForwardTick)
         {
-            TL.Reverse(false);
+            Mdl.IsGoingBackward = false;
             Mdl.AutoReplayTick.Restart();
             Tick();
         }
 
-        bool BackwardTick = Entry.Inputs["BackTick"].IsDown && !needTick && TL.IsTimelineAtBeginning();
-        if( BackwardTick)
+        bool BackwardTick = Entry.Inputs["BackTick"].IsDown && !needTick && !TL.IsTimelineAtBeginning();
+        if(BackwardTick)
         {
-            TL.Reverse(true);
+            Mdl.IsGoingBackward = true;
             Tick();
         }
 
@@ -342,7 +342,7 @@ public class WorldManager : TickClock, IControllable, ISavable {
         
         if(TL.IsTimelineAtBeginning())
         {
-            needTick = false;
+            Tick();
             Mdl.IsRewinding = false;
             return;
         }
@@ -358,8 +358,9 @@ public class WorldManager : TickClock, IControllable, ISavable {
         {
             // NOTE toffa: for now all timelines are reversed at the same time
             PC.Mdl.TL.Reverse(Reverse);
-            PC.Mdl.TL.Increment();
-            PC.Mdl.TL.GetCursorValue().Apply(Mdl.IsGoingBackward);
+            // NOTE toffa: if paying in reverse we have to apply before doing the increment, doing it in fixed update
+            if (!Reverse) PC.Mdl.TL.Increment();
+            PC.Mdl.TL.GetCursorValue()?.Apply(Mdl.IsGoingBackward);
         }
         if (Reverse) Mdl.Players.Reverse();
     }
@@ -370,7 +371,8 @@ public class WorldManager : TickClock, IControllable, ISavable {
         if (Reverse) Mdl.Players.Reverse();
         foreach(PlayerController PC in Mdl.Players)
         {
-            PC.Mdl.TL.GetCursorValue().ApplyPhysics(Reverse);
+            PC.Mdl.TL.GetCursorValue()?.ApplyPhysics(Reverse);
+            if (Reverse) PC.Mdl.TL.Increment(); 
         }
         if (Reverse) Mdl.Players.Reverse();
     }

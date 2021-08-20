@@ -76,13 +76,14 @@ public class Timeline<T> : ITimeline, ITickObserver where T : new()
 
     public int GetCursorIndex()
     {
-        if (!CheckIndexIsValid(_Cursor)) return 0;
+        if (!CheckIndexIsValid(_Cursor)) return -1;
         return _Cursor;
     }
 
     public ITimelineValue GetCursorValue()
     {
-        return _CursorValues[GetCursorIndex()] as ITimelineValue;
+        if (!CheckIndexIsValid(_Cursor)) return null;
+        return _CursorValues[_Cursor] as ITimelineValue;
     }
 
     public ITimelineValue GetCursorValue( int CursorIdx )
