@@ -363,6 +363,17 @@ public class WorldManager : TickClock, IControllable, ISavable {
             PC.Mdl.TL.GetCursorValue()?.Apply(Mdl.IsGoingBackward);
         }
         if (Reverse) Mdl.Players.Reverse();
+
+        ConnectorGraph cg = CurrentStageSelector.selected_stage.get_connector_graph();
+        foreach( Wire w in cg.wires)
+        {
+            // NOTE toffa: for now all timelines are reversed at the same time
+            w.TL.Reverse(Reverse);
+            // NOTE toffa: if paying in reverse we have to apply before doing the increment, doing it in fixed update
+            if (!Reverse) w.TL.Increment();
+            w.TL.GetCursorValue()?.Apply(Mdl.IsGoingBackward);
+        }
+
     }
     
     void FixedUpdateTimelines()
@@ -375,6 +386,13 @@ public class WorldManager : TickClock, IControllable, ISavable {
             if (Reverse) PC.Mdl.TL.Increment(); 
         }
         if (Reverse) Mdl.Players.Reverse();
+
+        ConnectorGraph cg = CurrentStageSelector.selected_stage.get_connector_graph();
+        foreach( Wire w in cg.wires)
+        {
+            w.TL.GetCursorValue()?.Apply(Mdl.IsGoingBackward);
+            if (Reverse) w.TL.Increment();
+        }
     }
 
     void UpdateTimers()

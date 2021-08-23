@@ -14,10 +14,12 @@ public class ActivatorObject : TickBased
     public int pulse_speed = 2; // 99/(0..-inf) = Infinite ; 1 = 1 tile/tick ; n = n tiles / tick
     public bool is_active = false;
 
+/*    
     public override void OnTick()
     {
         CG.update_wires();
     }
+*/
 
     // Start is called before the first frame update
     protected virtual void Start()

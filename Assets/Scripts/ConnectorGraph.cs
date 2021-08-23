@@ -9,14 +9,40 @@ using UnityEngine.Tilemaps;
 * TODO : CALL UPDATE_WIRE() each tick in world
 *   retrieve curr loaded connector graph from stage_selector => stage => get_connector_graph() and call update_wires()
 */
-public struct Wire
-{
 
+public class WireTimelineValue : ITimelineValue
+{
+    public Wire _Wire;
+    public Wire.Events _WireEvent = Wire.Events.NONE;
+
+    void ITimelineValue.Apply(bool Reversed)
+    {
+        if ( _Wire != null )
+            _Wire.update_pulses();
+    }
+
+    void ITimelineValue.ApplyPhysics(bool Reversed)
+    {
+        // no physics for wire atm
+    }
+}
+
+public class Wire
+{
+    public enum Events {
+        NONE,
+        INF_ON,
+        INF_OFF,
+        TRIGG_ON,
+        TRIG_OFF,
+        PULSE
+    }
+
+    public WireTimeline TL;
     public ActivatorObject emitter;
     int pulse_speed;
     bool is_infinite;
     public List<WireChunk> chunks;
-
     public WireChunk root_chunk;
 
     public Wire(ActivatorObject iEmitter)
@@ -32,6 +58,8 @@ public struct Wire
         pulse_speed = emitter.pulse_speed;
         root_chunk = null;
         is_infinite = ( pulse_speed <= 0 ) ? true : false ;
+        TL = new WireTimeline( 0, 0);
+        TL.SetWire(this);
     }
 
     public void addRootChunk(Vector3Int iRootPosition)
@@ -76,6 +104,8 @@ public struct Wire
                 else
                     target.deactivate();
             }
+
+            (TL.GetCursorValue() as WireTimelineValue)._WireEvent = iState ? Events.INF_ON : Events.INF_OFF ;
                 
             return;
         }
