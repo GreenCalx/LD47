@@ -87,6 +87,6 @@ public class SwitchTile : ActivatorObject
 
     void Update()
     {
-        TryReset();
+        //TryReset();
     }
 }
