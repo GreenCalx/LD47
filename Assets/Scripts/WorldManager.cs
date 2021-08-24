@@ -390,7 +390,7 @@ public class WorldManager : TickClock, IControllable, ISavable {
         ConnectorGraph cg = CurrentStageSelector.selected_stage.get_connector_graph();
         foreach( Wire w in cg.wires)
         {
-            w.TL.GetCursorValue()?.Apply(Mdl.IsGoingBackward);
+            w.TL.GetCursorValue()?.ApplyPhysics(Mdl.IsGoingBackward);
             if (Reverse) w.TL.Increment();
         }
     }

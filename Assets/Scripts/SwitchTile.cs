@@ -21,10 +21,6 @@ public class SwitchTile : ActivatorObject
             // TODO toffa: make this work in case it is another object than player that trigger
             GameObject.Find("GameLoop").GetComponent<WorldManager>().AddListener(other.gameObject.GetComponent<PlayerController>() as ITickObserver, this);
 
-            /*
-            foreach( ActivableObject ao in activableObjects )
-                ao.listen(signalKey, this, true);
-            */
             pulsate(true);
 
             GetComponentInChildren<AudioSource>().Play();
@@ -52,10 +48,6 @@ public class SwitchTile : ActivatorObject
     {
         if (isSwitched)
         {
-            /*
-            foreach (ActivableObject ao in activableObjects)
-                ao.listen(signalKey, this, false);
-*/
             pulsate(false);
             isSwitched = false;
 
@@ -68,21 +60,6 @@ public class SwitchTile : ActivatorObject
     private void OnTriggerExit2D(Collider2D other)
     {
         TryReset();
-       /* objectsOnSwitch.Remove(other.gameObject);
-
-        // switch is reseted when going out of it
-        // and nothing is on it anymore
-        if (isSwitched && objectsOnSwitch.Count == 0)
-        {
-            foreach( ActivableObject ao in activableObjects )
-                ao.listen(signalKey, this, false);
-
-            isSwitched = false;
-
-            SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
-            if (!!sr)
-                sr.sprite = spriteNotSwitched;
-        } */
     }
 
     void Update()

@@ -5,9 +5,7 @@ using UnityEngine;
 public class ActivatorObject : TickBased 
 {
     // OLD ATTR TO CLEAN UP
-    public GameObject[] activables;
     public SIGNAL_KEYS signalKey;
-    protected List<ActivableObject> activableObjects;
 
     // NEW ATTR
     protected ConnectorGraph CG;
@@ -24,16 +22,6 @@ public class ActivatorObject : TickBased
     // Start is called before the first frame update
     protected virtual void Start()
     {
-        activableObjects = new List<ActivableObject>();
-        foreach( GameObject go in activables )
-        {
-            ActivableObject activableObject = go.GetComponent<ActivableObject>(); 
-            if (!!activableObject)
-            {
-                activableObjects.Add(activableObject);
-            }
-        }
-
         is_active = false;
     }
     

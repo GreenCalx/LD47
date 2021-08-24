@@ -40,10 +40,6 @@ public class ButtonTile : ActivatorObject
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        /*
-        foreach( ActivableObject ao in activableObjects )
-            ao.listen(signalKey, this, false);
-        */
         // we just don't send a pulse now
         pulsate(false);
         
