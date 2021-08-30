@@ -166,8 +166,15 @@ public class Wire
 */
 
         // propagation of pulses
-        foreach( WireChunk wc in chunks )
+        int n_chunks = chunks.Count;
+        for( int i=n_chunks-1; i>=0 ; i--)
         {
+            WireChunk wc = chunks[i];
+            if (wc==null)
+            {
+                Debug.LogError("Missing WireChunk.");
+                continue;
+            }
             if (wc.hasImpulse())
             {
                 wc.propagateAll();
@@ -232,15 +239,15 @@ public class WireChunk
             return; // Stop propagation
         }
 
-
         if ( successors.Count == 0 )
         {
             foreach( ActivableObject target in targets)
             {
-                foreach( PulseToken pt in pulse_bag)
-                {
-                    target.listen(pt);
-                }
+                //foreach( PulseToken pt in pulse_bag)
+                //{
+                    //target.listen(pt);
+                //}
+                target.listen(iPT);
             }
             pulse_bag.Clear();
         } else {
