@@ -146,25 +146,6 @@ public class Wire
         if (is_infinite)
             return;
 
-        // Solve pulses
-        /*
-        int n_chunks = chunks.Count;
-        int tail_chunks = n_chunks - pulse_speed;
-        bool should_activate = false;
-        for ( int i=n_chunks-1; i >= tail_chunks ; i-- )
-        {
-            should_activate |= chunks[i].hasImpulse;
-        }
-        List<ActivableObject> aos = getWireTargets();
-        foreach (ActivableObject target in aos)
-        {
-            if (should_activate)
-                target.activate();
-            else
-                target.deactivate();
-        }
-*/
-
         // propagation of pulses
         int n_chunks = chunks.Count;
         for( int i=n_chunks-1; i>=0 ; i--)
@@ -175,11 +156,30 @@ public class Wire
                 Debug.LogError("Missing WireChunk.");
                 continue;
             }
+            // reset activated state
+            wc.activated_this_cycle = false;
+
+            // propagate impulses if needed
             if (wc.hasImpulse())
             {
                 wc.propagateAll();
             }
         }
+
+        // If no activation of chunks carrying targets, we deactivate targets.
+        foreach( WireChunk wc in chunks )
+        {
+            if (wc.targets.Count!=0)
+            {
+                if (!wc.activated_this_cycle)
+                {
+                    foreach ( ActivableObject ao in wc.targets )
+                    { ao.deactivate(); }
+                }
+            }
+        }
+
+
     }
 }
 
@@ -191,6 +191,9 @@ public class WireChunk
     public List<PulseToken> pulse_bag;
     public List<ActivableObject> targets;
 
+    public bool activated_this_cycle;
+
+
     public Wire wire;
 
     public WireChunk( Vector3Int iCoord, Wire iWire )
@@ -201,6 +204,7 @@ public class WireChunk
         predecessors = new List<Vector3Int>();
         successors = new List<Vector3Int>();
         targets = new List<ActivableObject>();
+        activated_this_cycle = false;
     }
 
     public bool hasImpulse()
@@ -243,11 +247,7 @@ public class WireChunk
         {
             foreach( ActivableObject target in targets)
             {
-                //foreach( PulseToken pt in pulse_bag)
-                //{
-                    //target.listen(pt);
-                //}
-                target.listen(iPT);
+                this.activated_this_cycle = target.listen(iPT);
             }
             pulse_bag.Clear();
         } else {

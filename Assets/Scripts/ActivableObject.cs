@@ -26,12 +26,13 @@ public class ActivableObject : MonoBehaviour
 
     public virtual void trigger(bool signalType) {}
 
-    public virtual void listen(PulseToken iPT)
+    public virtual bool listen(PulseToken iPT)
     {
         if ( iPT.PW >= required_PW )
-            activate();
+        { activate(); return true; }
         else
-            deactivate();
+        { deactivate(); }
+        return false;
     }
 
     public void activate()
