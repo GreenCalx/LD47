@@ -27,6 +27,34 @@ public class WireTimelineValue : ITimelineValue
     }
 }
 
+public class PulseToken
+{
+    // propagation speed
+    public int speed;
+
+    // Required Weight : defined by activator targets by number of emitters in wire.
+    // IF <= required_weight : DEACTIVATE
+    // IF > required_weight  : ACTIVATE
+    public int PW; // pulsewidth 
+
+    // TODO REMOVEME when we stop clonin like fagittiz
+    public bool deletion_flag;
+    public PulseToken( int iSpeed, int iPW )
+    {
+        speed = iSpeed;
+        PW = iPW;
+        deletion_flag = false;
+    }
+    public PulseToken( int iSpeed ) : this( iSpeed, 1 )
+    {}
+
+    public PulseToken getPropagated()
+    {
+        Debug.LogWarning("!!! Creates unnecessary object. TODO : DO BETTA");
+        return new PulseToken(speed-1, PW);
+    }
+}
+
 public class Wire
 {
     public enum Events {
@@ -40,7 +68,7 @@ public class Wire
 
     public WireTimeline TL;
     public ActivatorObject emitter;
-    int pulse_speed;
+    public int pulse_speed;
     bool is_infinite;
     public List<WireChunk> chunks;
     public WireChunk root_chunk;
@@ -109,7 +137,7 @@ public class Wire
                 
             return;
         }
-        chunks[pulse_speed - 1].hasImpulse = true;
+        chunks[0].pulse_bag.Add( new PulseToken(pulse_speed-1) );
     }
 
     public void update_pulses()
@@ -119,6 +147,7 @@ public class Wire
             return;
 
         // Solve pulses
+        /*
         int n_chunks = chunks.Count;
         int tail_chunks = n_chunks - pulse_speed;
         bool should_activate = false;
@@ -134,14 +163,14 @@ public class Wire
             else
                 target.deactivate();
         }
-
+*/
 
         // propagation of pulses
         foreach( WireChunk wc in chunks )
         {
-            if (wc.hasImpulse)
+            if (wc.hasImpulse())
             {
-                wc.propagatePulse(pulse_speed);
+                wc.propagateAll();
             }
         }
     }
@@ -152,7 +181,7 @@ public class WireChunk
     public List<Vector3Int> predecessors;
     public List<Vector3Int> successors;
     public Vector3Int coord;
-    public bool hasImpulse;
+    public List<PulseToken> pulse_bag;
     public List<ActivableObject> targets;
 
     public Wire wire;
@@ -161,10 +190,15 @@ public class WireChunk
     {
         wire = iWire;
         coord = iCoord;
-        hasImpulse = false;
+        pulse_bag = new List<PulseToken>();
         predecessors = new List<Vector3Int>();
         successors = new List<Vector3Int>();
         targets = new List<ActivableObject>();
+    }
+
+    public bool hasImpulse()
+    {
+        return (pulse_bag.Count > 0);
     }
 
     public void AddTargets( List<ActivableObject> iTargets )
@@ -177,26 +211,44 @@ public class WireChunk
         //targets.AddRange(iTargets);
     }
 
-    public void propagatePulse( int iPulseSpeed )
+    public void propagateAll()
     {
-        if ( iPulseSpeed == 0 )
+        foreach( PulseToken pt in pulse_bag)
+        {
+            propagatePulse(pt);
+        }
+
+        pulse_bag.RemoveAll( e => e.deletion_flag );
+    }
+
+    public void propagatePulse( PulseToken iPT )
+    {
+        if ( iPT.speed == 0 )
+        {
+            // Reset PT speed
+            iPT.speed = wire.pulse_speed;
+            pulse_bag.Add( iPT );
+
             return; // Stop propagation
+        }
+
 
         if ( successors.Count == 0 )
         {
-            /*foreach( ActivableObject target in targets)
+            foreach( ActivableObject target in targets)
             {
-                target.activate();
-                this.hasImpulse = false;
-            }*/
-            this.hasImpulse = false;
+                foreach( PulseToken pt in pulse_bag)
+                {
+                    target.listen(pt);
+                }
+            }
+            pulse_bag.Clear();
         } else {
             foreach ( Vector3Int succ_coord in successors )
             {
                 WireChunk wc = wire.getWChunkFromCoord(succ_coord);
-                wc.hasImpulse = true;
-                wc.propagatePulse( iPulseSpeed - 1 ); // decrement speed as we propagate
-                this.hasImpulse = false;
+                wc.propagatePulse( iPT.getPropagated() ); // decrement speed as we propagate
+                iPT.deletion_flag = true;
             }
         }
     }
