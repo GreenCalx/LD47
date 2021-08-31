@@ -99,6 +99,11 @@ public class Wire
         chunks.Add(root_chunk);
     }
 
+    public WireChunk getRootChunk()
+    {
+        return chunks[0];
+    }
+
     // TODO : I don't like the fact that we need this
     public WireChunk getWChunkFromCoord( Vector3Int iGridCoord )
     {
@@ -140,7 +145,9 @@ public class Wire
                 
             return;
         }
-        chunks[0].pulse_bag.Add( new PulseToken(pulse_speed-1) );
+
+        getRootChunk().pulse_bag.Add( new PulseToken(pulse_speed) );
+        getRootChunk().propagateAll();  
     }
 
     public void update_pulses()
@@ -266,7 +273,8 @@ public class WireChunk
             {
                 this.activated_this_cycle = target.listen(iPT);
             }
-            pulse_bag.Clear();
+            iPT.deletion_flag = true;
+            reset_color();
         } else {
             foreach ( Vector3Int succ_coord in successors )
             {
