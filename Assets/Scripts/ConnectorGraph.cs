@@ -72,7 +72,7 @@ public class Wire
     public WireTimeline TL;
     public ActivatorObject emitter;
     public int pulse_speed;
-    bool is_infinite;
+    public bool is_infinite;
     public List<WireChunk> chunks;
     public WireChunk root_chunk;
 
@@ -486,8 +486,16 @@ public class ConnectorGraph : MonoBehaviour
         foreach ( Wire w in wires )
         {
             if (w.emitter == iAO)
-                w.pulse(iState);
-        }
+            {
+                if ( iState == true )
+                    w.pulse(iState);
+                else if ( w.is_infinite )
+                {
+                    w.pulse(iState);
+                }
+                
+            }
+        }//! pulsateFrom
     }
 
 }
