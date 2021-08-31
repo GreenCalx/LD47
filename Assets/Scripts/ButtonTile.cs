@@ -23,9 +23,8 @@ public class ButtonTile : ActivatorObject
         // TODO toffa: make this work in case it is another object than player that trigger
         GameObject.Find("GameLoop").GetComponent<WorldManager>().AddListener(other.gameObject.GetComponent<PlayerController>() as ITickObserver, this);
 
-        pulsate(true);
-
-        sound_on.Play();
+        if (pulsate(true))
+            sound_on.Play();
 
         SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
         if (!!sr)
@@ -34,16 +33,19 @@ public class ButtonTile : ActivatorObject
 
     private void OnTriggerStay2D(Collider2D other)
     {
+        GameObject.Find("GameLoop").GetComponent<WorldManager>().AddListener(other.gameObject.GetComponent<PlayerController>() as ITickObserver, this);
+
         // button doesn't change
-        pulsate(true);
+        if (pulsate(true))
+            sound_on.Play();
+
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
         // we just don't send a pulse now
-        pulsate(false);
-        
-        sound_off.Play();
+        if (pulsate(false))
+            sound_off.Play();
 
         SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>();
         if (!!sr)

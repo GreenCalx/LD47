@@ -17,6 +17,7 @@ public class ActivableObject : MonoBehaviour
     // TODO : Required_PW should be equal to n_emitters in wire.
     public int required_PW;
 
+
     // Start is called before the first frame update
     public void Start()
     {

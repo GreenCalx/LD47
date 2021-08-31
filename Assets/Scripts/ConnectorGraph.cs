@@ -19,6 +19,9 @@ public class WireTimelineValue : ITimelineValue
     {
         if ( _Wire != null )
             _Wire.update_pulses();
+        
+        // Let emitters pulse again
+        _Wire.emitter.can_pulse = true;
     }
 
     void ITimelineValue.ApplyPhysics(bool Reversed)
@@ -90,9 +93,9 @@ public class Wire
         TL.SetWire(this);
     }
 
-    public void addRootChunk(Vector3Int iRootPosition)
+    public void addRootChunk(Vector3Int iRootPosition, ConnectorGraph iCG)
     {
-        root_chunk = new WireChunk(iRootPosition, this);
+        root_chunk = new WireChunk(iRootPosition, this, iCG);
         chunks.Add(root_chunk);
     }
 
@@ -193,10 +196,10 @@ public class WireChunk
 
     public bool activated_this_cycle;
 
-
+    public ConnectorGraph connectorGraph;
     public Wire wire;
 
-    public WireChunk( Vector3Int iCoord, Wire iWire )
+    public WireChunk( Vector3Int iCoord, Wire iWire, ConnectorGraph iCG )
     {
         wire = iWire;
         coord = iCoord;
@@ -205,6 +208,20 @@ public class WireChunk
         successors = new List<Vector3Int>();
         targets = new List<ActivableObject>();
         activated_this_cycle = false;
+
+        connectorGraph = iCG;
+        connectorGraph.TL.SetTileFlags( coord, TileFlags.None );
+
+    }
+
+    public void pulse_color()
+    {
+        connectorGraph.TL.SetColor( coord, Color.yellow );
+    }
+
+    public void reset_color()
+    {
+        connectorGraph.TL.SetColor( coord, Color.white );
     }
 
     public bool hasImpulse()
@@ -239,7 +256,7 @@ public class WireChunk
             // Reset PT speed
             iPT.speed = wire.pulse_speed;
             pulse_bag.Add( iPT );
-
+            pulse_color();
             return; // Stop propagation
         }
 
@@ -256,6 +273,7 @@ public class WireChunk
                 WireChunk wc = wire.getWChunkFromCoord(succ_coord);
                 wc.propagatePulse( iPT.getPropagated() ); // decrement speed as we propagate
                 iPT.deletion_flag = true;
+                reset_color();
             }
         }
     }
@@ -270,7 +288,7 @@ public class ConnectorGraph : MonoBehaviour
     { return paths; }
 
     private GridLayout GL;
-    private Tilemap TL;
+    public Tilemap TL;
 
     // Start is called before the first frame update
     void Start()
@@ -289,15 +307,6 @@ public class ConnectorGraph : MonoBehaviour
         
     }
 
-    public void update_wires()
-    {
-        foreach ( Wire w in wires )
-        {
-            w.update_pulses();
-        }
-    }
-
-
 
     void BuildGraph()
     {
@@ -315,10 +324,11 @@ public class ConnectorGraph : MonoBehaviour
 
             // 1.1 Update wires with root
             Wire wire = new Wire(ao);
-            wire.addRootChunk(start_pos);
+            wire.addRootChunk(start_pos, this);
 
             // Add Wire
             wires.Add(wire);
+
 
             // Build path for curr wire
             for( int i = 0; i < wires.Count ; i++)
@@ -351,7 +361,7 @@ public class ConnectorGraph : MonoBehaviour
                     continue;
                 }
                 iChunkToExpand.successors.Add(neighbor);
-                WireChunk new_chunk = new WireChunk( neighbor, ioCurrWire );
+                WireChunk new_chunk = new WireChunk( neighbor, ioCurrWire, this );
                 new_chunk.predecessors.Add(iChunkToExpand.coord);
                 ioCurrWire.chunks.Add(new_chunk);
             }

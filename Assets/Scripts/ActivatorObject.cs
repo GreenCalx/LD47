@@ -12,17 +12,14 @@ public class ActivatorObject : TickBased
     public int pulse_speed = 2; // 99/(0..-inf) = Infinite ; 1 = 1 tile/tick ; n = n tiles / tick
     public bool is_active = false;
 
-/*    
-    public override void OnTick()
-    {
-        CG.update_wires();
-    }
-*/
+    // Only one time per tick
+    public bool can_pulse;
 
     // Start is called before the first frame update
     protected virtual void Start()
     {
         is_active = false;
+        can_pulse = true;
     }
     
 
@@ -32,9 +29,15 @@ public class ActivatorObject : TickBased
         
     }
 
-    public void pulsate(bool iState) // 0 for no pulse , 1 for pulse
+    public bool pulsate(bool iState) // 0 for no pulse , 1 for pulse
     {
-        CG.pulsateFrom(this, iState);
+        if (can_pulse)
+        {
+            CG.pulsateFrom(this, iState);
+            can_pulse = false;
+            return true;
+        }
+        return false;
     }
 
     public void subscribeToGraph( ConnectorGraph iCG)
