@@ -347,6 +347,12 @@ public class ConnectorGraph : MonoBehaviour
 
         }//! fe
 
+        // 4. Try to merge wires ( common sections e.g. 2 emitters fo 1 activator )
+        //  SI W1.chunks ∩ W2.chunks != {}
+        //     ET W1.SIGNAL_TYPE == W2.SIGNAL_TYPE
+        //  ALORS W3 = W1 U W2 
+        //  PUIS delete W1, W2
+
         // 4. TODO : Junctions with Activator and Activable with Wire
         
     }

@@ -454,7 +454,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   level_to_load: 0
   stage_to_load: 2
-  stage_to_load_GO: {fileID: 1440420890956295060, guid: 392a5383af585d24da505277cb0d702b,
+  stage_to_load_GO: {fileID: 1440420890956295060, guid: 3c45285b46ae523488a211db9b44312c,
     type: 3}
   id: 0
   isStartingStage: 0
@@ -639,7 +639,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   level_to_load: 0
   stage_to_load: 5
-  stage_to_load_GO: {fileID: 4566795273740453812, guid: 4bcec492fc0528e43a132d5752abe7a5,
+  stage_to_load_GO: {fileID: 4566795273740453812, guid: 2424d41fc7f299f44a95d61fa751da9a,
     type: 3}
   id: 0
   isStartingStage: 0
@@ -985,7 +985,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   level_to_load: 0
   stage_to_load: 3
-  stage_to_load_GO: {fileID: 4618151503289873335, guid: d51a152d36fbce449876f28c67ce57fd,
+  stage_to_load_GO: {fileID: 4618151503289873335, guid: 896216a3b5f0e8f4597b8a7122614f8b,
     type: 3}
   id: 0
   isStartingStage: 0
@@ -1251,7 +1251,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   level_to_load: 0
   stage_to_load: 6
-  stage_to_load_GO: {fileID: 155406872727683043, guid: f956cdbebf55af8428c148d7e0c45c7f,
+  stage_to_load_GO: {fileID: 155406872727683043, guid: 19b98c5356601f047b21ef26466413df,
     type: 3}
   id: 0
   isStartingStage: 0
@@ -13381,7 +13381,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   level_to_load: 0
   stage_to_load: 4
-  stage_to_load_GO: {fileID: 6413457596378718504, guid: d544bb6959c6acb4fb8fe5915e8e320a,
+  stage_to_load_GO: {fileID: 6413457596378718504, guid: f18921f09a0b6314faa8ad3543dcbfb2,
     type: 3}
   id: 0
   isStartingStage: 0
@@ -13600,7 +13600,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   level_to_load: 0
   stage_to_load: 7
-  stage_to_load_GO: {fileID: 4624623945710013485, guid: 3597e0cb269127a4487acbf7a4c6c4ef,
+  stage_to_load_GO: {fileID: 4624623945710013485, guid: d40df887e72805f4e8013cf336126532,
     type: 3}
   id: 0
   isStartingStage: 0
