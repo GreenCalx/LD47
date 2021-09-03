@@ -10,6 +10,12 @@ using UnityEngine.Tilemaps;
 *   retrieve curr loaded connector graph from stage_selector => stage => get_connector_graph() and call update_wires()
 */
 
+[System.Serializable]
+public enum SIGNAL_KEYS
+{
+    NONE, BLUE, RED, YELLOW
+}
+
 public class WireTimelineValue : ITimelineValue
 {
     public Wire _Wire;
@@ -69,6 +75,7 @@ public class Wire
         PULSE
     }
 
+    public SIGNAL_KEYS sig_key;
     public WireTimeline TL;
     public ActivatorObject emitter;
     public int pulse_speed;
@@ -76,7 +83,7 @@ public class Wire
     public List<WireChunk> chunks;
     public WireChunk root_chunk;
 
-    public Wire(ActivatorObject iEmitter)
+    public Wire(ActivatorObject iEmitter, SIGNAL_KEYS iSigType)
     {
         chunks = new List<WireChunk>(1);
 
@@ -86,12 +93,16 @@ public class Wire
             emitter = null;
         }
         emitter = iEmitter;
+        sig_key = iEmitter.signalKey;
         pulse_speed = emitter.pulse_speed;
         root_chunk = null;
         is_infinite = ( pulse_speed <= 0 ) ? true : false ;
         TL = new WireTimeline( 0, 0);
         TL.SetWire(this);
     }
+
+    public Wire (ActivatorObject iEmitter) : this( iEmitter, SIGNAL_KEYS.NONE)
+    {}
 
     public void addRootChunk(Vector3Int iRootPosition, ConnectorGraph iCG)
     {
@@ -240,6 +251,11 @@ public class WireChunk
     {
         foreach ( ActivableObject ao in iTargets )
         {
+            if ((ao.sig_key != SIGNAL_KEYS.NONE ) && ( ao.sig_key != wire.sig_key ))
+            {
+                Debug.LogWarning("Mismatch between activator and activable signal type.");
+                continue;
+            }
             if ( !targets.Contains(ao) )
                 targets.Add(ao);
         }
@@ -331,12 +347,11 @@ public class ConnectorGraph : MonoBehaviour
             List<Vector3Int> neighbors = findNeighbors(start_pos);
 
             // 1.1 Update wires with root
-            Wire wire = new Wire(ao);
+            Wire wire = new Wire(ao, ao.signalKey);
             wire.addRootChunk(start_pos, this);
 
             // Add Wire
             wires.Add(wire);
-
 
             // Build path for curr wire
             for( int i = 0; i < wires.Count ; i++)

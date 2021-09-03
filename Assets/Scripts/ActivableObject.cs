@@ -3,15 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-[System.Serializable]
-public enum SIGNAL_KEYS
-{
-    NONE, BLUE, RED, YELLOW
-}
-
 public class ActivableObject : MonoBehaviour
 {
-    public SIGNAL_KEYS key;
+    public SIGNAL_KEYS sig_key;
     public bool isTriggered     = false;
     
     // TODO : Required_PW should be equal to n_emitters in wire.
