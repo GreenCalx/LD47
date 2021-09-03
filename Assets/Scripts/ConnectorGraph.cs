@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+using System.Linq; // Intersect, Union on Lists
+
 /**
 * ATTACH THIS COMPONENT TO CONNECTION LAYER OF THE STAGE MAP
 * 
@@ -367,9 +369,48 @@ public class ConnectorGraph : MonoBehaviour
         //     ET W1.SIGNAL_TYPE == W2.SIGNAL_TYPE
         //  ALORS W3 = W1 U W2 
         //  PUIS delete W1, W2
+        bool merge_occured = false;
+        for ( int i=0; i < wires.Count ; i++ )
+        {
+            Wire w1 = wires[i];
+            for (int j=i+1; j < wires.Count; j++)
+            {
+                Wire w2 = wires[j];
+                Wire merged_w = null;
+                if ( tryMergeWires( w1, w2, ref merged_w) )
+                {
+                    merge_occured = true;
+                    
+                    wires.Remove(w1);
+                    wires.Remove(w2);
+                    wires.Insert(0, merged_w);
+
+                    break;
+                }
+            } // !for j wire
+
+            if ( merge_occured )
+            { // reset main loop to try to merge with other wires as well.
+                i = 0;
+                merge_occured = false;
+            }
+        } // !for i wire
 
         // 4. TODO : Junctions with Activator and Activable with Wire
         
+    }
+
+    public bool tryMergeWires ( Wire iW1, Wire iW2, ref Wire oW3 )
+    {
+        Debug.Log("tryMergeWires");
+        List<WireChunk> res = iW1.chunks.Intersect( iW2.chunks ).ToList();
+        if ( res.Count > 0 )
+        {
+            foreach( WireChunk wc in res)
+            { Debug.Log(wc.coord); }
+        }
+
+        return false;
     }
 
     void findPath( ref Wire ioCurrWire, WireChunk iChunkToExpand )
