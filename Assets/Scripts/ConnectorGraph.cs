@@ -128,6 +128,22 @@ public class Wire
         return null;
     }
 
+    public void delete_chunk( WireChunk iChunk )
+    {
+        foreach( Vector3Int succ in iChunk.successors )
+        { 
+            WireChunk wc_succ = getWChunkFromCoord(succ);
+            wc_succ.predecessors.Remove(iChunk.coord); 
+        }
+        foreach( Vector3Int pred in iChunk.predecessors )
+        { 
+            WireChunk wc_pred = getWChunkFromCoord(pred);
+            wc_pred.successors.Remove(iChunk.coord); 
+        }
+
+        chunks.Remove(iChunk);
+    }
+
     public List<ActivableObject> getWireTargets()
     {
         List<ActivableObject> retval = new List<ActivableObject>();
@@ -314,6 +330,7 @@ public class ConnectorGraph : MonoBehaviour
     { return paths; }
 
     private GridLayout GL;
+    [HideInInspector]
     public Tilemap TL;
 
     // Start is called before the first frame update
@@ -360,7 +377,8 @@ public class ConnectorGraph : MonoBehaviour
             {
                 findPath( ref wire, wire.root_chunk );
             }
-                        
+
+            //cut_dead_branches(ref wire);
 
         }//! fe
 
@@ -369,6 +387,7 @@ public class ConnectorGraph : MonoBehaviour
         //     ET W1.SIGNAL_TYPE == W2.SIGNAL_TYPE
         //  ALORS W3 = W1 U W2 
         //  PUIS delete W1, W2
+        /*
         bool merge_occured = false;
         for ( int i=0; i < wires.Count ; i++ )
         {
@@ -395,9 +414,49 @@ public class ConnectorGraph : MonoBehaviour
                 merge_occured = false;
             }
         } // !for i wire
+        */
 
         // 4. TODO : Junctions with Activator and Activable with Wire
         
+    }
+
+    public void cut_dead_branches( ref Wire ioWire )
+    {
+        List<WireChunk> to_cut = new List<WireChunk>();
+        foreach( WireChunk wc in ioWire.chunks )
+        {
+            if( (wc.successors.Count == 0) && (wc.targets.Count == 0) )
+            {
+                // Dead branch
+                WireChunk cut_wc = wc;
+                int n_pred = cut_wc.predecessors.Count;
+                int n_succ = cut_wc.successors.Count;
+                int n_neighbors = n_pred + n_succ;
+                to_cut.Add(cut_wc);
+                while ( n_pred == 1 ) // dangerous?
+                {
+                    WireChunk predec = ioWire.getWChunkFromCoord(cut_wc.predecessors[0]);
+                    n_pred = predec.predecessors.Count;
+                    n_succ = predec.successors.Count;
+                    n_neighbors = n_pred + n_succ;
+                    if (n_neighbors > 2)
+                        break;
+
+                    to_cut.Add(predec);
+                    cut_wc = predec;
+                } //!while
+                // got out of while if >1 precessor (junc) or solo (0 p)
+                // thus we add this last WC to cut and we'll remove links to it afterwards
+                to_cut.Add(cut_wc);
+            }
+        }//! for wc
+
+        // Actual cut
+        foreach( WireChunk wc_to_cut in to_cut )
+        {
+            ioWire.delete_chunk(wc_to_cut);
+        }
+
     }
 
     public bool tryMergeWires ( Wire iW1, Wire iW2, ref Wire oW3 )

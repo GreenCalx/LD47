@@ -31,7 +31,7 @@ public class ActivatorObject : TickBased
 
     public bool pulsate(bool iState) // 0 for no pulse , 1 for pulse
     {
-        if (can_pulse)
+        if (can_pulse && (CG!=null))
         {
             CG.pulsateFrom(this, iState);
             can_pulse = false;
