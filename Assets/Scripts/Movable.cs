@@ -6,6 +6,92 @@ using System.Security.AccessControl;
 using System.Threading;
 using UnityEngine;
 
+public class MoveValue : TransientTickValue
+{
+    public MoveValue(Movable m, PlayerController.Direction d) {
+        _go = m;
+        _dir = d;
+    }
+    public Movable _go;
+    public PlayerController.Direction _dir = PlayerController.Direction.NONE;
+
+    public override void OnFixedTick() {
+        _go?.UpdatePosition(PlayerController.Directionf[(int)_dir]);
+    }
+    public override void OnFixedBackTick() { _go?.UpdatePosition(PlayerController.Directionf[(int)(PlayerController.InverseDirection(_dir))]); }
+}
+
+public class PlayerMoveValue : FixedTickValue
+{
+    WorldManager WM;
+    public void FindWM()
+    {
+        WM=GameObject.Find("GameLoop").GetComponent<WorldManager>();
+    }
+
+    public PlayerMoveValue(Movable m, PlayerController.Direction d)
+    {
+        _go = m;
+        _dir = d;
+    }
+    Movable _go;
+    PlayerController.Direction _dir = PlayerController.Direction.NONE;
+
+    public override void OnFixedTick() {
+        if (!WM) FindWM();
+        if (WM.TL.Mode == InputManager.Mode.REPLAY)
+        {
+            base.OnFixedTick();
+        }
+        if (WM.TL.Mode == InputManager.Mode.RECORD)
+        {
+            _go?.Move(_dir, true, true, this);
+        }
+    }
+}
+
+public class TransientTickValue : TickBased
+{
+}
+
+public class FixedTickValue : TickBasedAndClock
+{
+}
+
+public class CollisionManagerValue : FixedTickValue
+{
+    PlayerController PC;
+    WorldManager WM;
+    public CollisionManagerValue(WorldManager WM, PlayerController PC) { this.PC = PC; this.WM = WM; }
+    public override void OnFixedTick()
+    {
+        foreach(var P in WM.Mdl.Players)
+        {
+            if (P != PC)
+            {
+                Physics2D.IgnoreCollision(P.GetComponent<BoxCollider2D>(), PC.GetComponent<BoxCollider2D>(), false);
+            }
+            else break;
+        }
+    }
+
+    public override void OnFixedBackTick()
+    {
+        foreach(var P in WM.Mdl.Players)
+        {
+            if (P != PC)
+            {
+                Physics2D.IgnoreCollision(P.GetComponent<BoxCollider2D>(), PC.GetComponent<BoxCollider2D>(), true);
+            }
+            else break; 
+        }
+    }
+}
+
+public class BreakValue : FixedTickValue
+{
+}
+
 public class Movable : MonoBehaviour
 {
     static public float AnimationTime = 1.0f;
@@ -32,10 +118,10 @@ public class Movable : MonoBehaviour
     public bool BumpAnimation = false;
 
     public enum MoveResult { CanMove, CannotMove, IsAnimating }
-    public MoveResult Move(PlayerController.Direction D, bool ApplyPhysicsBetweenPlayers = true)
+    public MoveResult Move(PlayerController.Direction D, bool ApplyPhysicsBetweenPlayers = true, bool RecordEvent = true, FixedTickValue MoveValue = null)
     {
         if (Freeze) return MoveResult.CannotMove;
-        if (!CanMove()) return MoveResult.IsAnimating; 
+        //if (!CanMove()) return MoveResult.IsAnimating; 
 
         MoveResult NeedToBeMoved = MoveResult.CannotMove;
 
@@ -47,7 +133,7 @@ public class Movable : MonoBehaviour
             RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position + (0.6f * Dir3), Dir3, 0.5f, wallmask);
             if (hits.Length != 0)
             {
-                UpdatePositionBump(Direction, D);
+                UpdatePositionBump(Direction);
                 return MoveResult.CannotMove;
             }
             // MOVABLE HITS
@@ -78,7 +164,7 @@ public class Movable : MonoBehaviour
                             var mePC = GetComponent<PlayerController>();
                             if (Mov)
                             {
-                                if (PC && mePC && !(PC.IM.CurrentMode == InputManager.Mode.RECORD))
+                                if (PC && mePC)
                                 {
                                     if (Physics2D.GetIgnoreCollision(mePC.GetComponent<BoxCollider2D>(), PC.GetComponent<BoxCollider2D>()))
                                     {
@@ -86,30 +172,29 @@ public class Movable : MonoBehaviour
                                     }
                                     else
                                     {
-                                        NeedToBeMoved = Mov.Move(D);
+                                        NeedToBeMoved = Mov.Move(D, true, true, MoveValue);
                                     }
-                                }
-                                else
-                                {
-                                    NeedToBeMoved = Mov.Move(D);
                                 }
                             }
                         }
                     }
                 }
             }
-            if (NeedToBeMoved == MoveResult.CanMove) UpdatePosition(Direction, D);
+            if (NeedToBeMoved == MoveResult.CanMove) {
+                UpdatePosition(Direction);
+                if (RecordEvent && MoveValue != null) MoveValue.AddObserver(new MoveValue(this, D));
+            }
 
             if (D != PlayerController.Direction.NONE && NeedToBeMoved == MoveResult.CannotMove)
             {
                 // Do a bump into wall animation
-                UpdatePositionBump(Direction, D);
+                UpdatePositionBump(Direction);
             }
         }
         return NeedToBeMoved;
     }
 
-    void UpdatePositionBump(Vector2 Direction, PlayerController.Direction D)
+    void UpdatePositionBump(Vector2 Direction)
     {
         LastPosition = this.gameObject.transform.position;
         NewPosition = LastPosition + new Vector2(Direction.x,Direction.y);
@@ -119,7 +204,7 @@ public class Movable : MonoBehaviour
         BumpAnimation = true;
    }
 
-    void UpdatePosition(Vector2 Direction, PlayerController.Direction D)
+    public void UpdatePosition(Vector2 Direction)
     {
         LastPosition = this.gameObject.transform.position;
 

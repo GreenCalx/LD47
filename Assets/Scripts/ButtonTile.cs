@@ -15,8 +15,10 @@ public class ButtonTile : ActivatorObject
     private void OnTriggerEnter2D(Collider2D other)
     {
         // register object to get called on tick
-        // TODO toffa: make this work in case it is another object than player that trigger
-        GameObject.Find("GameLoop").GetComponent<WorldManager>().AddListener(other.gameObject.GetComponent<PlayerController>() as ITickObserver, this);
+        // NOTE toffa : for now we will update the wire at the beginning of the tick
+        var WireValue = new TempWireValue();
+        WireValue.Obj = this;
+        GameObject.Find("GameLoop").GetComponent<WorldManager>().TL.AddObserver(WireValue);
 
         if (pulsate(true))
             sound_on.Play();
@@ -28,11 +30,9 @@ public class ButtonTile : ActivatorObject
 
     private void OnTriggerStay2D(Collider2D other)
     {
-        GameObject.Find("GameLoop").GetComponent<WorldManager>().AddListener(other.gameObject.GetComponent<PlayerController>() as ITickObserver, this);
-
         // button doesn't change
-        if (pulsate(true))
-            sound_on.Play();
+        //if (pulsate(true))
+        //    sound_on.Play();
     }
 
     private void OnTriggerExit2D(Collider2D other)

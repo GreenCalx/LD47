@@ -79,12 +79,12 @@ public class InputManager : MonoBehaviour
         Entry.Add("Cancel");
         Entry.Add("Submit");
 
-        if(Saver) Entry = Saver.Tick(Entry);
+       // if(Saver) Entry = Saver.Tick(Entry);
 
-        Entry.isDpadDownPressed = Entry.Inputs["DPad_Vertical"].AxisValue == 1 && _LastDpadAxisVertical != 1;
-        Entry.isDpadUpPressed = Entry.Inputs["DPad_Vertical"].AxisValue == -1 && _LastDpadAxisVertical != -1;
-        Entry.isDpadLeftPressed = Entry.Inputs["DPad_Horizontal"].AxisValue == 1 && _LastDpadAxisHorizontal != 1;
-        Entry.isDpadRightPressed = Entry.Inputs["DPad_Horizontal"].AxisValue == -1 && _LastDpadAxisHorizontal != -1;
+       // Entry.isDpadDownPressed = Entry.Inputs["DPad_Vertical"].AxisValue == 1 && _LastDpadAxisVertical != 1;
+       // Entry.isDpadUpPressed = Entry.Inputs["DPad_Vertical"].AxisValue == -1 && _LastDpadAxisVertical != -1;
+       // Entry.isDpadLeftPressed = Entry.Inputs["DPad_Horizontal"].AxisValue == 1 && _LastDpadAxisHorizontal != 1;
+       // Entry.isDpadRightPressed = Entry.Inputs["DPad_Horizontal"].AxisValue == -1 && _LastDpadAxisHorizontal != -1;
 
         _LastDpadAxisHorizontal = Entry.Inputs["DPad_Horizontal"].AxisValue;
         _LastDpadAxisVertical = Entry.Inputs["DPad_Vertical"].AxisValue;

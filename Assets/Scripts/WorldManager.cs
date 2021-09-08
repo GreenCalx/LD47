@@ -21,54 +21,294 @@ static class Constants {
 
 public interface ITickController
 {
-    void Tick();
-    void AddListener(int Index, ITickObserver Listener); 
+    bool CanTick();
+    bool CanFixedTick();
+    bool NeedFixedTick();
+    bool Tick();
+    bool FixedTick();
+    bool BackTick();
+    bool FixedBackTick();
+    void AddObserver(ITickObserver Obs);
+    void AddObserver(int Index, ITickObserver Obs);
+    void RemoveObserver(ITickObserver Obs);
+    void RemoveAllObservers();
+    List<ITickObserver> GetObservers();
 }
 
 public interface ITickObserver
 {
+    void OnBackTick();
+    void OnFixedBackTick();
     void OnTick();
+    void OnFixedTick();
     void SetControler(ITickController Controler);
 }
 
-public class TickClock : MonoBehaviour, ITickController {
+public class TickClock : ITickController
+{
     public List<ITickObserver> _Listeners = new List<ITickObserver>();
-    public void AddListener(int Index, ITickObserver Listener) {
+    public List<ITickObserver> GetObservers()
+    {
+        return _Listeners;
+    }
+    // this bool is there to be able to avoid multiple tick without their
+    // fixedupdate counterpart if needed
+    // as of now this is the default behavior but might not be necessary
+    public bool IsSyncWithFixedUpdate = true;
+    private bool _NeedFixedTick = false;
+    private bool _SyncMutex = false;
+    public void RemoveAllObservers()
+    {
+        for ( int i = _Listeners.Count -1; i >= 0; --i)
+        {
+            if ((_Listeners[i] as BackTickSentinelValue) == null)
+            {
+                _Listeners.RemoveAt(i);
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+    public bool NeedFixedTick()
+    {
+        return _NeedFixedTick;
+    }
+    public virtual bool CanTick()
+    {
+        if (IsSyncWithFixedUpdate && _SyncMutex) return false;
+        else return true;
+    }
+    public virtual bool CanFixedTick()
+    {
+        return true;
+    }
+    public void AddObserver(int Index, ITickObserver Listener)
+    {
         // TODO(toffa): add all necessary checks
         if (_Listeners.Find((ITickObserver obj) => Listener == obj) != null) return;
         if (Index >= _Listeners.Count - 1)
         {
-            AddListener(Listener);
+            AddObserver(Listener);
             return;
         }
         Listener.SetControler(this);
         _Listeners.Insert(Index, Listener);
     }
-    public void AddListener(ITickObserver Listener) {
+    public void AddObserver(ITickObserver Listener)
+    {
         // TODO(toffa): add all necessary checks
         if (_Listeners.Find((ITickObserver obj) => Listener == obj) != null) return;
         Listener.SetControler(this);
         _Listeners.Add(Listener);
     }
-    public void AddListener(ITickObserver Index, ITickObserver Listener)
+    public void AddObserver(ITickObserver Index, ITickObserver Listener)
     {
-       AddListener( _Listeners.FindIndex((ITickObserver obj) => obj == Index), Listener);
+        AddObserver(_Listeners.FindIndex((ITickObserver obj) => obj == Index), Listener);
+    }
+    public void RemoveObserver(ITickObserver Obs)
+    {
+        _Listeners.Remove(Obs);
     }
 
-    public virtual void Tick() { }
+    public virtual bool Tick()
+    {
+        if (!CanTick()) return false;
+
+        _SyncMutex = true;
+        _NeedFixedTick = true;
+
+        foreach (var Obs in _Listeners) Obs.OnTick();
+
+        return true;
+    }
+    public virtual bool FixedTick()
+    {
+        if (!CanFixedTick()) return false;
+        _SyncMutex = false;
+        _NeedFixedTick = false;
+        for (int i = 0; i < _Listeners.Count; ++i)
+        {
+            var Obs = _Listeners[i];
+            Obs.OnFixedTick();
+            Physics2D.SyncTransforms();
+        }
+        return true;
+    }
+    public virtual bool BackTick()
+    {
+        if (!CanTick()) return false;
+
+        _SyncMutex = true;
+        _NeedFixedTick = true;
+        foreach (var Obs in _Listeners) Obs.OnBackTick();
+        return true;
+    }
+    public virtual bool FixedBackTick()
+    {
+        if (!CanFixedTick()) return false;
+
+        _SyncMutex = false;
+        _NeedFixedTick = false;
+        foreach (var Obs in _Listeners)
+        {
+            Obs.OnFixedBackTick();
+            Physics2D.SyncTransforms();
+        }
+        return true;
+    }
 }
 
-public class TickBased : MonoBehaviour, ITickObserver { 
-    private ITickController _Controler;
+public class TickClockBehaviour : MonoBehaviour, ITickController {
+    public List<ITickObserver> _Listeners = new List<ITickObserver>();
+    public List<ITickObserver> GetObservers()
+    {
+        return _Listeners;
+    }
+    // this bool is there to be able to avoid multiple tick without their
+    // fixedupdate counterpart if needed
+    // as of now this is the default behavior but might not be necessary
+    public bool IsSyncWithFixedUpdate = true;
+    private bool _NeedFixedTick = false;
+    private bool _SyncMutex = false;
+
+    public void RemoveAllObservers()
+    {
+        _Listeners.Clear();
+    }
+
+    public bool NeedFixedTick()
+    {
+        return _NeedFixedTick;
+    }
+    public virtual bool CanTick()
+    {
+        if (IsSyncWithFixedUpdate && _SyncMutex) return false;
+        else return true;
+    }
+
+    public virtual bool CanFixedTick()
+    {
+        return true;
+    }
+
+    public void AddObserver(int Index, ITickObserver Listener) {
+        // TODO(toffa): add all necessary checks
+        if (_Listeners.Find((ITickObserver obj) => Listener == obj) != null) return;
+        if (Index >= _Listeners.Count - 1)
+        {
+            AddObserver(Listener);
+            return;
+        }
+        Listener.SetControler(this);
+        _Listeners.Insert(Index, Listener);
+    }
+    public void AddObserver(ITickObserver Listener) {
+        // TODO(toffa): add all necessary checks
+        if (_Listeners.Find((ITickObserver obj) => Listener == obj) != null) return;
+        Listener.SetControler(this);
+        _Listeners.Add(Listener);
+    }
+    public void AddObserver(ITickObserver Index, ITickObserver Listener)
+    {
+       AddObserver( _Listeners.FindIndex((ITickObserver obj) => obj == Index), Listener);
+    }
+    public void RemoveObserver(ITickObserver Obs)
+    {
+        _Listeners.Remove(Obs);
+    }
+
+    public virtual bool Tick() {
+        if (!CanTick()) return false;
+        _SyncMutex = true;
+        _NeedFixedTick = true;
+
+        foreach (var Obs in _Listeners) Obs.OnTick();
+        return true;
+    }
+
+    public virtual bool FixedTick() {
+        if (!CanFixedTick()) return false;
+        _SyncMutex = false;
+        _NeedFixedTick = false;
+        foreach (var Obs in _Listeners)
+        {
+            Obs.OnFixedTick();
+            Physics2D.SyncTransforms();
+        }
+         return true;
+    }
+
+    public virtual bool BackTick() {
+        if (!CanTick()) return false;
+
+        _SyncMutex = true;
+        _NeedFixedTick = true;
+        foreach (var Obs in _Listeners) Obs.OnBackTick();
+        return true;
+    }
+
+    public virtual bool FixedBackTick() {
+        if (!CanFixedTick()) return false;
+
+        _SyncMutex = false;
+        _NeedFixedTick = false;
+        foreach (var Obs in _Listeners)
+        {
+            Obs.OnFixedBackTick();
+            Physics2D.SyncTransforms();
+        }
+        return true;
+    }
+
+}
+
+public class TickBasedBehaviour : MonoBehaviour, ITickObserver { 
+    protected ITickController _Controler;
     public void SetControler(ITickController Controler)
     {
         _Controler = Controler;
     }
 
     public virtual void OnTick() { }
+    public virtual void OnFixedTick() { }
+    public virtual void OnBackTick() { }
+    public virtual void OnFixedBackTick() { }
 }
 
-public class WorldManager : TickClock, IControllable, ISavable {
+
+public class TickBased : ITickObserver { 
+    protected ITickController _Controler;
+    public void SetControler(ITickController Controler)
+    {
+        _Controler = Controler;
+    }
+
+    public virtual void OnTick() { }
+    public virtual void OnFixedTick() { }
+    public virtual void OnBackTick() { }
+    public virtual void OnFixedBackTick() { }
+}
+
+public class TickBasedAndClock : TickClock, ITickObserver
+{
+    protected ITickController _Controler;
+    public void SetControler(ITickController Controler)
+    {
+        _Controler = Controler;
+    }
+
+    public virtual void OnTick() { Tick(); }
+    public virtual void OnFixedTick() { FixedTick(); }
+    public virtual void OnBackTick() { BackTick(); }
+    public virtual void OnFixedBackTick() { FixedBackTick(); }
+}
+
+public class BackTickSentinelValue : FixedTickValue{
+}
+
+public class WorldManager : TickClockBehaviour, IControllable, ISavable {
     // Save boilerplate
     public WorldManager()
     {
@@ -105,8 +345,10 @@ public class WorldManager : TickClock, IControllable, ISavable {
     public InputManager IM;
     public MasterMixerControl MixerControl;
 
-    public PlayerTimeline TL = new PlayerTimeline(0);
-    public bool needTick = false;
+    // NOTE toffa : this is the general timeline that is used to dispatch to every other observer the tick
+    // basically the only obs of the WorldTick. On each value there zill be a list of events that happened during the tick
+    // and this will be used to rewind
+    public GeneralTimeline TL = GeneralTimeline.Create(25);
     /// <summary>
     /// Add a new player to the list of current players in the wolrld.
     /// The list will remain sorted.
@@ -130,7 +372,6 @@ public class WorldManager : TickClock, IControllable, ISavable {
         // Create the new timeline. It will not be done the first time as it will be null
         // copy previous player variables inside new one
         if (Mdl.Players.Count != 0) {
-            TL = TL?.GetNestedTimeline();
             NewPlayer.GetComponent<Movable>().StartPosition = PreviousPlayer.GetComponent<Movable>().StartPosition;
             // For now new players are randomly colored
             var SpriteRender = NewPlayer.GetComponentInChildren<SpriteRenderer>();
@@ -141,20 +382,61 @@ public class WorldManager : TickClock, IControllable, ISavable {
                 // then we uodate every other player color to be darker
                 for (int i = 0; i < Mdl.Players.Count - 1; ++i) { Mdl.Players[i].GetComponentInChildren<SpriteRenderer>().color *= 0.7f; }
             }
-        } 
-        NewPlayer.Mdl.TL = TL;
-        TL.SetPlayer(NewPlayer);
+        }
+
+        NewPlayer.Mdl.TL = (GetCurrentPlayer() != null) ? GetCurrentPlayer()?.Mdl.TL?.GetNestedTimeline() : PlayerTimeline.Create(0);
+        // NOTE toffa : the player timeline is obsed by the player. When the playertimeline receive a tick it will dispatch
+        // to the player controller if we are in record mode to make the player move. Each event happening will then be
+        // recorded in this.TL
+        NewPlayer.Mdl.TL.AddObserver(NewPlayer);
+
         Mdl.Players.Add(NewPlayer);
-        AddListener(GetCurrentPlayer() as ITickObserver);
+        TL.AddObserver(NewPlayer);
+
+
+        // Add Recording of this player value as moveValue in our timeline
+        for (int i = 0; i < 25; ++i)
+        {
+            if (i <= TL.GetCursorIndex())
+            {
+                var TLValue = TL.GetCursorValue(i);
+                foreach(var V in TLValue.GetObservers())
+                {
+                    var TransientObs = (V as PlayerMoveValue)?.GetObservers();
+                    for (int j = 0; j < TransientObs?.Count; ++j)
+                    {
+                        if ( (TransientObs[j] as MoveValue)._go.gameObject == PreviousPlayer.gameObject)
+                        {
+                            (V as PlayerMoveValue).AddObserver(new MoveValue(NewPlayer.GetComponent<Movable>(), (TransientObs[j] as MoveValue)._dir));
+                        }
+                    }
+                }
+
+                var PreviousPlayerMove = (PreviousPlayer.Mdl.TL.GetCursorValue(i) as PlayerTimelineValue);
+                var NewPlayerMove = new PlayerMoveValue(NewPlayer.GetComponent<Movable>(), PreviousPlayerMove.GetValue());
+
+                TLValue?.AddObserver(NewPlayerMove);
+            }
+            else
+                TL.GetCursorValue(i)?.AddObserver(new BackTickSentinelValue());
+        }
+        // IMPORTANT toffa this has to be at the end of the event list, it is used to avoid to ba able to tick back further than this index in record mode
+        TL.GetCursorValue(TL.GetCursorIndex())?.AddObserver(new BreakValue());
+        TL.GetCursorValue(TL.GetCursorIndex() + 1)?.AddObserver(new CollisionManagerValue(this, NewPlayer));
+
         return NewPlayer;
     }
     // Start is called before the first frame update
     void Start()
     {
+        AddObserver(TL);
+
         var GO = AddPlayer( StartTile.transform.position );
         var PC = GO.GetComponent<PlayerController>();
         IM.Attach(PC);
         IM.Attach(this);
+
+        TL.Mode = IM.CurrentMode;
 
         // NOTE(Toffa): We dont need to start the animation as we want to start white
         //CurrentCamera?.GetComponent<PostFXRenderer>().StartAnimation(GO.transform.position);
@@ -176,43 +458,14 @@ public class WorldManager : TickClock, IControllable, ISavable {
         GameObject stage_selec_go = GameObject.Find("stage_selector");
         CurrentStageSelector = stage_selec_go.GetComponent<StageSelector>();
     }
-
-    public override void Tick()
-    {
-        needTick = true;
-        UpdateTimelines();
-    }
-
+    
     void FixedUpdate()
     {
-        if (!needTick) return;
-
-        FixedUpdateTimelines();
-#if false
-        if (!Mdl.IsGoingBackward)
+        if (NeedFixedTick())
         {
-            foreach (ITickObserver Obs in _Listeners)
-            {
-                Obs.OnTick();
-                // IMPORTANT: sync tranforms between physics to change positions of object for
-                // next physic tick
-                Physics2D.SyncTransforms();
-            }
-        } else
-        {
-            _Listeners.Reverse();
-            foreach (ITickObserver Obs in _Listeners)
-            {
-                Obs.OnTick();
-                // IMPORTANT: sync tranforms between physics to change positions of object for
-                // next physic tick
-                Physics2D.SyncTransforms();
-            }
-            _Listeners.Reverse();
+            if (Mdl.IsGoingBackward) FixedBackTick();
+            else FixedTick();
         }
-#endif
-
-        needTick = false;
     }
 
     /// <summary>
@@ -260,11 +513,14 @@ public class WorldManager : TickClock, IControllable, ISavable {
             Tick();
         }
 
-        bool BackwardTick = Entry.Inputs["BackTick"].IsDown && !needTick && !TL.IsTimelineAtBeginning();
+        var Obs = TL.GetCursorValue()?.GetObservers();
+        bool T = Obs != null ? ((Obs.Count != 0) && (Obs[Obs.Count - 1] as BreakValue == null)) : false;
+
+        bool BackwardTick = Entry.Inputs["BackTick"].IsDown && !TL.IsTimelineAtBeginning();
         if(BackwardTick)
         {
             Mdl.IsGoingBackward = true;
-            Tick();
+            BackTick();
         }
 
         bool needBreak = (IM.CurrentMode == InputManager.Mode.REPLAY) && (Mdl.Players.Count != 0) && !Mdl.IsRewinding && (AnyDirection || Break);
@@ -278,6 +534,7 @@ public class WorldManager : TickClock, IControllable, ISavable {
             CurrentPlayer.GetComponent<PlayerController>().IM.CurrentMode = InputManager.Mode.REPLAY;
             IM.Attach(GO.GetComponent<PlayerController>());
             IM.CurrentMode = InputManager.Mode.RECORD;
+            TL.Mode = InputManager.Mode.RECORD;
 
             CurrentCamera?.GetComponent<PostFXRenderer>()?.StartAnimation(CurrentPlayer.transform.position, Mdl.Players.Count - 2, Mdl.Players.Count - 1);
 
@@ -323,9 +580,9 @@ public class WorldManager : TickClock, IControllable, ISavable {
         tl_ui.trySwitchTimeline( last_pc.Mdl.TL );
     }
 
-    bool CanTick()
+    public override bool CanTick()
     {
-        if (needTick) return false;
+        if (!base.CanTick()) return false;
         // If any player is still animating we cannot move the timeline
         if (!(GetCurrentPlayer().GetComponent<Movable>().CanMove())) return false;
         foreach (PlayerController GO in Mdl.Players) {
@@ -342,57 +599,12 @@ public class WorldManager : TickClock, IControllable, ISavable {
         
         if(TL.IsTimelineAtBeginning())
         {
-            Tick();
+            Mdl.IsGoingBackward = false;
             Mdl.IsRewinding = false;
             return;
         }
 
-        Tick();
-    }
-
-    void UpdateTimelines()
-    {
-        var Reverse = Mdl.IsGoingBackward || Mdl.IsRewinding;
-        if (Reverse) Mdl.Players.Reverse();
-        foreach(PlayerController PC in Mdl.Players)
-        {
-            // NOTE toffa: for now all timelines are reversed at the same time
-            PC.Mdl.TL.Reverse(Reverse);
-            // NOTE toffa: if paying in reverse we have to apply before doing the increment, doing it in fixed update
-            if (!Reverse) PC.Mdl.TL.Increment();
-            PC.Mdl.TL.GetCursorValue()?.Apply(Mdl.IsGoingBackward);
-        }
-        if (Reverse) Mdl.Players.Reverse();
-
-        ConnectorGraph cg = CurrentStageSelector.selected_stage.get_connector_graph();
-        foreach( Wire w in cg.wires)
-        {
-            // NOTE toffa: for now all timelines are reversed at the same time
-            w.TL.Reverse(Reverse);
-            // NOTE toffa: if paying in reverse we have to apply before doing the increment, doing it in fixed update
-            if (!Reverse) w.TL.Increment();
-            w.TL.GetCursorValue()?.Apply(Mdl.IsGoingBackward);
-        }
-
-    }
-    
-    void FixedUpdateTimelines()
-    {
-        var Reverse = Mdl.IsGoingBackward || Mdl.IsRewinding;
-        if (Reverse) Mdl.Players.Reverse();
-        foreach(PlayerController PC in Mdl.Players)
-        {
-            PC.Mdl.TL.GetCursorValue()?.ApplyPhysics(Reverse);
-            if (Reverse) PC.Mdl.TL.Increment(); 
-        }
-        if (Reverse) Mdl.Players.Reverse();
-
-        ConnectorGraph cg = CurrentStageSelector.selected_stage.get_connector_graph();
-        foreach( Wire w in cg.wires)
-        {
-            w.TL.GetCursorValue()?.ApplyPhysics(Mdl.IsGoingBackward);
-            if (Reverse) w.TL.Increment();
-        }
+        BackTick();
     }
 
     void UpdateTimers()
@@ -408,13 +620,10 @@ public class WorldManager : TickClock, IControllable, ISavable {
         if (Mdl.IsRewinding) RewindTimeline();
         else if (TL.IsTimelineAtEnd())
         {
-            // NOTE toffa: we need to set the needtick variable to false because the last tick to cause
-            // for the increment en hance the end of the timeline has set it to true and it can lead to some
-            // weird behaviors. Even this is probably not a good solution and needTick should not be set
-            // to true if trying to tick outside of the timeline boundaries.
-            needTick = false;
             Mdl.IsRewinding = true;
+            Mdl.IsGoingBackward = true;
             IM.CurrentMode = InputManager.Mode.REPLAY;
+            TL.Mode = InputManager.Mode.REPLAY;
         }
 
         levelUI_GO?.GetComponent<UITimeline>()?.refresh(IM.CurrentMode);

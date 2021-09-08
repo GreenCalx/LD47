@@ -19,7 +19,7 @@ public class SwitchTile : ActivatorObject
 
             // register object to get called on tick
             // TODO toffa: make this work in case it is another object than player that trigger
-            GameObject.Find("GameLoop").GetComponent<WorldManager>().AddListener(other.gameObject.GetComponent<PlayerController>() as ITickObserver, this);
+            GameObject.Find("GameLoop").GetComponent<WorldManager>().AddObserver(other.gameObject.GetComponent<PlayerController>() as ITickObserver, this);
 
             pulsate(true);
 

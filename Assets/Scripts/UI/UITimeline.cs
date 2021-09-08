@@ -170,7 +170,7 @@ public class UITimeline : MonoBehaviour
 
             __time_units[i].showEnabled();
 
-            updateSquareInputImage( i, (active_tl.GetCursorValue(i) as PlayerTimelineValue)._PlayerDirection);
+            updateSquareInputImage( i, (active_tl.GetCursorValue(i) as PlayerTimelineValue).GetValue());
 
             // RECORD exclusive logic for current timeline
              if ( __WM.IM.CurrentMode==InputManager.Mode.RECORD && !is_previous_tl )

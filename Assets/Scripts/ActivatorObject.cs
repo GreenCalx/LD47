@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ActivatorObject : TickBased 
+public class ActivatorObject : TickBasedBehaviour 
 {
     // OLD ATTR TO CLEAN UP
     public SIGNAL_KEYS signalKey;
@@ -31,6 +31,7 @@ public class ActivatorObject : TickBased
 
     public bool pulsate(bool iState) // 0 for no pulse , 1 for pulse
     {
+#if false
         if (can_pulse && (CG!=null))
         {
             CG.pulsateFrom(this, iState);
@@ -38,6 +39,12 @@ public class ActivatorObject : TickBased
             return true;
         }
         return false;
+#endif
+        if(CG != null)
+        {
+            CG.pulsateFrom(this, iState);
+        }
+        return true;
     }
 
     public void subscribeToGraph( ConnectorGraph iCG)

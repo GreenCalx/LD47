@@ -18,12 +18,29 @@ public enum SIGNAL_KEYS
     NONE, BLUE, RED, YELLOW
 }
 
-public class WireTimelineValue : ITimelineValue
+public class TempWireValue : FixedTickValue
+{
+    public ActivatorObject Obj;
+
+    public override void OnTick()
+    {
+        base.OnTick();
+        Obj.pulsate(true);
+    }
+
+    public override void OnBackTick()
+    {
+        base.OnBackTick();
+        Obj.pulsate(false);
+    }
+}
+
+public class WireTimelineValue : FixedTickValue
 {
     public Wire _Wire;
     public Wire.Events _WireEvent = Wire.Events.NONE;
 
-    void ITimelineValue.Apply(bool Reversed)
+    public override void OnTick()
     {
         if ( _Wire != null )
             _Wire.update_pulses();
@@ -32,9 +49,11 @@ public class WireTimelineValue : ITimelineValue
         _Wire.emitter.can_pulse = true;
     }
 
-    void ITimelineValue.ApplyPhysics(bool Reversed)
+    public override void OnBackTick()
     {
-        // no physics for wire atm
+        if (_Wire != null)
+            // TODO toffa reverse signal
+            _Wire.update_pulses();
     }
 }
 
@@ -78,7 +97,6 @@ public class Wire
     }
 
     public SIGNAL_KEYS sig_key;
-    public WireTimeline TL;
     public ActivatorObject emitter;
     public int pulse_speed;
     public bool is_infinite;
@@ -99,8 +117,8 @@ public class Wire
         pulse_speed = emitter.pulse_speed;
         root_chunk = null;
         is_infinite = ( pulse_speed <= 0 ) ? true : false ;
-        TL = new WireTimeline( 0, 0);
-        TL.SetWire(this);
+        //TL = new WireTimeline( 0, 0);
+        //TL.SetWire(this);
     }
 
     public Wire (ActivatorObject iEmitter) : this( iEmitter, SIGNAL_KEYS.NONE)
@@ -170,7 +188,7 @@ public class Wire
                     target.deactivate();
             }
 
-            (TL.GetCursorValue() as WireTimelineValue)._WireEvent = iState ? Events.INF_ON : Events.INF_OFF ;
+            //(TL.GetCursorValue() as WireTimelineValue)._WireEvent = iState ? Events.INF_ON : Events.INF_OFF ;
                 
             return;
         }
