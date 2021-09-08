@@ -20,18 +20,18 @@ public enum SIGNAL_KEYS
 
 public class TempWireValue : FixedTickValue
 {
-    public ActivatorObject Obj;
+    public Wire Obj;
 
     public override void OnTick()
     {
         base.OnTick();
-        Obj.pulsate(true);
+        Obj.update_pulses();
     }
 
     public override void OnBackTick()
     {
         base.OnBackTick();
-        Obj.pulsate(false);
+        Obj.update_pulses();
     }
 }
 
@@ -102,6 +102,20 @@ public class Wire
     public bool is_infinite;
     public List<WireChunk> chunks;
     public WireChunk root_chunk;
+
+    public void print()
+    {
+        Debug.Log("WIRE " + emitter.gameObject.name + " of size " + chunks.Count);
+        foreach(WireChunk wc in chunks)
+        { 
+            Debug.Log(wc.coord);
+            if (wc.targets.Count != 0)
+            {
+                foreach( ActivableObject ao in wc.targets)
+                    Debug.Log("Chunk Target : " + ao.name );
+            }
+        }
+    }
 
     public Wire(ActivatorObject iEmitter, SIGNAL_KEYS iSigType)
     {
@@ -391,12 +405,11 @@ public class ConnectorGraph : MonoBehaviour
             wires.Add(wire);
 
             // Build path for curr wire
-            for( int i = 0; i < wires.Count ; i++)
-            {
-                findPath( ref wire, wire.root_chunk );
-            }
+            findPath( ref wire, wire.root_chunk );
 
-            //cut_dead_branches(ref wire);
+            cut_dead_branches(ref wire);
+
+            wire.print();
 
         }//! fe
 
@@ -465,7 +478,7 @@ public class ConnectorGraph : MonoBehaviour
                 } //!while
                 // got out of while if >1 precessor (junc) or solo (0 p)
                 // thus we add this last WC to cut and we'll remove links to it afterwards
-                to_cut.Add(cut_wc);
+                //to_cut.Add(cut_wc);
             }
         }//! for wc
 
@@ -635,6 +648,23 @@ public class ConnectorGraph : MonoBehaviour
                 
             }
         }//! pulsateFrom
+    }
+
+    public void observeWire(ActivatorObject ao)
+    {
+        var WireValue = new TempWireValue();
+        foreach( Wire w in wires )
+        {
+            if ( w.emitter == ao )
+            {
+                WireValue.Obj = w;
+                break;
+            }
+
+        }
+        // register object to get called on tick
+        // NOTE toffa : for now we will update the wire at the beginning of the tick
+        GameObject.Find("GameLoop").GetComponent<WorldManager>().TL.AddObserver(WireValue);
     }
 
 }

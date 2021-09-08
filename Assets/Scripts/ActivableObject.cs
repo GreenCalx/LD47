@@ -24,7 +24,10 @@ public class ActivableObject : MonoBehaviour
     public virtual bool listen(PulseToken iPT)
     {
         if ( iPT.PW >= required_PW )
-        { activate(); return true; }
+        { 
+            Debug.Log("trig");
+            activate(); return true; 
+        }
         else
         { deactivate(); }
         return false;

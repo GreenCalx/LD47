@@ -16,9 +16,7 @@ public class ButtonTile : ActivatorObject
     {
         // register object to get called on tick
         // NOTE toffa : for now we will update the wire at the beginning of the tick
-        var WireValue = new TempWireValue();
-        WireValue.Obj = this;
-        GameObject.Find("GameLoop").GetComponent<WorldManager>().TL.AddObserver(WireValue);
+        CG.observeWire(this);
 
         if (pulsate(true))
             sound_on.Play();
