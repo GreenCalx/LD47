@@ -29,8 +29,8 @@ public class ButtonTile : ActivatorObject
     private void OnTriggerStay2D(Collider2D other)
     {
         // button doesn't change
-        //if (pulsate(true))
-        //    sound_on.Play();
+        if (pulsate(true))
+            sound_on.Play();
     }
 
     private void OnTriggerExit2D(Collider2D other)

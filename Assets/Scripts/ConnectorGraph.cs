@@ -26,34 +26,14 @@ public class TempWireValue : FixedTickValue
     {
         base.OnTick();
         Obj.update_pulses();
+        Obj.emitter.can_pulse = true;
     }
 
     public override void OnBackTick()
     {
         base.OnBackTick();
         Obj.update_pulses();
-    }
-}
-
-public class WireTimelineValue : FixedTickValue
-{
-    public Wire _Wire;
-    public Wire.Events _WireEvent = Wire.Events.NONE;
-
-    public override void OnTick()
-    {
-        if ( _Wire != null )
-            _Wire.update_pulses();
-        
-        // Let emitters pulse again
-        _Wire.emitter.can_pulse = true;
-    }
-
-    public override void OnBackTick()
-    {
-        if (_Wire != null)
-            // TODO toffa reverse signal
-            _Wire.update_pulses();
+        Obj.emitter.can_pulse = true;
     }
 }
 
@@ -96,6 +76,7 @@ public class Wire
         PULSE
     }
 
+    public bool has_TL_obs;
     public SIGNAL_KEYS sig_key;
     public ActivatorObject emitter;
     public int pulse_speed;
@@ -131,8 +112,7 @@ public class Wire
         pulse_speed = emitter.pulse_speed;
         root_chunk = null;
         is_infinite = ( pulse_speed <= 0 ) ? true : false ;
-        //TL = new WireTimeline( 0, 0);
-        //TL.SetWire(this);
+        has_TL_obs = false;
     }
 
     public Wire (ActivatorObject iEmitter) : this( iEmitter, SIGNAL_KEYS.NONE)
@@ -657,7 +637,13 @@ public class ConnectorGraph : MonoBehaviour
         {
             if ( w.emitter == ao )
             {
+                // if already has observer, we return to avoid double update_pulses/tick
+                // might change later ?
+                if (w.has_TL_obs)
+                    return;
+
                 WireValue.Obj = w;
+                w.has_TL_obs = true;
                 break;
             }
 

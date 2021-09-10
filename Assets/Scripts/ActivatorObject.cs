@@ -31,7 +31,6 @@ public class ActivatorObject : TickBasedBehaviour
 
     public bool pulsate(bool iState) // 0 for no pulse , 1 for pulse
     {
-#if false
         if (can_pulse && (CG!=null))
         {
             CG.pulsateFrom(this, iState);
@@ -39,12 +38,6 @@ public class ActivatorObject : TickBasedBehaviour
             return true;
         }
         return false;
-#endif
-        if(CG != null)
-        {
-            CG.pulsateFrom(this, iState);
-        }
-        return true;
     }
 
     public void subscribeToGraph( ConnectorGraph iCG)
