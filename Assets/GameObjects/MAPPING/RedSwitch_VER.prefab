@@ -72,15 +72,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdd9a265a1edfa849a3ead8e5f9c4469, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  activables:
-  - {fileID: 0}
   signalKey: 2
   pulse_speed: -1
   is_active: 0
+  can_pulse: 0
   isSwitched: 0
-  spriteSwitched: {fileID: -6003906923816210838, guid: 4e11435977d1d164fa8a650765617e3f,
+  spriteSwitched: {fileID: -7976983520803733739, guid: 6640df0b804554e4097b0760265a21cc,
     type: 3}
-  spriteNotSwitched: {fileID: 158852517215618925, guid: 4e11435977d1d164fa8a650765617e3f,
+  spriteNotSwitched: {fileID: 6967207825976401495, guid: 6640df0b804554e4097b0760265a21cc,
     type: 3}
   SwitchTick: -1
 --- !u!82 &1845426609134498403
@@ -251,7 +250,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: 158852517215618925, guid: 4e11435977d1d164fa8a650765617e3f, type: 3}
+  m_Sprite: {fileID: 6967207825976401495, guid: 6640df0b804554e4097b0760265a21cc,
+    type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
