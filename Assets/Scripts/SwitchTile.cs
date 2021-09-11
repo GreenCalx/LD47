@@ -15,12 +15,14 @@ public class SwitchTile : ActivatorObject
     {
         if (!isSwitched)
         {
-            objectsOnSwitch.Add(other.gameObject);
+            //objectsOnSwitch.Add(other.gameObject);
 
             // register object to get called on tick
             // TODO toffa: make this work in case it is another object than player that trigger
-            GameObject.Find("GameLoop").GetComponent<WorldManager>().AddObserver(other.gameObject.GetComponent<PlayerController>() as ITickObserver, this);
+            //GameObject.Find("GameLoop").GetComponent<WorldManager>().AddObserver(other.gameObject.GetComponent<PlayerController>() as ITickObserver, this);
 
+            CG.observeWire(this);
+            
             pulsate(true);
 
             GetComponentInChildren<AudioSource>().Play();
