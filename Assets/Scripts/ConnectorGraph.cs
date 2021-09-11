@@ -367,6 +367,9 @@ public class ConnectorGraph : MonoBehaviour
     {
         foreach( ActivatorObject ao in emitters )
         {
+            if (ao == null)
+                continue;
+                
             // Subscribe AO to this connector graph
             ao.subscribeToGraph(this);
 
