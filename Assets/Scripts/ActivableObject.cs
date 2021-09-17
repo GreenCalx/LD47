@@ -10,26 +10,34 @@ public class ActivableObject : MonoBehaviour
     
     // TODO : Required_PW should be equal to n_emitters in wire.
     public int required_PW;
-
+    private int stored_pulses = 0;
 
     // Start is called before the first frame update
     public void Start()
     {
         isTriggered = false;
-        required_PW = 1;
+    }
+
+    public void resetStorage()
+    {
+        this.stored_pulses = 0;
     }
 
     public virtual void trigger(bool signalType) {}
 
     public virtual bool listen(PulseToken iPT)
     {
-        if ( iPT.PW >= required_PW )
+        this.stored_pulses += iPT.PW;
+        
+        if ( this.stored_pulses >= required_PW )
         { 
             Debug.Log("trig");
             activate(); return true; 
         }
         else
-        { deactivate(); }
+        { 
+            deactivate(); 
+        }
         return false;
     }
 

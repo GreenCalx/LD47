@@ -25,16 +25,28 @@ public class TempWireValue : FixedTickValue
     public override void OnTick()
     {
         base.OnTick();
+        Obj.CG.tryResetWireStatuses(); // TEMP OnPostTick
         Obj.update_pulses();
         Obj.emitter.can_pulse = true;
+        Obj.CG.tryResetPulsesCounter(); // TEMP OnPostTick
+
     }
 
     public override void OnBackTick()
     {
         base.OnBackTick();
+        Obj.CG.tryResetWireStatuses(); // TEMP OnPostTick
         Obj.update_pulses();
         Obj.emitter.can_pulse = true;
+        Obj.CG.tryResetPulsesCounter(); // TEMP OnPostTick
     }
+
+/*
+    public override void OnPostTick()
+    {
+        Obj.resetPWStorages();
+    }
+    */
 }
 
 public class PulseToken
@@ -76,6 +88,7 @@ public class Wire
         PULSE
     }
 
+    public ConnectorGraph CG;
     public bool has_TL_obs;
     public SIGNAL_KEYS sig_key;
     public ActivatorObject emitter;
@@ -83,6 +96,8 @@ public class Wire
     public bool is_infinite;
     public List<WireChunk> chunks;
     public WireChunk root_chunk;
+
+    public bool pulses_got_updated = false; // TEMP OnPostTick
 
     public void print()
     {
@@ -98,8 +113,9 @@ public class Wire
         }
     }
 
-    public Wire(ActivatorObject iEmitter, SIGNAL_KEYS iSigType)
+    public Wire(ActivatorObject iEmitter, SIGNAL_KEYS iSigType, ConnectorGraph iCG)
     {
+        CG = iCG;
         chunks = new List<WireChunk>(1);
 
         if ( iEmitter == null )
@@ -115,12 +131,12 @@ public class Wire
         has_TL_obs = false;
     }
 
-    public Wire (ActivatorObject iEmitter) : this( iEmitter, SIGNAL_KEYS.NONE)
+    public Wire (ActivatorObject iEmitter, ConnectorGraph iCG) : this( iEmitter, SIGNAL_KEYS.NONE, iCG)
     {}
 
-    public void addRootChunk(Vector3Int iRootPosition, ConnectorGraph iCG)
+    public void addRootChunk(Vector3Int iRootPosition)
     {
-        root_chunk = new WireChunk(iRootPosition, this, iCG);
+        root_chunk = new WireChunk(iRootPosition, this, CG);
         chunks.Add(root_chunk);
     }
 
@@ -165,6 +181,13 @@ public class Wire
                 retval.AddRange(wc.targets);
         }
         return retval;
+    }
+
+    public void resetPWStorages()
+    {
+        List<ActivableObject> targets = getWireTargets();
+        foreach( ActivableObject t in targets)
+            t.resetStorage();
     }
 
     public void pulse(bool iState)
@@ -230,7 +253,7 @@ public class Wire
             }
         }
 
-
+        pulses_got_updated = true; // TEMP OnPostTick
     }
 }
 
@@ -381,8 +404,8 @@ public class ConnectorGraph : MonoBehaviour
             List<Vector3Int> neighbors = findNeighbors(start_pos);
 
             // 1.1 Update wires with root
-            Wire wire = new Wire(ao, ao.signalKey);
-            wire.addRootChunk(start_pos, this);
+            Wire wire = new Wire(ao, ao.signalKey,this);
+            wire.addRootChunk(start_pos);
 
             // Add Wire
             wires.Add(wire);
@@ -655,5 +678,40 @@ public class ConnectorGraph : MonoBehaviour
         // NOTE toffa : for now we will update the wire at the beginning of the tick
         GameObject.Find("GameLoop").GetComponent<WorldManager>().TL.AddObserver(WireValue);
     }
+
+
+    // ---- TEMP OnPostTick ----
+    public void tryResetWireStatuses()
+    {
+        bool needReset = true;
+        foreach( Wire w in wires )
+        {
+            needReset &= w.pulses_got_updated;
+        }
+
+        if (!needReset)
+            return;
+
+        foreach( Wire w in wires )
+        {
+            w.pulses_got_updated = false;
+        }
+    }
+
+    public void tryResetPulsesCounter()
+    {
+        bool needReset = true;
+        foreach( Wire w in wires )
+        {
+            needReset &= w.pulses_got_updated;
+        }
+
+        if (needReset)
+        {
+            foreach( Wire w in wires )
+                w.resetPWStorages();
+        }
+    }
+    // --------------------------
 
 }
