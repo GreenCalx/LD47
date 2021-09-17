@@ -287,7 +287,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sig_key: 1
   isTriggered: 0
-  required_PW: 0
+  required_PW: 1
   sound_on: {fileID: 2570427615928016147}
   sound_off: {fileID: 2604882592775545872}
 --- !u!50 &5851609305883751114

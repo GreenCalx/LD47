@@ -330,11 +330,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 521b6982894c0ce4da3e8588d5d4aab1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  activators:
-  - {fileID: 0}
-  activatorsObject: []
-  key: 2
+  sig_key: 2
   isTriggered: 0
+  required_PW: 1
   sound_on: {fileID: 307252035153226150}
   sound_off: {fileID: 274170645620756645}
 --- !u!50 &8565140588863587967

@@ -31,7 +31,7 @@ public class ActivableObject : MonoBehaviour
         
         if ( this.stored_pulses >= required_PW )
         { 
-            Debug.Log("trig");
+            Debug.Log("trig : storage " + this.stored_pulses);
             activate(); return true; 
         }
         else

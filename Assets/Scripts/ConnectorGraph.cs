@@ -199,12 +199,14 @@ public class Wire
             List<ActivableObject> aos = getWireTargets();
             foreach (ActivableObject target in aos )
             {
-                if (iState)
-                    target.activate();
-                else
-                    target.deactivate();
+                // if (iState)
+                //     target.activate();
+                // else
+                //     target.deactivate();
+                PulseToken ptk = new PulseToken(0, iState?1:-1);
+                target.listen(ptk);
+                ptk = null; // wait GC...
             }
-
             //(TL.GetCursorValue() as WireTimelineValue)._WireEvent = iState ? Events.INF_ON : Events.INF_OFF ;
                 
             return;
