@@ -201,7 +201,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b31b2e284a489994d8559c3394be3670, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  signalKey: 1
+  signalKey: 3
   pulse_speed: -1
   is_active: 0
   can_pulse: 0

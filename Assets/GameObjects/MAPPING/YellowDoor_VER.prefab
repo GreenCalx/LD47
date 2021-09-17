@@ -285,7 +285,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 521b6982894c0ce4da3e8588d5d4aab1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sig_key: 1
+  sig_key: 3
   isTriggered: 0
   required_PW: 0
   sound_on: {fileID: 4137697017124144376}
