@@ -47,7 +47,7 @@ public class PlayerMoveValue : FixedTickValue
         {
             _go?.Move(_dir, true, true, this);
         }
-    }
+   }
 }
 
 public class TransientTickValue : TickBased

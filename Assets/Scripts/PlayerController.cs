@@ -22,6 +22,8 @@ public class PlayerController : TickBasedBehaviour, IControllable , ISavable {
     public enum Direction { UP, DOWN, RIGHT, LEFT, NONE };
     static public readonly string[] DirectionInputs = { "Up", "Down", "Right", "Left", "None" };
     static public readonly Vector2[] Directionf = { new Vector2(0, 1), new Vector2(0, -1), new Vector2(1, 0), new Vector2(-1, 0), new Vector2(0,0) };
+    static public readonly string[] DirectionSpriteName = {"up_arrow", "down_arrow", "right_arrow", "left_arrow", "none_arrow"};
+    static public Sprite[] DirectionSprite; 
     static public Direction InverseDirection(Direction D)
     {
         if      (D == PlayerController.Direction.UP)    D = PlayerController.Direction.DOWN;
@@ -83,6 +85,16 @@ public class PlayerController : TickBasedBehaviour, IControllable , ISavable {
     public void Start()
     {
         StartAnimation();
+
+        if (DirectionSprite == null) {
+            // Create sprite only once
+            DirectionSprite = new Sprite[5];
+            DirectionSprite[0] = Resources.Load<Sprite>(DirectionSpriteName[0]) ;
+            DirectionSprite[1] = Resources.Load<Sprite>(DirectionSpriteName[1]) ;
+            DirectionSprite[2] = Resources.Load<Sprite>(DirectionSpriteName[2]) ;
+            DirectionSprite[3] = Resources.Load<Sprite>(DirectionSpriteName[3]) ;
+            DirectionSprite[4] = Resources.Load<Sprite>(DirectionSpriteName[4]) ;
+        }
     }
 
     public override void OnTick()
@@ -117,6 +129,8 @@ public class PlayerController : TickBasedBehaviour, IControllable , ISavable {
                 }
             }
         }
+        if (Constants.ShowPlayerInputAsTexture && (Mdl.TL.GetCursorValue(Mdl.TL.GetCursorIndex()+1) as PlayerTimelineValue) != null)
+            GetComponentInChildren<SpriteRenderer>().sprite = PlayerController.DirectionSprite[(int)((Mdl.TL.GetCursorValue(Mdl.TL.GetCursorIndex() + 1) as PlayerTimelineValue)._Value)];
     }
 
     public override void OnFixedBackTick()
@@ -141,6 +155,8 @@ public class PlayerController : TickBasedBehaviour, IControllable , ISavable {
 
         base.OnFixedBackTick();
         Mdl.TL.Decrement();
+        if (Constants.ShowPlayerInputAsTexture && Mdl.TL.GetCursorValue() != null)
+            GetComponentInChildren<SpriteRenderer>().sprite = PlayerController.DirectionSprite[(int)((Mdl.TL.GetCursorValue() as PlayerTimelineValue)._Value)];
     }
 
     /// <summary>

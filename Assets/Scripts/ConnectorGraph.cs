@@ -25,28 +25,21 @@ public class TempWireValue : FixedTickValue
     public override void OnTick()
     {
         base.OnTick();
-        Obj.CG.tryResetWireStatuses(); // TEMP OnPostTick
         Obj.update_pulses();
         Obj.emitter.can_pulse = true;
-        Obj.CG.tryResetPulsesCounter(); // TEMP OnPostTick
 
     }
 
     public override void OnBackTick()
     {
         base.OnBackTick();
-        Obj.CG.tryResetWireStatuses(); // TEMP OnPostTick
         Obj.update_pulses();
         Obj.emitter.can_pulse = true;
-        Obj.CG.tryResetPulsesCounter(); // TEMP OnPostTick
     }
-
-/*
     public override void OnPostTick()
     {
         Obj.resetPWStorages();
     }
-    */
 }
 
 public class PulseToken

@@ -15,6 +15,8 @@ static class Constants {
     static public float MoveAnimationTime = 0.2f;
     static public float RewindAnimationTime = 0.1f;
 
+    static public bool ShowPlayerInputAsTexture = true;
+
     // Names
     static public readonly string MAIN_CAMERA_NAME = "Main Camera";
 }
@@ -41,6 +43,8 @@ public interface ITickObserver
     void OnFixedBackTick();
     void OnTick();
     void OnFixedTick();
+    void OnPostTick();
+    void OnPreTick();
     void SetControler(ITickController Controler);
 }
 
@@ -119,7 +123,9 @@ public class TickClock : ITickController
         _SyncMutex = true;
         _NeedFixedTick = true;
 
+        foreach (var Obs in _Listeners) Obs.OnPreTick();
         foreach (var Obs in _Listeners) Obs.OnTick();
+        foreach (var Obs in _Listeners) Obs.OnPostTick();
 
         return true;
     }
@@ -142,7 +148,9 @@ public class TickClock : ITickController
 
         _SyncMutex = true;
         _NeedFixedTick = true;
+        foreach (var Obs in _Listeners) Obs.OnPreTick();
         foreach (var Obs in _Listeners) Obs.OnBackTick();
+        foreach (var Obs in _Listeners) Obs.OnPostTick();
         return true;
     }
     public virtual bool FixedBackTick()
@@ -275,6 +283,8 @@ public class TickBasedBehaviour : MonoBehaviour, ITickObserver {
     public virtual void OnFixedTick() { }
     public virtual void OnBackTick() { }
     public virtual void OnFixedBackTick() { }
+    public virtual void OnPreTick() {}
+    public virtual void OnPostTick() {}
 }
 
 
@@ -289,6 +299,8 @@ public class TickBased : ITickObserver {
     public virtual void OnFixedTick() { }
     public virtual void OnBackTick() { }
     public virtual void OnFixedBackTick() { }
+    public virtual void OnPreTick() {}
+    public virtual void OnPostTick() {}
 }
 
 public class TickBasedAndClock : TickClock, ITickObserver
@@ -303,6 +315,8 @@ public class TickBasedAndClock : TickClock, ITickObserver
     public virtual void OnFixedTick() { FixedTick(); }
     public virtual void OnBackTick() { BackTick(); }
     public virtual void OnFixedBackTick() { FixedBackTick(); }
+    public virtual void OnPreTick() {}
+    public virtual void OnPostTick() {}
 }
 
 public class BackTickSentinelValue : FixedTickValue{
